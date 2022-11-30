@@ -160,7 +160,7 @@
                   <Text layoutX="37.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Búsqueda pedido" />
                   <TextField layoutX="37.0" layoutY="61.0" prefHeight="30.0" prefWidth="164.0" promptText="Nº Pedido" />
                   <TextField layoutX="252.0" layoutY="219.0" prefHeight="30.0" prefWidth="164.0" promptText="Cantidad" />
-                  <TextField layoutX="470.0" layoutY="219.0" prefHeight="30.0" prefWidth="164.0" promptText="PVP" />
+                  <TextField layoutX="470.0" layoutY="219.0" prefHeight="30.0" prefWidth="164.0" promptText="PVP unitario" />
                   <Button layoutX="238.0" layoutY="61.0" mnemonicParsing="false" text="Buscar" />
                   <Separator layoutX="37.0" layoutY="177.0" prefHeight="42.0" prefWidth="988.0" />
                   <Button layoutX="885.0" layoutY="144.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="134.0" text="Crear pedido" />
