@@ -135,36 +135,36 @@
             </AnchorPane>
          </content>
       </Tab>
-      <Tab text="Detalle de pedido">
+      <Tab id="orderDetail" text="Detalle de pedido">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1039.0">
                <children>
-                  <TableView layoutX="35.0" layoutY="285.0" prefHeight="287.0" prefWidth="992.0">
+                  <TableView fx:id="orderDetailTableView" layoutX="35.0" layoutY="285.0" prefHeight="287.0" prefWidth="992.0">
                      <columns>
-                        <TableColumn prefWidth="93.0" text="Nº pedido" />
-                        <TableColumn prefWidth="108.0" text="Nº producto" />
-                        <TableColumn minWidth="0.0" prefWidth="153.0" text="Precio por unidad" />
-                        <TableColumn minWidth="0.0" prefWidth="125.0" text="Cantidad" />
-                        <TableColumn maxWidth="250.0" prefWidth="184.0" text="Order Line Number" />
-                        <TableColumn minWidth="0.0" prefWidth="153.0" text="Precio total" />
+                        <TableColumn fx:id="colOrderNum" prefWidth="93.0" text="Nº pedido" />
+                        <TableColumn fx:id="colProductName" prefWidth="108.0" text="Nº producto" />
+                        <TableColumn fx:id="colPriceEach" minWidth="0.0" prefWidth="153.0" text="Precio por unidad" />
+                        <TableColumn fx:id="colQuantity" minWidth="0.0" prefWidth="125.0" text="Cantidad" />
+                        <TableColumn fx:id="colOrderLineNumber" maxWidth="250.0" prefWidth="184.0" text="Order Line Number" />
+                        <TableColumn fx:id="colTotalPrice" minWidth="0.0" prefWidth="153.0" text="Precio total" />
                      </columns>
                   </TableView>
-                  <Button layoutX="883.0" layoutY="219.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="138.0" text="Añadir producto" />
-                  <Button layoutX="574.0" layoutY="597.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="95.0" text="Eliminar" />
-                  <ComboBox layoutX="37.0" layoutY="139.0" prefWidth="150.0" promptText="CLIENTE" />
+                  <Button fx:id="addProduct" layoutX="883.0" layoutY="219.0" mnemonicParsing="false" onAction="#onActionAddProduct" prefHeight="31.0" prefWidth="138.0" text="Añadir producto" />
+                  <Button fx:id="orderDetailDeleteButton" layoutX="574.0" layoutY="597.0" mnemonicParsing="false" onAction="#onActionOrderDetailDeleteButton" prefHeight="39.0" prefWidth="95.0" text="Eliminar" />
+                  <ComboBox fx:id="clientComboBox" layoutX="37.0" layoutY="148.0" onAction="#onActionClientComboBox" prefWidth="150.0" promptText="CLIENTE" />
                   <Separator layoutX="37.0" layoutY="103.0" prefHeight="42.0" prefWidth="988.0" />
-                  <ComboBox layoutX="37.0" layoutY="219.0" prefWidth="150.0" promptText="PRODUCTO" />
-                  <DatePicker layoutX="252.0" layoutY="145.0" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de pedido" />
-                  <DatePicker layoutX="470.0" layoutY="145.0" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de envío" />
-                  <DatePicker layoutX="687.0" layoutY="145.0" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de llegada" />
+                  <ComboBox fx:id="productComboBox" layoutX="37.0" layoutY="219.0" onAction="#onActionProductComboBox" prefWidth="150.0" promptText="PRODUCTO" />
+                  <DatePicker fx:id="orderDate" layoutX="252.0" layoutY="145.0" onAction="#onActionOrderDate" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de pedido" />
+                  <DatePicker fx:id="shippedDate" layoutX="470.0" layoutY="145.0" onAction="#onActionShippedDate" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de envío" />
+                  <DatePicker fx:id="requiredDate" layoutX="687.0" layoutY="145.0" onAction="#onActionRequiredDate" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de llegada" />
                   <Text layoutX="37.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Búsqueda pedido" />
-                  <TextField layoutX="37.0" layoutY="61.0" prefHeight="30.0" prefWidth="164.0" promptText="Nº Pedido" />
-                  <TextField layoutX="252.0" layoutY="219.0" prefHeight="30.0" prefWidth="164.0" promptText="Cantidad" />
-                  <TextField layoutX="470.0" layoutY="219.0" prefHeight="30.0" prefWidth="164.0" promptText="PVP unitario" />
-                  <Button layoutX="238.0" layoutY="61.0" mnemonicParsing="false" text="Buscar" />
+                  <TextField fx:id="orderNum" layoutX="37.0" layoutY="61.0" onAction="#onActionOrderNum" prefHeight="30.0" prefWidth="164.0" promptText="Nº Pedido" />
+                  <TextField fx:id="productQuantity" layoutX="252.0" layoutY="219.0" onAction="#onActionProductQuantity" prefHeight="30.0" prefWidth="164.0" promptText="Cantidad" />
+                  <TextField fx:id="priceEach" layoutX="470.0" layoutY="219.0" onAction="#onActionPriceEach" prefHeight="30.0" prefWidth="164.0" promptText="PVP unitario" />
+                  <Button fx:id="searchOrder" layoutX="238.0" layoutY="61.0" mnemonicParsing="false" onAction="#onActionSearchOrder" text="Buscar" />
                   <Separator layoutX="37.0" layoutY="177.0" prefHeight="42.0" prefWidth="988.0" />
-                  <Button layoutX="885.0" layoutY="144.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="134.0" text="Crear pedido" />
-                  <Button layoutX="385.0" layoutY="597.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="95.0" text="Actualizar" />
+                  <Button fx:id="createOrder" layoutX="885.0" layoutY="144.0" mnemonicParsing="false" onAction="#onActionCreateOrder" prefHeight="33.0" prefWidth="134.0" text="Crear pedido" />
+                  <Button fx:id="orderDetailUpdateBtn" layoutX="385.0" layoutY="597.0" mnemonicParsing="false" onAction="#onActionOrderDetailUpdateBtn" prefHeight="39.0" prefWidth="95.0" text="Actualizar" />
                </children>
             </AnchorPane>
          </content>
