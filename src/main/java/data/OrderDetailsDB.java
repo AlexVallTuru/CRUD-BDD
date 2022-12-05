@@ -6,8 +6,8 @@ package data;
 
 /**
  *
- * @author Kiwi
+ * @author Ztudo
  */
-public class testClass {
+public class OrderDetailsDB {
     
 }

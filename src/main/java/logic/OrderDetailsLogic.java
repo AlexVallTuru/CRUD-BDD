@@ -2,12 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package presentation;
+package logic;
 
 /**
  *
- * @author Kiwi
+ * @author Ztudo
  */
-public class testClass {
+public class OrderDetailsLogic {
     
 }
