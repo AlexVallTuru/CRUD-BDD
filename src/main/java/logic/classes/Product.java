@@ -24,6 +24,9 @@ public class Product {
         this.buyPrice = buyPrice;
     }
 
+    public Product() {
+    }
+
     public int getProductCode() {
         return productCode;
     }
