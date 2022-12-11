@@ -35,8 +35,15 @@ public class OrderLogic {
      * @throws SQLException
      */
     public void setData() throws SQLException {
-
         this.ordersOList.setAll(OrderDB.ordersToList(conn));
+    }
 
+    /**
+     * Obtiene la lista observable
+     *
+     * @return
+     */
+    public ObservableList<Order> getOrderObservableList() {
+        return ordersOList;
     }
 }

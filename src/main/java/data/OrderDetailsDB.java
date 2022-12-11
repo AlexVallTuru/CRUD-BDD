@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package data;
 
 import java.sql.Connection;
@@ -19,7 +15,7 @@ import logic.classes.Product;
 public class OrderDetailsDB {
 
     /**
-     * Retorna el contingut de la taula en una col·lecció d'Assignatura
+     * Retorna el contenido de la table en una colección de OrderDetails
      *
      * @param conn
      * @return
@@ -43,7 +39,8 @@ public class OrderDetailsDB {
     }
 
     /**
-     * Retorna un producto siempre y cuando coincida con el productCode.
+     * Retorna un producto cuyo productCode coincida con el pasado por
+     * parámetro.
      *
      * @param con
      * @param productCode

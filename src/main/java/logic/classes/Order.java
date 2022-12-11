@@ -11,14 +11,14 @@ package logic.classes;
 public class Order {
 
     private int orderNumber;
-    private String dateTime;
+    private String orderDate;
     private String requiredDate;
     private String shippedDate;
     private Customer customer;
 
-    public Order(int orderNumber, String dateTime, String requiredDate, String shippedDate, Customer customer) {
+    public Order(int orderNumber, String orderDate, String requiredDate, String shippedDate, Customer customer) {
         this.orderNumber = orderNumber;
-        this.dateTime = dateTime;
+        this.orderDate = orderDate;
         this.requiredDate = requiredDate;
         this.shippedDate = shippedDate;
         this.customer = customer;
@@ -32,12 +32,12 @@ public class Order {
         this.orderNumber = orderNumber;
     }
 
-    public String getDateTime() {
-        return dateTime;
+    public String getOrderDate() {
+        return orderDate;
     }
 
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
     }
 
     public String getRequiredDate() {
@@ -66,6 +66,6 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" + "orderNumber=" + orderNumber + ", dateTime=" + dateTime + ", requiredDate=" + requiredDate + ", shippedDate=" + shippedDate + ", customer=" + customer + '}';
+        return "Order{" + "orderNumber=" + orderNumber + ", dateTime=" + orderDate + ", requiredDate=" + requiredDate + ", shippedDate=" + shippedDate + ", customer=" + customer + '}';
     }
 }

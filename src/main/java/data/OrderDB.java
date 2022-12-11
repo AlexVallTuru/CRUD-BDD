@@ -36,14 +36,15 @@ public class OrderDB {
         ResultSet rs = query.getResultSet();
 
         while (rs.next()) {
-            Customer customer = getCustomer(conn, rs.getString("customerEmail"));
-            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getString("dateTime"), rs.getString("requiredDate"), rs.getString("shippedDate"), customer));
+            Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
+            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getString("orderDate"), rs.getString("requiredDate"), rs.getString("shippedDate"), customer));
         }
         return ordersList;
     }
 
     /**
-     * Retorna un cliente siempre y cuando coincida con el customerEmail.
+     * Retorna un customer cuyo customerEmail coincida con el pasado por
+     * parámetro.
      *
      * @param conn
      * @param customerEmail
@@ -55,12 +56,12 @@ public class OrderDB {
 
         Statement query;
         query = conn.createStatement();
-        query.executeQuery("SELECT * FROM customers WHERE customerEmail = " + customerEmail);
+        query.executeQuery("SELECT * FROM customers WHERE customerEmail = '" + customerEmail + "'");
 
         ResultSet rs = query.getResultSet();
 
         if (rs.next()) {
-            customer = new Customer(rs.getString("customerEmail"), rs.getString("idCard"), rs.getString("customerName"), rs.getString("phoneNumber"), rs.getDouble("creditLimit"), rs.getString("birthDate"));
+            customer = new Customer(rs.getString("customerEmail"), rs.getString("idCard"), rs.getString("customerName"), rs.getString("phone"), rs.getDouble("creditLimit"), rs.getString("birthDate"));
         }
         return customer;
     }
