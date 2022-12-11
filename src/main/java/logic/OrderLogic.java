@@ -5,28 +5,28 @@
 package logic;
 
 import data.ConnectionDB;
-import data.OrderDetailsDB;
+import data.OrderDB;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import logic.classes.OrderDetails;
+import logic.classes.Order;
 
 /**
  *
- * @author Ztudo
+ * @author Kiwi
  */
-public class OrderDetailsLogic {
+public class OrderLogic {
 
     Connection conn;
-    ObservableList<OrderDetails> orderDetailsOList;
+    ObservableList<Order> ordersOList;
 
-    public OrderDetailsLogic() throws SQLException {
+    public OrderLogic() throws SQLException {
         // inicialitzem connexió amb BD pero passant per la capa d'aplicació
         conn = ConnectionDB.getInstance().getConnection();
 
         // inicialitzem col.lecció
-        orderDetailsOList = FXCollections.<OrderDetails>observableArrayList();
+        ordersOList = FXCollections.<Order>observableArrayList();
     }
 
     /**
@@ -36,7 +36,7 @@ public class OrderDetailsLogic {
      */
     public void setData() throws SQLException {
 
-        this.orderDetailsOList.setAll(OrderDetailsDB.orderDetailsToList(conn));
+        this.ordersOList.setAll(OrderDB.ordersToList(conn));
 
     }
 }

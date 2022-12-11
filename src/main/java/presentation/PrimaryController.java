@@ -1,7 +1,10 @@
 package presentation;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -9,67 +12,57 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
-public class PrimaryController {
+public class PrimaryController implements Initializable {
 
-    @FXML
-    private Button createOrder;
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
 
-    @FXML
-    private TableColumn<?, ?> colQuantity;
-
-    @FXML
-    private TableColumn<?, ?> colPriceEach;
-
-    @FXML
-    private Button addProduct;
-
-    @FXML
-    private ComboBox<?> clientComboBox;
-
-    @FXML
-    private DatePicker requiredDate;
-
-    @FXML
-    private TextField orderNum;
-
-    @FXML
-    private TableColumn<?, ?> colOrderNum;
-
-    @FXML
-    private ComboBox<?> productComboBox;
-
-    @FXML
-    private Button orderDetailDeleteButton;
-
-    @FXML
-    private TextField priceEach;
-
-    @FXML
-    private TableColumn<?, ?> colOrderLineNumber;
-
-    @FXML
-    private Button orderDetailUpdateBtn;
-
-    @FXML
-    private TextField productQuantity;
+    }
 
     @FXML
     private TableView<?> orderDetailTableView;
 
     @FXML
-    private TableColumn<?, ?> colTotalPrice;
+    private TableColumn colOrderNum, colProductName, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
+
+    @FXML
+    private Button createOrder;
+
+    @FXML
+    private Button addProduct;
+
+    @FXML
+    private Button orderDetailDeleteButton;
+
+    @FXML
+    private Button orderDetailUpdateBtn;
+
+    @FXML
+    private Button searchOrder;
+
+    @FXML
+    private ComboBox<?> clientComboBox;
+
+    @FXML
+    private ComboBox<?> productComboBox;
+
+    @FXML
+    private TextField orderNum;
+
+    @FXML
+    private TextField priceEach;
+
+    @FXML
+    private TextField productQuantity;
+
+    @FXML
+    private DatePicker requiredDate;
 
     @FXML
     private DatePicker orderDate;
 
     @FXML
     private DatePicker shippedDate;
-
-    @FXML
-    private TableColumn<?, ?> colProductName;
-
-    @FXML
-    private Button searchOrder;
 
     @FXML
     void onActionAddProduct(ActionEvent event) {
@@ -135,5 +128,4 @@ public class PrimaryController {
     void onActionOrderDetailUpdateBtn(ActionEvent event) {
 
     }
-
 }
