@@ -17,9 +17,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Region;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
+import logic.ProductLogic;
 
 public class PrimaryController implements Initializable {
 
+    ProductLogic productLogicLayer;
     OrderLogic orderLogicLayer;
     OrderDetailsLogic orderDetailsLogicLayer;
 
@@ -86,6 +88,9 @@ public class PrimaryController implements Initializable {
     @FXML
     private DatePicker shippedDate;
     
+    /**
+     * Elements productes
+     */
     @FXML
     private TableView productsTableView;
     
@@ -137,6 +142,26 @@ public class PrimaryController implements Initializable {
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
         //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("Descripcio"));
 
+        /**
+         * Inicialitzar taula de productes
+         */
+        // Capa logica
+        try {
+            productLogicLayer = new ProductLogic();
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+        } catch (SQLException ex) {
+            showMessage(1, "Error cargando datos: " + ex.toString());
+        } catch (Exception ex) {
+            showMessage(1, "Error iniciando la capa lógica: " + ex.toString());
+        }
+        
+        // Insertar dades a cada columna
+        colProductCode.setCellFactory(new PropertyValueFactory<>("productCode"));
+        colProductName.setCellFactory(new PropertyValueFactory<>("productName"));
+        colProductDescription.setCellFactory(new PropertyValueFactory<>("productDescription"));
+        colQuantityInStock.setCellFactory(new PropertyValueFactory<>("quantitytInStock"));
+        colBuyPrice.setCellFactory(new PropertyValueFactory<>("buyPrice"));
     }
 
     /**

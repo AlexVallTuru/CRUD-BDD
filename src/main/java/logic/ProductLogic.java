@@ -22,6 +22,11 @@ public class ProductLogic {
     Connection conn;
     ObservableList<Product> productsOList;
     
+    /**
+     * Inicialitzar connexió i col·lecció
+     * 
+     * @throws SQLException 
+     */
     public ProductLogic() throws SQLException {
         // Inicialitzar connexió
         conn = ConnectionDB.getInstance().getConnection();
