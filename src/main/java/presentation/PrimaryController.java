@@ -18,9 +18,10 @@ import javafx.scene.layout.Region;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
+import logic.classes.Customer;
 
 public class PrimaryController implements Initializable {
-    
+
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
     OrderDetailsLogic orderDetailsLogicLayer;
@@ -251,7 +252,7 @@ public class PrimaryController implements Initializable {
 
     }
     //CUSTOMER 
-    
+
     @FXML
     private Button bt_aniadir, bt_actualizar, bt_eliminar;
     @FXML
@@ -262,8 +263,13 @@ public class PrimaryController implements Initializable {
     private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
 
     @FXML
-    void onClick_bt_aniadir(ActionEvent event) {
-
+    void onClick_bt_aniadir(ActionEvent event) throws SQLException {
+        
+        customerLogicLayer.afegirCustomer(getCustomerFromView());
+        
+        //Para actualizar la pagina
+        customerLogicLayer.setData();
+        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
     }
 
     @FXML
@@ -276,4 +282,16 @@ public class PrimaryController implements Initializable {
 
     }
 
+    private Customer getCustomerFromView() throws NumberFormatException {
+        Customer customer = new Customer();
+
+        customer.setCustomerName(tf_customerName.getText());
+        customer.setCustomerEmail(tf_customerEmail.getText());
+        customer.setIdCard(tf_idCard.getText());
+        customer.setPhoneNumber(tf_phoneNumber.getText());
+        customer.setBirthDate(tf_birthDate.getText());
+        customer.setCreditLimit(Double.parseDouble(tf_creditLimit.getText()));
+
+        return customer;
+    }
 }

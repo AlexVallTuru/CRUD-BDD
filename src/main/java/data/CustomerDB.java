@@ -53,33 +53,28 @@ public class CustomerDB {
     }
 
     //Aixo es el setter
-    public static int insereixNouCustomer(Connection con, Customer e) throws SQLException {
+    public static int insereixNouCustomer(Connection con, Customer customer) throws SQLException {
+        
         Statement sentencia;
         int id = 1;
 
         sentencia = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
         //Carguem les dades del mysql per treballarles
-        sentencia.executeQuery("SELECT * FROM Assignatura order by idAssignatura asc");
+        sentencia.executeQuery("SELECT * FROM customers");
         //Aquestes dades les posem a un fitxer per poderles treballar que es dira rs
         ResultSet rs = sentencia.getResultSet();
-
-        // si hi ha algun registre a la taula
-        if (rs.next()) {
-            rs.last();
-            id = rs.getInt("customerEmail") + 1;
-        }
 
         //Aquesta comanda et coloca a la ultima posicio de la taula
         rs.moveToInsertRow();
 
         //Aqui es fan els setters
-        rs.updateString("customerEmail", e.getCustomerEmail());
-        rs.updateString("idCard", e.getIdCard());
-        rs.updateString("customerName", e.getCustomerName());
-        rs.updateString("phone", e.getPhoneNumber());
-        rs.updateDouble("creditLimit", e.getCreditLimit());
-        rs.updateString("birthDate", e.getBirthDate());
+        rs.updateString("customerEmail", customer.getCustomerEmail());
+        rs.updateString("idCard", customer.getIdCard());
+        rs.updateString("customerName", customer.getCustomerName());
+        rs.updateString("phone", customer.getPhoneNumber());
+        rs.updateDouble("creditLimit", customer.getCreditLimit());
+        rs.updateString("birthDate", customer.getBirthDate());
         
         //Afeguim les dades seleccionades a la taula mysql
         rs.insertRow();
