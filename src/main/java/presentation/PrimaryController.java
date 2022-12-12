@@ -27,7 +27,7 @@ public class PrimaryController implements Initializable {
     private TableView orderDetailTableView;
 
     @FXML
-    private TableColumn colOrderNumDetails, colProductName, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
+    private TableColumn colOrderNumDetails, colOrderDetailProductName, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
 
     @FXML
     private TableView orderTableView;
@@ -85,6 +85,36 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private DatePicker shippedDate;
+    
+    @FXML
+    private TableView productsTableView;
+    
+    @FXML
+    private TableColumn colProductCode, colProductName, colProductDescription, colQuantityInStock, colBuyPrice;
+    
+    @FXML
+    private Button updateProductBtn;
+    
+    @FXML
+    private Button addNewProductBtn;
+    
+    @FXML
+    private Button deleteProductBtn;
+    
+    @FXML
+    private TextField productCodeField;
+    
+    @FXML
+    private TextField productNameField;
+    
+    @FXML
+    private TextField productDescripcionField;
+    
+    @FXML
+    private TextField quantityInStockField;
+    
+    @FXML
+    private TextField buyPriceField;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -236,4 +266,23 @@ public class PrimaryController implements Initializable {
     void onActionSearchOrderBtn(ActionEvent event) {
 
     }
+    
+    // Funcions productes
+    
+    
+    @FXML
+    void onActionUpdateProductBtn(ActionEvent event) {
+        
+    }
+    
+    @FXML
+    void onActionAddNewProductBtn(ActionEvent event) {
+        
+    }
+    
+    @FXML 
+    void onActionDeleteProductBtn(ActionEvent event) {
+        
+    }
+    
 }
