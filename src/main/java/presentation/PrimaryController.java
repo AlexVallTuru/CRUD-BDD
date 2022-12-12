@@ -14,6 +14,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
@@ -264,9 +265,9 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onClick_bt_aniadir(ActionEvent event) throws SQLException {
-        
+
         customerLogicLayer.afegirCustomer(getCustomerFromView());
-        
+
         //Para actualizar la pagina
         customerLogicLayer.setData();
         tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
@@ -294,4 +295,51 @@ public class PrimaryController implements Initializable {
 
         return customer;
     }
+
+    @FXML
+    private void handleOnMouseClicked(MouseEvent ev) {
+        // si hem seleccionat un registre de la taula
+        if (tv_customer.getSelectionModel().getSelectedItem() != null) {
+            // agafem les dades de l'objecte seleccionat i els traspassem
+            // als camps del formulari
+            setCustomerToView(getCustomerFromTable());
+
+            //habilitem botó de modificar i eliminar
+            //btnModificar.setDisable(false);
+            //btnEliminar.setDisable(false);
+        } else {
+            //desactivaSeleccio();
+        }
+    }
+
+    private void setCustomerToView(Customer customer) {
+        if (customer != null) {
+            tf_birthDate.setText(customer.getBirthDate());
+            tf_customerEmail.setText(customer.getCustomerEmail());
+            tf_creditLimit.setText(String.valueOf(customer.getCreditLimit()));
+            tf_customerName.setText(customer.getCustomerName());
+            tf_idCard.setText(customer.getIdCard());
+            tf_phoneNumber.setText(customer.getPhoneNumber());
+        }
+    }
+        private Customer getCustomerFromTable()
+    {
+        Customer customer = null;
+        
+        customer = (Customer)tv_customer.getSelectionModel().getSelectedItem();
+        
+        return customer;
+    }
+
+    /**
+     * Deshabilita botons i selecció d'usuari
+     */
+    //private void desactivaSeleccio()
+    /**
+     * {
+     * //deshabilitem botóns i fila seleccionada btnModificar.setDisable(true);
+     * btnEliminar.setDisable(true);
+     * taulaAssignatura.getSelectionModel().clearSelection();
+    }*
+     */
 }
