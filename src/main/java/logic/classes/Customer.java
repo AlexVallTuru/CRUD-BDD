@@ -26,6 +26,10 @@ public class Customer {
         this.birthDate = birthDate;
     }
 
+    public Customer() {
+    }
+
+
     public String getCustomerEmail() {
         return customerEmail;
     }

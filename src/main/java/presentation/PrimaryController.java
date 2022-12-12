@@ -15,11 +15,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Region;
+import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
 
 public class PrimaryController implements Initializable {
-
+    
+    CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
     OrderDetailsLogic orderDetailsLogicLayer;
 
@@ -90,9 +92,14 @@ public class PrimaryController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
+            //Customer Order
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            //Customer Logic
+            customerLogicLayer = new CustomerLogic();
+            customerLogicLayer.setData();
+            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -100,13 +107,20 @@ public class PrimaryController implements Initializable {
         }
 
         //Vínculo entre los atributos de la clase Order y las columnas de orderTableView
+        //Columnas Order
         colOrderNum.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
         colOrderDate.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
         colRequiredDate.setCellValueFactory(new PropertyValueFactory<>("requiredDate"));
         colShippedDate.setCellValueFactory(new PropertyValueFactory<>("shippedDate"));
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
         //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("Descripcio"));
-
+        //Columnas Costumer
+        col_customerEmail.setCellValueFactory(new PropertyValueFactory<>("customerEmail"));
+        col_idCard.setCellValueFactory(new PropertyValueFactory<>("idCard"));
+        col_customerName.setCellValueFactory(new PropertyValueFactory<>("customerName"));
+        col_phoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        col_birthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+        col_creditLimit.setCellValueFactory(new PropertyValueFactory<>("creditLimit"));
     }
 
     /**
@@ -236,4 +250,30 @@ public class PrimaryController implements Initializable {
     void onActionSearchOrderBtn(ActionEvent event) {
 
     }
+    //CUSTOMER 
+    
+    @FXML
+    private Button bt_aniadir, bt_actualizar, bt_eliminar;
+    @FXML
+    private TableView tv_customer;
+    @FXML
+    private TableColumn col_customerName, col_idCard, col_creditLimit, col_phoneNumber, col_customerEmail, col_birthDate;
+    @FXML
+    private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
+
+    @FXML
+    void onClick_bt_aniadir(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onClick_bt_actualizar(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onClick_bt_eliminar(ActionEvent event) {
+
+    }
+
 }
