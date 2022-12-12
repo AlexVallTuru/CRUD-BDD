@@ -55,7 +55,7 @@ public class CustomerLogic {
      * @throws SQLException
      */
     public void afegirCustomer(Customer customer) throws SQLException {
-        
+
         CustomerDB.insereixNouCustomer(conn, customer);
 
         llistaObservableCustomer.add(customer);
@@ -108,7 +108,7 @@ public class CustomerLogic {
          * Pattern regles = Pattern.compile("^([A-Z]{3}-[0-9]{3})$");
          *
          * if (regles.matcher(txt).find()) {ret = true;}
-       *
+         *
          */
         return ret;
     }
@@ -119,5 +119,14 @@ public class CustomerLogic {
 
     public ObservableList<Customer> getCustomerObservableList() {
         return llistaObservableCustomer;
+    }
+
+    public void modificarCustomer(Customer customer) throws SQLException, Exception {
+        // si no valida el format del nom, genera una excepció
+        /**if (!this.validaNomAssignatura(as.getNom())) {
+            throw new Exception("El format del nom de l'assignatura no és correcte. Un exemple de format correcte seria ABC-123");
+        }**/
+
+        CustomerDB.modificaCustomer(conn, customer);
     }
 }

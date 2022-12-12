@@ -274,8 +274,8 @@ public class PrimaryController implements Initializable {
     }
 
     @FXML
-    void onClick_bt_actualizar(ActionEvent event) {
-
+    void onClick_bt_actualizar(ActionEvent event) throws Exception {
+        customerLogicLayer.modificarCustomer(getCustomerFromView());
     }
 
     @FXML

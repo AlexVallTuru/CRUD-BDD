@@ -81,5 +81,25 @@ public class CustomerDB {
 
         return id;
     }
+        public static void modificaCustomer(Connection con, Customer customer) throws SQLException
+    {
+        Statement sentencia;
+        
+        sentencia = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+
+        sentencia.executeQuery("SELECT * FROM customers WHERE customerEmail = " + customer.getCustomerEmail());
+        ResultSet rs = sentencia.getResultSet();
+        
+        if (rs.next())
+        {
+        rs.updateString("idCard", customer.getIdCard());
+        rs.updateString("customerName", customer.getCustomerName());
+        rs.updateString("phone", customer.getPhoneNumber());
+        rs.updateDouble("creditLimit", customer.getCreditLimit());
+        rs.updateString("birthDate", customer.getBirthDate());
+            
+        rs.updateRow();
+        }
+    }
 }
 
