@@ -2,6 +2,14 @@ package presentation;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,6 +34,7 @@ import logic.OrderDetailsLogic;
 import logic.OrderLogic;
 import logic.classes.Order;
 import logic.ProductLogic;
+import logic.classes.AppConfig;
 import logic.classes.Customer;
 
 public class PrimaryController implements Initializable {
@@ -100,37 +109,37 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private DatePicker shippedDate;
-    
+
     /**
      * Elements productes
      */
     @FXML
     private TableView productsTableView;
-    
+
     @FXML
     private TableColumn colProductCode, colProductName, colProductDescription, colQuantityInStock, colBuyPrice;
-    
+
     @FXML
     private Button updateProductBtn;
-    
+
     @FXML
     private Button addNewProductBtn;
-    
+
     @FXML
     private Button deleteProductBtn;
-    
+
     @FXML
     private TextField productCodeField;
-    
+
     @FXML
     private TextField productNameField;
-    
+
     @FXML
     private TextField productDescripcionField;
-    
+
     @FXML
     private TextField quantityInStockField;
-    
+
     @FXML
     private TextField buyPriceField;
 
@@ -156,7 +165,10 @@ public class PrimaryController implements Initializable {
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
             //AppConfig Logic
             appConfigLogic = new AppConfigLogic();
-            customerLogicLayer.setData();
+            //Cargamos los datos del OBJETO en la base de datos
+            appConfigLogic.setData();
+            //Bolcamos los datos de la base de datos en este objeto para poder trabajar con ellos.
+
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -343,13 +355,11 @@ public class PrimaryController implements Initializable {
         return order;
     }
     // Funcions productes
-    
-    
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) {
-        
+
     }
-    
+
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) {
         
@@ -359,10 +369,8 @@ public class PrimaryController implements Initializable {
     void onActionDeleteProductBtn(ActionEvent event) {
         
     }
-    
 
     //CUSTOMER 
-
     @FXML
     private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
     @FXML
@@ -375,11 +383,33 @@ public class PrimaryController implements Initializable {
     @FXML
     void onClick_bt_aniadir(ActionEvent event) throws SQLException {
 
-        customerLogicLayer.afegirCustomer(getCustomerFromView());
+        AppConfig appConfig = appConfigLogic.getAppConfig();
+        //Aqui obtenim la minima edat i si es superior o igual entra al if i escui a la base de dades
+        if (appConfig.getMinCustomerAge() > calcularEdat(getCustomerFromView())) {
+            customerLogicLayer.afegirCustomer(getCustomerFromView());
 
-        //Para actualizar la pagina
-        customerLogicLayer.setData();
-        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            //Para actualizar la pagina
+            customerLogicLayer.setData();
+            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+        }
+
+    }
+
+    public int calcularEdat(Customer customer) {
+        //Creamos un formato de fecha 
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        //A traves del parse pasamos la fecha al formato y le pasamos la fecha de la base de datos y el formato al que la queremos pasar
+        LocalDate fechaNac = LocalDate.parse(customer.getBirthDate(), fmt);
+
+        //Creamos una variable donde le metemos la fecha de hoy
+        LocalDate ahora = LocalDate.now();
+
+        //Utilizamos el metodo period para crear un objeto que nos restara dos fechas y nos obtendra años, meses y dias.
+        Period periodo = Period.between(fechaNac, ahora);
+
+        //Esta variable obtendra la edad de la persona.
+        return periodo.getYears();
     }
 
     @FXML

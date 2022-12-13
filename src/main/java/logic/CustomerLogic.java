@@ -56,7 +56,7 @@ public class CustomerLogic {
      * @throws SQLException
      */
     public void afegirCustomer(Customer customer) throws SQLException {
-
+        
         CustomerDB.insereixNouCustomer(conn, customer);
 
         llistaObservableCustomer.add(customer);
