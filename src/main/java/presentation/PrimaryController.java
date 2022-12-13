@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import logic.AppConfigLogic;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
@@ -23,8 +24,10 @@ import logic.classes.Customer;
 
 public class PrimaryController implements Initializable {
 
+    
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
+    AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
     @FXML
@@ -94,7 +97,7 @@ public class PrimaryController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
-            //Customer Order
+            //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
@@ -102,6 +105,9 @@ public class PrimaryController implements Initializable {
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            //AppConfig Logic
+            appConfigLogic = new AppConfigLogic();
+            customerLogicLayer.setData();
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
