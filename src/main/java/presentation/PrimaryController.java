@@ -14,16 +14,28 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import logic.DateConverter;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
 import logic.classes.Order;
+import logic.AppConfigLogic;
+import logic.CustomerLogic;
+import logic.OrderDetailsLogic;
+import logic.OrderLogic;
+import logic.classes.Order;
+import logic.ProductLogic;
+import logic.classes.Customer;
 
 public class PrimaryController implements Initializable {
 
+    ProductLogic productLogicLayer;
+
+    CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
 
+    AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
     @FXML
@@ -88,6 +100,39 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private DatePicker shippedDate;
+    
+    /**
+     * Elements productes
+     */
+    @FXML
+    private TableView productsTableView;
+    
+    @FXML
+    private TableColumn colProductCode, colProductName, colProductDescription, colQuantityInStock, colBuyPrice;
+    
+    @FXML
+    private Button updateProductBtn;
+    
+    @FXML
+    private Button addNewProductBtn;
+    
+    @FXML
+    private Button deleteProductBtn;
+    
+    @FXML
+    private TextField productCodeField;
+    
+    @FXML
+    private TextField productNameField;
+    
+    @FXML
+    private TextField productDescripcionField;
+    
+    @FXML
+    private TextField quantityInStockField;
+    
+    @FXML
+    private TextField buyPriceField;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -97,9 +142,21 @@ public class PrimaryController implements Initializable {
             //ComboBox
             //clientComboBox.setItems();
             //productComboBox.setItems();
+            //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            // Product logic
+            productLogicLayer = new ProductLogic();
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+            //Customer Logic
+            customerLogicLayer = new CustomerLogic();
+            customerLogicLayer.setData();
+            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            //AppConfig Logic
+            appConfigLogic = new AppConfigLogic();
+            customerLogicLayer.setData();
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -107,13 +164,26 @@ public class PrimaryController implements Initializable {
         }
 
         //Vínculo entre los atributos de la clase Order y las columnas de orderTableView
+        //Columnas Order
         colOrderNum.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
         colOrderDate.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
         colRequiredDate.setCellValueFactory(new PropertyValueFactory<>("requiredDate"));
         colShippedDate.setCellValueFactory(new PropertyValueFactory<>("shippedDate"));
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
         //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("Descripcio"));
-
+        // Columnes Product
+        colProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
+        colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        colProductDescription.setCellValueFactory(new PropertyValueFactory<>("productDescription"));
+        colQuantityInStock.setCellValueFactory(new PropertyValueFactory<>("quantityInStock"));
+        colBuyPrice.setCellValueFactory(new PropertyValueFactory<>("buyPrice"));
+        //Columnas Costumer
+        col_customerEmail.setCellValueFactory(new PropertyValueFactory<>("customerEmail"));
+        col_idCard.setCellValueFactory(new PropertyValueFactory<>("idCard"));
+        col_customerName.setCellValueFactory(new PropertyValueFactory<>("customerName"));
+        col_phoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        col_birthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+        col_creditLimit.setCellValueFactory(new PropertyValueFactory<>("creditLimit"));
     }
 
     /**
@@ -271,5 +341,140 @@ public class PrimaryController implements Initializable {
         order.setCustomer(clientComboBox.getEditor().toString());
 
         return order;
+    }
+    // Funcions productes
+    
+    
+    @FXML
+    void onActionUpdateProductBtn(ActionEvent event) {
+        
+    }
+    
+    @FXML
+    void onActionAddNewProductBtn(ActionEvent event) {
+        
+    }
+    
+    @FXML 
+    void onActionDeleteProductBtn(ActionEvent event) {
+        
+    }
+    
+
+    //CUSTOMER 
+
+    @FXML
+    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
+    @FXML
+    private TableView tv_customer;
+    @FXML
+    private TableColumn col_customerName, col_idCard, col_creditLimit, col_phoneNumber, col_customerEmail, col_birthDate;
+    @FXML
+    private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
+
+    @FXML
+    void onClick_bt_aniadir(ActionEvent event) throws SQLException {
+
+        customerLogicLayer.afegirCustomer(getCustomerFromView());
+
+        //Para actualizar la pagina
+        customerLogicLayer.setData();
+        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+    }
+
+    @FXML
+    void onClick_bt_actualizar(ActionEvent event) throws Exception {
+        customerLogicLayer.modificarCustomer(getCustomerFromView());
+
+        //Para actualizar la pagina
+        customerLogicLayer.setData();
+        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+    }
+
+    @FXML
+    void onClick_bt_eliminar(ActionEvent event) {
+        // capturem l'objecte seleccionat a la taula
+        Customer customer = getCustomerFromTable();
+
+        try {
+            customerLogicLayer.eliminarCustomer(customer);
+
+        } catch (SQLException e) {
+            showMessage(1, "Error al eliminar les dades: " + e);
+        }
+    }
+
+    private Customer getCustomerFromView() throws NumberFormatException {
+        Customer customer = new Customer();
+
+        customer.setCustomerName(tf_customerName.getText());
+        customer.setCustomerEmail(tf_customerEmail.getText());
+        customer.setIdCard(tf_idCard.getText());
+        customer.setPhoneNumber(tf_phoneNumber.getText());
+        customer.setBirthDate(tf_birthDate.getText());
+        customer.setCreditLimit(Double.parseDouble(tf_creditLimit.getText()));
+
+        return customer;
+    }
+
+    @FXML
+    private void handleOnMouseClicked(MouseEvent ev) {
+        // si hem seleccionat un registre de la taula
+        if (tv_customer.getSelectionModel().getSelectedItem() != null) {
+            //Desabilitem el boto del mail al ser la primarykey i el boto añadir ja que no podem afeguir si actualitzem
+            tf_customerEmail.setDisable(true);
+            // agafem les dades de l'objecte seleccionat i els traspassem
+            // als camps del formulari
+            setCustomerToView(getCustomerFromTable());
+
+            //habilitem botó de modificar i eliminar
+            bt_actualizar.setDisable(false);
+            bt_eliminar.setDisable(false);
+        } else {
+            //desactivaSeleccio();
+        }
+    }
+
+    @FXML
+    private void onClick_bt_limpiar(ActionEvent event) {
+        //Habilitem el boto del mail
+        tf_customerEmail.setDisable(false);
+
+        //limpiamos registro y desactivamos el click de la pantalla
+        desactivaSeleccio();
+
+        //seteamos todos los registros a vacio
+        tf_birthDate.clear();
+        tf_creditLimit.clear();
+        tf_customerEmail.clear();
+        tf_customerName.clear();
+        tf_idCard.clear();
+        tf_phoneNumber.clear();
+    }
+
+    private void setCustomerToView(Customer customer) {
+        if (customer != null) {
+            tf_birthDate.setText(customer.getBirthDate());
+            tf_customerEmail.setText(customer.getCustomerEmail());
+            tf_creditLimit.setText(String.valueOf(customer.getCreditLimit()));
+            tf_customerName.setText(customer.getCustomerName());
+            tf_idCard.setText(customer.getIdCard());
+            tf_phoneNumber.setText(customer.getPhoneNumber());
+        }
+    }
+
+    private Customer getCustomerFromTable() {
+        Customer customer = null;
+
+        customer = (Customer) tv_customer.getSelectionModel().getSelectedItem();
+
+        return customer;
+    }
+
+    private void desactivaSeleccio() {
+        //deshabilitem botóns i fila seleccionada
+        bt_actualizar.setDisable(true);
+        bt_eliminar.setDisable(true);
+        tv_customer.getSelectionModel().clearSelection();
     }
 }
