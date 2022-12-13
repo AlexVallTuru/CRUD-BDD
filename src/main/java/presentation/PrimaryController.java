@@ -1,5 +1,6 @@
 package presentation;
 
+import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -21,6 +22,7 @@ import logic.OrderDetailsLogic;
 import logic.OrderLogic;
 import logic.ProductLogic;
 import logic.classes.Customer;
+import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
 
@@ -117,7 +119,7 @@ public class PrimaryController implements Initializable {
     private TextField productNameField;
     
     @FXML
-    private TextField productDescripcionField;
+    private TextField productDescriptionField;
     
     @FXML
     private TextField quantityInStockField;
@@ -299,21 +301,47 @@ public class PrimaryController implements Initializable {
     }
     
     // Funcions productes
-    
-    
+
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) {
         
     }
     
+    /**
+     * Envia els valors dels camps a la capa lógica
+     * 
+     * @param event
+     * @throws SQLException 
+     */
     @FXML
-    void onActionAddNewProductBtn(ActionEvent event) {
+    void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
+        productLogicLayer.addProduct(getProductFromView());
         
+        // Actualitzar la taula
+        productLogicLayer.setData();
+        productsTableView.setItems(productLogicLayer.getProductObservableList());
     }
     
     @FXML 
     void onActionDeleteProductBtn(ActionEvent event) {
         
+    }
+    
+    /**
+     * Obté els valors dels camps
+     * 
+     * @return
+     * @throws NumberFormatException 
+     */
+    private Product getProductFromView() throws NumberFormatException {
+        Product product = new Product();
+        
+        product.setProductName(productNameField.getText());
+        product.setProductDescription(productDescriptionField.getText());
+        product.setQuantityInStock(parseInt(quantityInStockField.getText()));
+        product.setBuyPrice(Double.parseDouble(buyPriceField.getText()));
+        
+        return product;
     }
     
     //CUSTOMER 

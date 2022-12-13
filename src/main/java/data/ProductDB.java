@@ -45,4 +45,28 @@ public class ProductDB {
         }
         return productsList;
     }
+    
+    /**
+     * Inserta un nou producte a la BBDD
+     * 
+     * @param conn
+     * @param product
+     * @throws SQLException 
+     */
+    public static void insertProduct(Connection conn, Product product) throws SQLException {
+        // Preparem una sentencia sql i carreguem les dades de la BBDD per treballar amb aquesta
+        Statement query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        query.executeQuery("SELECT * FROM products");
+        ResultSet rs = query.getResultSet();
+        
+        // Anem a l'ultima posició de la taula i obtenim les noves dades
+        rs.moveToInsertRow();
+        rs.updateString("productName", product.getProductName());
+        rs.updateString("productDescription", product.getProductDescription());
+        rs.updateInt("quantityInStock", product.getQuantityInStock());
+        rs.updateDouble("buyPrice", product.getBuyPrice());
+        
+        // Afegim les dades a la BBDD
+        rs.insertRow();
+    }
 }

@@ -51,4 +51,16 @@ public class ProductLogic {
     public ObservableList<Product> getProductObservableList() {
         return productsOList;
     }
+    
+    /**
+     * Envia un nou producte a la capa BBDD
+     * 
+     * @param product
+     * @throws SQLException 
+     */
+    public void addProduct(Product product) throws SQLException {
+        ProductDB.insertProduct(conn, product);
+        
+        productsOList.add(product);
+    }
 }
