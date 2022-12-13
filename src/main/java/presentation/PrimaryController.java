@@ -19,10 +19,12 @@ import javafx.scene.layout.Region;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
+import logic.ProductLogic;
 import logic.classes.Customer;
 
 public class PrimaryController implements Initializable {
 
+    ProductLogic productLogicLayer;
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
     OrderDetailsLogic orderDetailsLogicLayer;
@@ -31,7 +33,7 @@ public class PrimaryController implements Initializable {
     private TableView orderDetailTableView;
 
     @FXML
-    private TableColumn colOrderNumDetails, colProductName, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
+    private TableColumn colOrderNumDetails, colOrderDetailProductName, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
 
     @FXML
     private TableView orderTableView;
@@ -89,6 +91,39 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private DatePicker shippedDate;
+    
+    /**
+     * Elements productes
+     */
+    @FXML
+    private TableView productsTableView;
+    
+    @FXML
+    private TableColumn colProductCode, colProductName, colProductDescription, colQuantityInStock, colBuyPrice;
+    
+    @FXML
+    private Button updateProductBtn;
+    
+    @FXML
+    private Button addNewProductBtn;
+    
+    @FXML
+    private Button deleteProductBtn;
+    
+    @FXML
+    private TextField productCodeField;
+    
+    @FXML
+    private TextField productNameField;
+    
+    @FXML
+    private TextField productDescripcionField;
+    
+    @FXML
+    private TextField quantityInStockField;
+    
+    @FXML
+    private TextField buyPriceField;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -98,6 +133,10 @@ public class PrimaryController implements Initializable {
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            // Product logic
+            productLogicLayer = new ProductLogic();
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
             //Customer Logic
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
@@ -116,6 +155,12 @@ public class PrimaryController implements Initializable {
         colShippedDate.setCellValueFactory(new PropertyValueFactory<>("shippedDate"));
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
         //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("Descripcio"));
+        // Columnes Product
+        colProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
+        colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        colProductDescription.setCellValueFactory(new PropertyValueFactory<>("productDescription"));
+        colQuantityInStock.setCellValueFactory(new PropertyValueFactory<>("quantityInStock"));
+        colBuyPrice.setCellValueFactory(new PropertyValueFactory<>("buyPrice"));
         //Columnas Costumer
         col_customerEmail.setCellValueFactory(new PropertyValueFactory<>("customerEmail"));
         col_idCard.setCellValueFactory(new PropertyValueFactory<>("idCard"));
@@ -252,6 +297,25 @@ public class PrimaryController implements Initializable {
     void onActionSearchOrderBtn(ActionEvent event) {
 
     }
+    
+    // Funcions productes
+    
+    
+    @FXML
+    void onActionUpdateProductBtn(ActionEvent event) {
+        
+    }
+    
+    @FXML
+    void onActionAddNewProductBtn(ActionEvent event) {
+        
+    }
+    
+    @FXML 
+    void onActionDeleteProductBtn(ActionEvent event) {
+        
+    }
+    
     //CUSTOMER 
 
     @FXML
