@@ -255,6 +255,7 @@ public class PrimaryController implements Initializable {
     //CUSTOMER 
 
     @FXML
+    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
     @FXML
     private TableView tv_customer;
     @FXML
@@ -364,7 +365,6 @@ public class PrimaryController implements Initializable {
         return customer;
     }
 
-    /**
     private void desactivaSeleccio() {
         //deshabilitem botóns i fila seleccionada
         bt_actualizar.setDisable(true);
