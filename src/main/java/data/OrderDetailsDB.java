@@ -42,16 +42,16 @@ public class OrderDetailsDB {
      * Retorna un producto cuyo productCode coincida con el pasado por
      * parámetro.
      *
-     * @param con
+     * @param conn
      * @param productCode
      * @return
      * @throws SQLException
      */
-    public static Product getProduct(Connection con, int productCode) throws SQLException {
+    public static Product getProduct(Connection conn, int productCode) throws SQLException {
         Product product = null;
 
         Statement query;
-        query = con.createStatement();
+        query = conn.createStatement();
         query.executeQuery("SELECT * FROM products WHERE productCode = " + productCode);
 
         ResultSet rs = query.getResultSet();
