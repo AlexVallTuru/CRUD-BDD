@@ -128,6 +128,10 @@ public class PrimaryController implements Initializable {
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            // Product logic
+            productLogicLayer = new ProductLogic();
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -141,27 +145,13 @@ public class PrimaryController implements Initializable {
         colShippedDate.setCellValueFactory(new PropertyValueFactory<>("shippedDate"));
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
         //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("Descripcio"));
-
-        /**
-         * Inicialitzar taula de productes
-         */
-        // Capa logica
-        try {
-            productLogicLayer = new ProductLogic();
-            productLogicLayer.setData();
-            productsTableView.setItems(productLogicLayer.getProductObservableList());
-        } catch (SQLException ex) {
-            showMessage(1, "Error cargando datos: " + ex.toString());
-        } catch (Exception ex) {
-            showMessage(1, "Error iniciando la capa lógica: " + ex.toString());
-        }
         
-        // Insertar dades a cada columna
-        colProductCode.setCellFactory(new PropertyValueFactory<>("productCode"));
-        colProductName.setCellFactory(new PropertyValueFactory<>("productName"));
-        colProductDescription.setCellFactory(new PropertyValueFactory<>("productDescription"));
-        colQuantityInStock.setCellFactory(new PropertyValueFactory<>("quantitytInStock"));
-        colBuyPrice.setCellFactory(new PropertyValueFactory<>("buyPrice"));
+        // Columnes Product
+        colProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
+        colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        colProductDescription.setCellValueFactory(new PropertyValueFactory<>("productDescription"));
+        colQuantityInStock.setCellValueFactory(new PropertyValueFactory<>("quantityInStock"));
+        colBuyPrice.setCellValueFactory(new PropertyValueFactory<>("buyPrice"));
     }
 
     /**

@@ -41,7 +41,7 @@ public class ProductDB {
             productsList.add(new Product(
                     rs.getInt("productCode"), rs.getString("productName"), 
                     rs.getString("productDescription"), rs.getInt("quantityInStock"), 
-                    rs.getInt("buyPrice")));
+                    rs.getDouble("buyPrice")));
         }
         return productsList;
     }
