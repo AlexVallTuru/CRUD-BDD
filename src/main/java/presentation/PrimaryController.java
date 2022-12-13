@@ -255,7 +255,7 @@ public class PrimaryController implements Initializable {
     //CUSTOMER 
 
     @FXML
-    private Button bt_aniadir, bt_actualizar, bt_eliminar;
+    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
     @FXML
     private TableView tv_customer;
     @FXML
@@ -276,11 +276,23 @@ public class PrimaryController implements Initializable {
     @FXML
     void onClick_bt_actualizar(ActionEvent event) throws Exception {
         customerLogicLayer.modificarCustomer(getCustomerFromView());
+
+        //Para actualizar la pagina
+        customerLogicLayer.setData();
+        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
     }
 
     @FXML
     void onClick_bt_eliminar(ActionEvent event) {
+        // capturem l'objecte seleccionat a la taula
+        Customer customer = getCustomerFromTable();
 
+        try {
+            customerLogicLayer.eliminarCustomer(customer);
+
+        } catch (SQLException e) {
+            showMessage(1, "Error al eliminar les dades: " + e);
+        }
     }
 
     private Customer getCustomerFromView() throws NumberFormatException {
@@ -300,16 +312,35 @@ public class PrimaryController implements Initializable {
     private void handleOnMouseClicked(MouseEvent ev) {
         // si hem seleccionat un registre de la taula
         if (tv_customer.getSelectionModel().getSelectedItem() != null) {
+            //Desabilitem el boto del mail al ser la primarykey i el boto añadir ja que no podem afeguir si actualitzem
+            tf_customerEmail.setDisable(true);
             // agafem les dades de l'objecte seleccionat i els traspassem
             // als camps del formulari
             setCustomerToView(getCustomerFromTable());
 
             //habilitem botó de modificar i eliminar
-            //btnModificar.setDisable(false);
-            //btnEliminar.setDisable(false);
+            bt_actualizar.setDisable(false);
+            bt_eliminar.setDisable(false);
         } else {
             //desactivaSeleccio();
         }
+    }
+
+    @FXML
+    private void onClick_bt_limpiar(ActionEvent event) {
+        //Habilitem el boto del mail
+        tf_customerEmail.setDisable(false);
+
+        //limpiamos registro y desactivamos el click de la pantalla
+        desactivaSeleccio();
+
+        //seteamos todos los registros a vacio
+        tf_birthDate.clear();
+        tf_creditLimit.clear();
+        tf_customerEmail.clear();
+        tf_customerName.clear();
+        tf_idCard.clear();
+        tf_phoneNumber.clear();
     }
 
     private void setCustomerToView(Customer customer) {
@@ -322,24 +353,19 @@ public class PrimaryController implements Initializable {
             tf_phoneNumber.setText(customer.getPhoneNumber());
         }
     }
-        private Customer getCustomerFromTable()
-    {
+
+    private Customer getCustomerFromTable() {
         Customer customer = null;
-        
-        customer = (Customer)tv_customer.getSelectionModel().getSelectedItem();
-        
+
+        customer = (Customer) tv_customer.getSelectionModel().getSelectedItem();
+
         return customer;
     }
 
-    /**
-     * Deshabilita botons i selecció d'usuari
-     */
-    //private void desactivaSeleccio()
-    /**
-     * {
-     * //deshabilitem botóns i fila seleccionada btnModificar.setDisable(true);
-     * btnEliminar.setDisable(true);
-     * taulaAssignatura.getSelectionModel().clearSelection();
-    }*
-     */
+    private void desactivaSeleccio() {
+        //deshabilitem botóns i fila seleccionada
+        bt_actualizar.setDisable(true);
+        bt_eliminar.setDisable(true);
+        tv_customer.getSelectionModel().clearSelection();
+    }
 }
