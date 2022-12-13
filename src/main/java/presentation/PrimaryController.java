@@ -25,11 +25,8 @@ import logic.classes.Customer;
 
 public class PrimaryController implements Initializable {
 
-<<<<<<< HEAD
-    
-=======
     ProductLogic productLogicLayer;
->>>>>>> develop
+
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
     AppConfigLogic appConfigLogic;
