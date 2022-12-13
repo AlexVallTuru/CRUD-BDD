@@ -16,8 +16,9 @@ import logic.classes.AppConfig;
  * @author Alex
  */
 public class AppConfigDB {
-        public static ArrayList<AppConfig> carregarAppConfig(Connection con) throws SQLException {
-        ArrayList<AppConfig> ret = new ArrayList<>();
+
+    public static AppConfig carregarAppConfig(Connection con) throws SQLException {
+        AppConfig appConfig = new AppConfig();
 
         Statement sentencia;
 
@@ -32,15 +33,15 @@ public class AppConfigDB {
              * una coleccio tipus array list que contindra l'objecte amb totes
              * les dades de totes les posicions*
              */
-            ret.add(new AppConfig(rs.getDouble("defaultCreditLimit"),
+            appConfig = new AppConfig(rs.getDouble("defaultCreditLimit"),
                     rs.getInt("defaultQuantityInStock"),
                     rs.getInt("defaultQuantityOrdered"),
                     rs.getInt("defaultProductBenefit"),
                     rs.getInt("minShippingHours"),
                     rs.getInt("minCustomerAge"),
                     rs.getInt("maxLinesPerOrder"),
-                    rs.getDouble("maxOrderAmount")));
+                    rs.getDouble("maxOrderAmount"));
         }
-        return ret;
+        return appConfig;
     }
 }
