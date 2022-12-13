@@ -293,8 +293,6 @@ public class PrimaryController implements Initializable {
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar les dades: " + e);
         }
-
-        //desactivaSeleccio();
     }
 
     private Customer getCustomerFromView() throws NumberFormatException {
@@ -316,7 +314,6 @@ public class PrimaryController implements Initializable {
         if (tv_customer.getSelectionModel().getSelectedItem() != null) {
             //Desabilitem el boto del mail al ser la primarykey i el boto añadir ja que no podem afeguir si actualitzem
             tf_customerEmail.setDisable(true);
-            //bt_aniadir.setDisable(true);
             // agafem les dades de l'objecte seleccionat i els traspassem
             // als camps del formulari
             setCustomerToView(getCustomerFromTable());

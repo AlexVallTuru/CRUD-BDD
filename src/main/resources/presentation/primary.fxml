@@ -33,12 +33,12 @@
                   <Button fx:id="bt_actualizar" layoutX="497.0" layoutY="596.0" mnemonicParsing="false" onAction="#onClick_bt_actualizar" text="Actualizar" />
                   <Button fx:id="bt_aniadir" layoutX="430.0" layoutY="596.0" mnemonicParsing="false" onAction="#onClick_bt_aniadir" text="Añadir" />
                   <Button fx:id="bt_eliminar" layoutX="582.0" layoutY="596.0" mnemonicParsing="false" onAction="#onClick_bt_eliminar" text="Eliminar" />
-                  <TextField fx:id="tf_customerName" layoutX="31.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
-                  <TextField fx:id="tf_idCard" layoutX="190.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
-                  <TextField fx:id="tf_creditLimit" layoutX="355.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
-                  <TextField fx:id="tf_phoneNumber" layoutX="524.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
-                  <TextField fx:id="tf_customerEmail" layoutX="686.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
-                  <TextField fx:id="tf_birthDate" layoutX="850.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
+                  <TextField fx:id="tf_customerName" layoutX="31.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" promptText="Nombre" />
+                  <TextField fx:id="tf_idCard" layoutX="190.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" promptText="DNI" />
+                  <TextField fx:id="tf_creditLimit" layoutX="355.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" promptText="Limite de Credito" />
+                  <TextField fx:id="tf_phoneNumber" layoutX="524.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" promptText="Telefono" />
+                  <TextField fx:id="tf_customerEmail" layoutX="686.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" promptText="Email" />
+                  <TextField fx:id="tf_birthDate" layoutX="850.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" promptText="Fecha de nacimiento" />
                   <Button fx:id="bt_limpiar" layoutX="479.0" layoutY="638.0" mnemonicParsing="false" onAction="#onClick_bt_limpiar" text="Limpiar Registro" />
                </children></AnchorPane>
       </content>

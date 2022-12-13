@@ -18,18 +18,6 @@ import logic.classes.Customer;
  */
 public class CustomerDB {
 
-    public static Connection connectarBD() throws SQLException {
-        Connection ret = null;
-
-        // si tot ha anat correcte, getConnection retorna una instància de la classe Connection
-        // Aquesta és la classe base per a poder realitzar qualsevol accès a BBDD
-        ret = DriverManager.getConnection("jdbc:mysql://localhost:3306/m03uf6_22_23?useUnicode=true&"
-                + "useJDBCCompliantTimezoneShift=true&"
-                + "useLegacyDatetimeCode=false&serverTimezone=UTC, root, 123456");
-
-        return ret;
-    }
-
     public static ArrayList<Customer> carregarCustomer(Connection con) throws SQLException {
         ArrayList<Customer> ret = new ArrayList<>();
 

@@ -82,9 +82,6 @@ public class CustomerLogic {
      *
      * @return
      */
-    public ObservableList<Customer> getLlistaObservableCustomer() {
-        return llistaObservableCustomer;
-    }
 
     /**
      * Tanca la connexió amb la BBDD
