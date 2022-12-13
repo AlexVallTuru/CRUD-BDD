@@ -1,0 +1,9 @@
+diff a/src/main/java/presentation/PrimaryController.java b/src/main/java/presentation/PrimaryController.java	(rejected hunks)
+@@ -255,7 +255,6 @@
+     //CUSTOMER 
+ 
+     @FXML
+-    private Button bt_aniadir, bt_actualizar, bt_eliminar;
+     private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
+     @FXML
+     private TableView tv_customer;
