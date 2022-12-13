@@ -255,7 +255,7 @@ public class PrimaryController implements Initializable {
     //CUSTOMER 
 
     @FXML
-    private Button bt_aniadir, bt_actualizar, bt_eliminar;
+    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
     @FXML
     private TableView tv_customer;
     @FXML
@@ -314,8 +314,9 @@ public class PrimaryController implements Initializable {
     private void handleOnMouseClicked(MouseEvent ev) {
         // si hem seleccionat un registre de la taula
         if (tv_customer.getSelectionModel().getSelectedItem() != null) {
-            //Desabilitem el boto del mail al ser la primarykey
+            //Desabilitem el boto del mail al ser la primarykey i el boto añadir ja que no podem afeguir si actualitzem
             tf_customerEmail.setDisable(true);
+            //bt_aniadir.setDisable(true);
             // agafem les dades de l'objecte seleccionat i els traspassem
             // als camps del formulari
             setCustomerToView(getCustomerFromTable());
@@ -326,6 +327,23 @@ public class PrimaryController implements Initializable {
         } else {
             //desactivaSeleccio();
         }
+    }
+
+    @FXML
+    private void onClick_bt_limpiar(ActionEvent event) {
+        //Habilitem el boto del mail
+        tf_customerEmail.setDisable(false);
+
+        //limpiamos registro y desactivamos el click de la pantalla
+        desactivaSeleccio();
+
+        //seteamos todos los registros a vacio
+        tf_birthDate.clear();
+        tf_creditLimit.clear();
+        tf_customerEmail.clear();
+        tf_customerName.clear();
+        tf_idCard.clear();
+        tf_phoneNumber.clear();
     }
 
     private void setCustomerToView(Customer customer) {
@@ -347,14 +365,10 @@ public class PrimaryController implements Initializable {
         return customer;
     }
 
-    /**
-     * Deshabilita botons i selecció d'usuari
-     */
-    //private void desactivaSeleccio()
-    /**
-     * {
-     * //deshabilitem botóns i fila seleccionada btnModificar.setDisable(true);
-     * btnEliminar.setDisable(true);
-     * taulaAssignatura.getSelectionModel().clearSelection(); }*
-     */
+    private void desactivaSeleccio() {
+        //deshabilitem botóns i fila seleccionada
+        bt_actualizar.setDisable(true);
+        bt_eliminar.setDisable(true);
+        tv_customer.getSelectionModel().clearSelection();
+    }
 }
