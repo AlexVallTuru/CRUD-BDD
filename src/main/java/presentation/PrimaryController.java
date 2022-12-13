@@ -24,10 +24,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import logic.DateConverter;
+import logic.OrderDetailsLogic;
+import logic.OrderLogic;
+import logic.classes.Order;
 import logic.AppConfigLogic;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
+import logic.classes.Order;
 import logic.ProductLogic;
 import logic.classes.AppConfig;
 import logic.classes.Customer;
@@ -38,6 +43,7 @@ public class PrimaryController implements Initializable {
 
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
+
     AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
@@ -141,6 +147,10 @@ public class PrimaryController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
+
+            //ComboBox
+            //clientComboBox.setItems();
+            //productComboBox.setItems();
             //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
@@ -189,7 +199,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Mostra una ventana con un mensaje
+     * Muestra una ventana con un mensaje
      *
      * @param tipus 0 = info, 1 = error
      * @param txt
@@ -244,6 +254,7 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionClientComboBox(ActionEvent event) {
 
+        //Cargar lista de objetos con setItems
     }
 
     @FXML
@@ -289,6 +300,17 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionCreateOrderBtn(ActionEvent event) {
 
+        // capturem les noves dades
+        Order order = getOrderFromView();
+
+        try {
+            orderLogicLayer.insertOrder();
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } catch (SQLException e) {
+            showMessage(1, "Error a l'inserir les dades: " + e);
+        }
+        //desactivaSeleccio();
     }
 
     @FXML
@@ -316,6 +338,22 @@ public class PrimaryController implements Initializable {
 
     }
 
+    /**
+     * Recupera les dades del formulari
+     *
+     * @return Objecte order amb les dades
+     * @throws NumberFormatException
+     */
+    private Order getOrderFromView() throws NumberFormatException {
+        Order order = new Order();
+
+        order.setOrderDate(DateConverter.convertToDate(orderDate.getValue()));
+        order.setRequiredDate(DateConverter.convertToDate(requiredDate.getValue()));
+        order.setShippedDate(DateConverter.convertToDate(shippedDate.getValue()));
+        order.setCustomer(clientComboBox.getEditor().toString());
+
+        return order;
+    }
     // Funcions productes
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) {
@@ -324,12 +362,12 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) {
-
+        
     }
-
-    @FXML
+    
+    @FXML 
     void onActionDeleteProductBtn(ActionEvent event) {
-
+        
     }
 
     //CUSTOMER 

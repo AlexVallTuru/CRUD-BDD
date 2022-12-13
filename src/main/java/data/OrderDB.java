@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import logic.classes.Customer;
 import logic.classes.Order;
 
 /**
@@ -34,36 +33,40 @@ public class OrderDB {
         query.executeQuery("SELECT * FROM orders");
 
         ResultSet rs = query.getResultSet();
-
         while (rs.next()) {
-            Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
-            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getString("orderDate"), rs.getString("requiredDate"), rs.getString("shippedDate"), customer));
+            //Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
+            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getDate("orderDate"), rs.getDate("requiredDate"), rs.getDate("shippedDate"), rs.getString("customers_CustomerEmail")));
         }
         return ordersList;
     }
 
     /**
-     * Retorna un customer cuyo customerEmail coincida con el pasado por
-     * parámetro.
+     * Inserta un nuevo pedido
      *
      * @param conn
-     * @param customerEmail
-     * @return
+     * @param order
      * @throws SQLException
      */
-    public static Customer getCustomer(Connection conn, String customerEmail) throws SQLException {
-        Customer customer = null;
+    public static void insertOrder(Connection conn, Order order) throws SQLException {
 
         Statement query;
-        query = conn.createStatement();
-        query.executeQuery("SELECT * FROM customers WHERE customerEmail = '" + customerEmail + "'");
+        query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        query.executeQuery("SELECT * FROM order BY orderNumber ASC");
 
         ResultSet rs = query.getResultSet();
 
         if (rs.next()) {
-            customer = new Customer(rs.getString("customerEmail"), rs.getString("idCard"), rs.getString("customerName"), rs.getString("phone"), rs.getDouble("creditLimit"), rs.getString("birthDate"));
+            rs.last();
         }
-        return customer;
-    }
 
+        rs.moveToInsertRow();
+
+        rs.updateDate("orderDate", order.getOrderDate());
+        rs.updateDate("requiredDate", order.getRequiredDate());
+        rs.updateDate("shippedDate", order.getShippedDate());
+        rs.updateString("customers_customerEmail", order.getCustomer());
+
+        rs.insertRow();
+        rs.getInt("orderNumber");
+    }
 }
