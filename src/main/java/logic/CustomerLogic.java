@@ -70,7 +70,7 @@ public class CustomerLogic {
     public void eliminarCustomer(Customer customer) throws SQLException {
 
         //l'eliminem de la BBDD
-        //CustomerDB.eliminaCustomer(conn, customer);
+        CustomerDB.eliminaCustomer(conn, customer);
         // Si tot ha anat bé, eliminem l'objecte de la llista observable.
         // NOTA: Quan afegim o eliminem elements de la collecció, la taula es
         // refresca de forma automàtica.

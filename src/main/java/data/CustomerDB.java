@@ -29,7 +29,7 @@ public class CustomerDB {
 
         return ret;
     }
-    
+
     public static ArrayList<Customer> carregarCustomer(Connection con) throws SQLException {
         ArrayList<Customer> ret = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class CustomerDB {
 
     //Aixo es el setter
     public static int insereixNouCustomer(Connection con, Customer customer) throws SQLException {
-        
+
         Statement sentencia;
         int id = 1;
 
@@ -75,31 +75,38 @@ public class CustomerDB {
         rs.updateString("phone", customer.getPhoneNumber());
         rs.updateDouble("creditLimit", customer.getCreditLimit());
         rs.updateString("birthDate", customer.getBirthDate());
-        
+
         //Afeguim les dades seleccionades a la taula mysql
         rs.insertRow();
 
         return id;
     }
-        public static void modificaCustomer(Connection con, Customer customer) throws SQLException
-    {
+
+    public static void modificaCustomer(Connection con, Customer customer) throws SQLException {
         Statement sentencia;
-        
+
         sentencia = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
-        sentencia.executeQuery("SELECT * FROM customers WHERE customerEmail = " + customer.getCustomerEmail());
+        sentencia.executeQuery("SELECT * FROM customers WHERE customerEmail = " + "'" + customer.getCustomerEmail() + "'");
         ResultSet rs = sentencia.getResultSet();
-        
-        if (rs.next())
-        {
-        rs.updateString("idCard", customer.getIdCard());
-        rs.updateString("customerName", customer.getCustomerName());
-        rs.updateString("phone", customer.getPhoneNumber());
-        rs.updateDouble("creditLimit", customer.getCreditLimit());
-        rs.updateString("birthDate", customer.getBirthDate());
-            
-        rs.updateRow();
+
+        if (rs.next()) {
+            rs.updateString("customerEmail", customer.getCustomerEmail());
+            rs.updateString("idCard", customer.getIdCard());
+            rs.updateString("customerName", customer.getCustomerName());
+            rs.updateString("phone", customer.getPhoneNumber());
+            rs.updateDouble("creditLimit", customer.getCreditLimit());
+            rs.updateString("birthDate", customer.getBirthDate());
+
+            rs.updateRow();
         }
     }
-}
 
+    public static void eliminaCustomer(Connection con, Customer customer) throws SQLException {
+        Statement sentencia;
+
+        sentencia = con.createStatement();
+        String sqlStr = "DELETE FROM customers WHERE customerEmail = " + "'" + customer.getCustomerEmail() + "'";
+        sentencia.executeUpdate(sqlStr);
+    }
+}

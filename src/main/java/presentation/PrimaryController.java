@@ -276,11 +276,25 @@ public class PrimaryController implements Initializable {
     @FXML
     void onClick_bt_actualizar(ActionEvent event) throws Exception {
         customerLogicLayer.modificarCustomer(getCustomerFromView());
+
+        //Para actualizar la pagina
+        customerLogicLayer.setData();
+        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
     }
 
     @FXML
     void onClick_bt_eliminar(ActionEvent event) {
+        // capturem l'objecte seleccionat a la taula
+        Customer customer = getCustomerFromTable();
 
+        try {
+            customerLogicLayer.eliminarCustomer(customer);
+
+        } catch (SQLException e) {
+            showMessage(1, "Error al eliminar les dades: " + e);
+        }
+
+        //desactivaSeleccio();
     }
 
     private Customer getCustomerFromView() throws NumberFormatException {
@@ -300,13 +314,15 @@ public class PrimaryController implements Initializable {
     private void handleOnMouseClicked(MouseEvent ev) {
         // si hem seleccionat un registre de la taula
         if (tv_customer.getSelectionModel().getSelectedItem() != null) {
+            //Desabilitem el boto del mail al ser la primarykey
+            tf_customerEmail.setDisable(true);
             // agafem les dades de l'objecte seleccionat i els traspassem
             // als camps del formulari
             setCustomerToView(getCustomerFromTable());
 
             //habilitem botó de modificar i eliminar
-            //btnModificar.setDisable(false);
-            //btnEliminar.setDisable(false);
+            bt_actualizar.setDisable(false);
+            bt_eliminar.setDisable(false);
         } else {
             //desactivaSeleccio();
         }
@@ -322,12 +338,12 @@ public class PrimaryController implements Initializable {
             tf_phoneNumber.setText(customer.getPhoneNumber());
         }
     }
-        private Customer getCustomerFromTable()
-    {
+
+    private Customer getCustomerFromTable() {
         Customer customer = null;
-        
-        customer = (Customer)tv_customer.getSelectionModel().getSelectedItem();
-        
+
+        customer = (Customer) tv_customer.getSelectionModel().getSelectedItem();
+
         return customer;
     }
 
@@ -339,7 +355,6 @@ public class PrimaryController implements Initializable {
      * {
      * //deshabilitem botóns i fila seleccionada btnModificar.setDisable(true);
      * btnEliminar.setDisable(true);
-     * taulaAssignatura.getSelectionModel().clearSelection();
-    }*
+     * taulaAssignatura.getSelectionModel().clearSelection(); }*
      */
 }

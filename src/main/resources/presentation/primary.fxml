@@ -34,7 +34,7 @@
                   <TextField fx:id="tf_idCard" layoutX="190.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
                   <TextField fx:id="tf_creditLimit" layoutX="355.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
                   <TextField fx:id="tf_phoneNumber" layoutX="524.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
-                  <TextField fx:id="tf_customerEmail" layoutX="686.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
+                  <TextField fx:id="tf_customerEmail" layoutX="686.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0"/>
                   <TextField fx:id="tf_birthDate" layoutX="850.0" layoutY="520.0" prefHeight="47.0" prefWidth="149.0" />
                </children></AnchorPane>
       </content>
