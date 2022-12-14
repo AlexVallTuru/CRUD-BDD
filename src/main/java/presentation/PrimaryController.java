@@ -113,6 +113,9 @@ public class PrimaryController implements Initializable {
     private Button deleteProductBtn;
     
     @FXML
+    private Button cleanFieldsBtn;
+    
+    @FXML
     private TextField productCodeField;
     
     @FXML
@@ -300,11 +303,24 @@ public class PrimaryController implements Initializable {
 
     }
     
-    // Funcions productes
+    /* 
+    Funcions productes
+    */
 
+    /**
+     * Envia a la capa logica el producte a editar seleccionat des-de el
+     * observableList
+     * 
+     * @param event
+     * @throws SQLException 
+     */
     @FXML
-    void onActionUpdateProductBtn(ActionEvent event) {
+    void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
+        productLogicLayer.editProduct(getProductFromView());
         
+        // Actualitzar la vista
+        productLogicLayer.setData();
+        productsTableView.setItems(productLogicLayer.getProductObservableList());
     }
     
     /**
@@ -322,9 +338,42 @@ public class PrimaryController implements Initializable {
         productsTableView.setItems(productLogicLayer.getProductObservableList());
     }
     
+    /**
+     * Envia l'entrada seleccionada que es vol eliminar de la taula a la capa
+     * logica
+     * 
+     * @param event 
+     */
     @FXML 
     void onActionDeleteProductBtn(ActionEvent event) {
+        Product product = getProductFromTable();
         
+        // Intenta eliminar l'entrada. Si falla, mostra un missatge amb l'error
+        try {
+            productLogicLayer.removeProduct(product);
+        } catch (SQLException e) {
+            showMessage(1, "Error eliminant l'entrada: " + e);
+        }
+    }
+    
+    /**
+     * Desactiva botons i elimina dades als camps d'edicio
+     * 
+     * @param event 
+     */
+    @FXML
+    void onActionCleanFieldsBtn(ActionEvent event) {
+        // Desactivar botons i deseleccionar entrada de la taula
+        updateProductBtn.setDisable(true);
+        deleteProductBtn.setDisable(true);
+        productsTableView.getSelectionModel().clearSelection();
+        
+        // Esborrar dades als camps d'edició
+        productCodeField.clear();
+        productNameField.clear();
+        productDescriptionField.clear();
+        quantityInStockField.clear();
+        buyPriceField.clear();
     }
     
     /**
@@ -336,11 +385,55 @@ public class PrimaryController implements Initializable {
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
         
+        // Si estem modificant una entrada, existira un codi
+        if (!productCodeField.getText().equals("")) {
+            product.setProductCode(parseInt(productCodeField.getText()));
+        }
         product.setProductName(productNameField.getText());
         product.setProductDescription(productDescriptionField.getText());
         product.setQuantityInStock(parseInt(quantityInStockField.getText()));
         product.setBuyPrice(Double.parseDouble(buyPriceField.getText()));
         
+        return product;
+    }
+    
+    /**
+     * Comprova si hem seleccionat una entrada de la taula i envia els valors
+     * als camps d'edició per a modificar o eliminar aquesta.
+     * 
+     * @param ev 
+     */
+    @FXML
+    private void handleProductMouseCicked(MouseEvent ev) {
+        if (productsTableView.getSelectionModel().getSelectedItem() != null) {
+            setProductToView(getProductFromTable());
+            updateProductBtn.setDisable(false);
+            deleteProductBtn.setDisable(false);
+        }
+    }
+    
+    /**
+     * Envia els valors del camp de la taula seleccionat als camps d'edició
+     * 
+     * @param product 
+     */
+    private void setProductToView(Product product) {
+        if (product != null) {
+            productCodeField.setText(String.valueOf(product.getProductCode()));
+            productNameField.setText(product.getProductName());
+            productDescriptionField.setText(product.getProductDescription());
+            quantityInStockField.setText(String.valueOf(product.getQuantityInStock()));
+            buyPriceField.setText(String.valueOf(product.getBuyPrice()));
+        }
+    }
+    
+    /**
+     * Obte el producte de la taula
+     * 
+     * @return 
+     */
+    private Product getProductFromTable() {
+        Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
         return product;
     }
     
