@@ -3,6 +3,14 @@ package presentation;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,18 +25,28 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import logic.DateConverter;
+import logic.OrderDetailsLogic;
+import logic.OrderLogic;
+import logic.classes.Order;
+import logic.AppConfigLogic;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
 import logic.OrderLogic;
+import logic.classes.Order;
 import logic.ProductLogic;
+import logic.classes.AppConfig;
 import logic.classes.Customer;
 import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
 
     ProductLogic productLogicLayer;
+
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
+
+    AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
     @FXML
@@ -93,40 +111,40 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private DatePicker shippedDate;
-    
+
     /**
      * Elements productes
      */
     @FXML
     private TableView productsTableView;
-    
+
     @FXML
     private TableColumn colProductCode, colProductName, colProductDescription, colQuantityInStock, colBuyPrice;
-    
+
     @FXML
     private Button updateProductBtn;
-    
+
     @FXML
     private Button addNewProductBtn;
-    
+
     @FXML
     private Button deleteProductBtn;
-    
+
     @FXML
     private Button cleanFieldsBtn;
     
     @FXML
     private TextField productCodeField;
-    
+
     @FXML
     private TextField productNameField;
-    
+
     @FXML
     private TextField productDescriptionField;
     
     @FXML
     private TextField quantityInStockField;
-    
+
     @FXML
     private TextField buyPriceField;
 
@@ -134,7 +152,11 @@ public class PrimaryController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
-            //Customer Order
+
+            //ComboBox
+            //clientComboBox.setItems();
+            //productComboBox.setItems();
+            //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
@@ -146,6 +168,12 @@ public class PrimaryController implements Initializable {
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            //AppConfig Logic
+            appConfigLogic = new AppConfigLogic();
+            //Cargamos los datos del OBJETO en la base de datos
+            appConfigLogic.setData();
+            //Bolcamos los datos de la base de datos en este objeto para poder trabajar con ellos.
+
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -176,7 +204,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Mostra una ventana con un mensaje
+     * Muestra una ventana con un mensaje
      *
      * @param tipus 0 = info, 1 = error
      * @param txt
@@ -231,6 +259,7 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionClientComboBox(ActionEvent event) {
 
+        //Cargar lista de objetos con setItems
     }
 
     @FXML
@@ -276,6 +305,17 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionCreateOrderBtn(ActionEvent event) {
 
+        // capturem les noves dades
+        Order order = getOrderFromView();
+
+        try {
+            orderLogicLayer.insertOrder();
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } catch (SQLException e) {
+            showMessage(1, "Error a l'inserir les dades: " + e);
+        }
+        //desactivaSeleccio();
     }
 
     @FXML
@@ -302,6 +342,23 @@ public class PrimaryController implements Initializable {
     void onActionSearchOrderBtn(ActionEvent event) {
 
     }
+
+    /**
+     * Recupera les dades del formulari
+     *
+     * @return Objecte order amb les dades
+     * @throws NumberFormatException
+     */
+    private Order getOrderFromView() throws NumberFormatException {
+        Order order = new Order();
+
+        order.setOrderDate(DateConverter.convertToDate(orderDate.getValue()));
+        order.setRequiredDate(DateConverter.convertToDate(requiredDate.getValue()));
+        order.setShippedDate(DateConverter.convertToDate(shippedDate.getValue()));
+        order.setCustomer(clientComboBox.getEditor().toString());
+
+        return order;
+    }
     
     /* 
     Funcions productes
@@ -322,7 +379,7 @@ public class PrimaryController implements Initializable {
         productLogicLayer.setData();
         productsTableView.setItems(productLogicLayer.getProductObservableList());
     }
-    
+
     /**
      * Envia els valors dels camps a la capa lógica
      * 
@@ -436,9 +493,8 @@ public class PrimaryController implements Initializable {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
         return product;
     }
-    
-    //CUSTOMER 
 
+    //CUSTOMER 
     @FXML
     private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
     @FXML
@@ -451,11 +507,33 @@ public class PrimaryController implements Initializable {
     @FXML
     void onClick_bt_aniadir(ActionEvent event) throws SQLException {
 
-        customerLogicLayer.afegirCustomer(getCustomerFromView());
+        AppConfig appConfig = appConfigLogic.getAppConfig();
+        //Aqui obtenim la minima edat i si es superior o igual entra al if i escui a la base de dades
+        if (appConfig.getMinCustomerAge() > calcularEdat(getCustomerFromView())) {
+            customerLogicLayer.afegirCustomer(getCustomerFromView());
 
-        //Para actualizar la pagina
-        customerLogicLayer.setData();
-        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            //Para actualizar la pagina
+            customerLogicLayer.setData();
+            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+        }
+
+    }
+
+    public int calcularEdat(Customer customer) {
+        //Creamos un formato de fecha 
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        //A traves del parse pasamos la fecha al formato y le pasamos la fecha de la base de datos y el formato al que la queremos pasar
+        LocalDate fechaNac = LocalDate.parse(customer.getBirthDate(), fmt);
+
+        //Creamos una variable donde le metemos la fecha de hoy
+        LocalDate ahora = LocalDate.now();
+
+        //Utilizamos el metodo period para crear un objeto que nos restara dos fechas y nos obtendra años, meses y dias.
+        Period periodo = Period.between(fechaNac, ahora);
+
+        //Esta variable obtendra la edad de la persona.
+        return periodo.getYears();
     }
 
     @FXML

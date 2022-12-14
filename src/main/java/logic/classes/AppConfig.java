@@ -19,6 +19,17 @@ public class AppConfig {
     private int maxLinesPerOrder;
     private double maxOrderAmount;
 
+    public AppConfig(double defaultCreditLimit, int defaultQuantityInStock, int defaultQuantityOrdered, int defaultProductBenefit, int minShippingHours, int minCustomerAge, int maxLinesPerOrder, double maxOrderAmount) {
+        this.defaultCreditLimit = defaultCreditLimit;
+        this.defaultQuantityInStock = defaultQuantityInStock;
+        this.defaultQuantityOrdered = defaultQuantityOrdered;
+        this.defaultProductBenefit = defaultProductBenefit;
+        this.minShippingHours = minShippingHours;
+        this.minCustomerAge = minCustomerAge;
+        this.maxLinesPerOrder = maxLinesPerOrder;
+        this.maxOrderAmount = maxOrderAmount;
+    }
+
     public AppConfig() {
     }
 

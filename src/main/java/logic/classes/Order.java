@@ -4,6 +4,9 @@
  */
 package logic.classes;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 /**
  *
  * @author Ztudo
@@ -11,17 +14,20 @@ package logic.classes;
 public class Order {
 
     private int orderNumber;
-    private String orderDate;
-    private String requiredDate;
-    private String shippedDate;
-    private Customer customer;
+    private Date orderDate;
+    private Date requiredDate;
+    private Date shippedDate;
+    private String customer;
 
-    public Order(int orderNumber, String orderDate, String requiredDate, String shippedDate, Customer customer) {
+    public Order(int orderNumber, Date orderDate, Date requiredDate, Date shippedDate, String customer) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
         this.requiredDate = requiredDate;
         this.shippedDate = shippedDate;
         this.customer = customer;
+    }
+
+    public Order() {
     }
 
     public int getOrderNumber() {
@@ -32,35 +38,35 @@ public class Order {
         this.orderNumber = orderNumber;
     }
 
-    public String getOrderDate() {
+    public Date getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(String orderDate) {
+    public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
 
-    public String getRequiredDate() {
+    public Date getRequiredDate() {
         return requiredDate;
     }
 
-    public void setRequiredDate(String requiredDate) {
+    public void setRequiredDate(Date requiredDate) {
         this.requiredDate = requiredDate;
     }
 
-    public String getShippedDate() {
+    public Date getShippedDate() {
         return shippedDate;
     }
 
-    public void setShippedDate(String shippedDate) {
+    public void setShippedDate(Date shippedDate) {
         this.shippedDate = shippedDate;
     }
 
-    public Customer getCustomer() {
+    public String getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Customer customer) {
+    public void setCustomer(String customer) {
         this.customer = customer;
     }
 

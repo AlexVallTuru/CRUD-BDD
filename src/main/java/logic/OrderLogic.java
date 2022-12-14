@@ -46,4 +46,18 @@ public class OrderLogic {
     public ObservableList<Order> getOrderObservableList() {
         return ordersOList;
     }
+
+    public void insertOrder() throws SQLException {
+
+        Order order = new Order();
+
+        // afegim una nova assignatura
+        OrderDB.insertOrder(conn, order);
+
+        // Si tot ha anat bé, afegim l'objecte a la llista observable.
+        // NOTA: Quan afegim o eliminem elements de la collecció, la taula es
+        // refresca de forma automàtica, amb el mateix efecte que
+        // si fessim taulaAssignatura.refresh()
+        ordersOList.add(order);
+    }
 }

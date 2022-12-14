@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.Customer;
+import logic.classes.AppConfig;
 
 /**
  *
@@ -22,7 +23,7 @@ public class CustomerLogic {
     //Objecte connexió a la BBDD
     Connection conn;
 
-    //llista observable d'objectes de la classe Assignatura
+    //llista observable d'objectes de la classe Customer
     ObservableList<Customer> llistaObservableCustomer;
 
     /**
@@ -55,7 +56,7 @@ public class CustomerLogic {
      * @throws SQLException
      */
     public void afegirCustomer(Customer customer) throws SQLException {
-
+        
         CustomerDB.insereixNouCustomer(conn, customer);
 
         llistaObservableCustomer.add(customer);
@@ -82,7 +83,6 @@ public class CustomerLogic {
      *
      * @return
      */
-
     /**
      * Tanca la connexió amb la BBDD
      *
@@ -118,12 +118,23 @@ public class CustomerLogic {
         return llistaObservableCustomer;
     }
 
+
+
     public void modificarCustomer(Customer customer) throws SQLException, Exception {
         // si no valida el format del nom, genera una excepció
-        /**if (!this.validaNomAssignatura(as.getNom())) {
-            throw new Exception("El format del nom de l'assignatura no és correcte. Un exemple de format correcte seria ABC-123");
-        }**/
+        /**
+         * if (!this.validaNomAssignatura(as.getNom())) { throw new
+         * Exception("El format del nom de l'assignatura no és correcte. Un
+         * exemple de format correcte seria ABC-123"); }*
+         */
 
         CustomerDB.modificaCustomer(conn, customer);
+    }
+
+    public void calcularEdad() throws SQLException, Exception {
+        AppConfig appconfig = null;
+
+        appconfig.getMinCustomerAge();
+
     }
 }
