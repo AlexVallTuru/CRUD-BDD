@@ -51,4 +51,47 @@ public class ProductLogic {
     public ObservableList<Product> getProductObservableList() {
         return productsOList;
     }
+    
+    /**
+     * Envia un nou producte a la capa BBDD
+     * 
+     * @param product
+     * @throws SQLException 
+     */
+    public void addProduct(Product product) throws SQLException {
+        ProductDB.insertProduct(conn, product);
+        
+        productsOList.add(product);
+    }
+    
+    /**
+     * Envia a la capa BBDD la entrada a eliminar i també elimina aquesta de la
+     * observableList
+     * 
+     * @param product
+     * @throws SQLException 
+     */
+    public void removeProduct(Product product) throws SQLException {
+        ProductDB.deleteProduct(conn, product);
+        productsOList.remove(product);
+    }
+    
+    /**
+     * Envia a la capa BBDD el producte modificat
+     * 
+     * @param product
+     * @throws SQLException 
+     */
+    public void editProduct(Product product) throws SQLException {
+        ProductDB.modifyProduct(conn, product);
+    }
+    
+    /**
+     * Tanca la connexió a la BBDD
+     * 
+     * @throws SQLException 
+     */
+    public void closeConn() throws SQLException {
+        this.conn.close();
+    }
 }
