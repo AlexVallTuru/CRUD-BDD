@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="712.0" prefWidth="1061.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="presentation.PrimaryController">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="712.0" prefWidth="1061.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="presentation.PrimaryController">
   <tabs>
     <Tab text="Clientes">
       <content>
@@ -77,7 +77,7 @@
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1039.0">
                <children>
-                  <TableView fx:id="orderTableView" layoutX="26.0" layoutY="109.0" prefHeight="393.0" prefWidth="985.0">
+                  <TableView fx:id="orderTableView" layoutX="26.0" layoutY="109.0" onMouseClicked="#handleOrderOnMouseClicked" prefHeight="393.0" prefWidth="985.0">
                      <columns>
                         <TableColumn fx:id="colOrderNum" prefWidth="131.0" text="Nº pedido" />
                         <TableColumn fx:id="colOrderDate" prefWidth="163.0" text="Fecha pedido" />
@@ -93,9 +93,9 @@
                   <DatePicker fx:id="fromOrderData" layoutX="31.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="De" />
                   <DatePicker fx:id="toOrderData" layoutX="242.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="Hasta" />
                   <Text layoutX="31.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Filtrar entre dos fechas" />
-                  <TextField layoutX="31.0" layoutY="537.0" promptText="Fecha de pedido" />
-                  <TextField layoutX="250.0" layoutY="537.0" promptText="Fecha de llegada" />
-                  <TextField layoutX="474.0" layoutY="537.0" promptText="Fecha de envío" />
+                  <TextField fx:id="orderTabOrderDate" layoutX="31.0" layoutY="537.0" promptText="Fecha de pedido" />
+                  <TextField fx:id="orderTabRequiredDate" layoutX="250.0" layoutY="537.0" promptText="Fecha de llegada" />
+                  <TextField fx:id="orderTabShippingDate" layoutX="474.0" layoutY="537.0" promptText="Fecha de envío" />
                   <Button fx:id="modifyOrderBtn" layoutX="490.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionModifyOrderBtn" text="Modificar" />
                   <Button fx:id="searchOrderBtn" layoutX="474.0" layoutY="43.0" mnemonicParsing="false" onAction="#onActionSearchOrderBtn" text="Buscar" />
                </children>

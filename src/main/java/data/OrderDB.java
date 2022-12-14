@@ -18,7 +18,7 @@ import logic.classes.Order;
 public class OrderDB {
 
     /**
-     * Retorna el contingut de la taula en una col·lecció d'Assignatura
+     * Retorna el contenido de la tabla en una colección de "Orders"
      *
      * @param conn
      * @return
@@ -35,7 +35,7 @@ public class OrderDB {
         ResultSet rs = query.getResultSet();
         while (rs.next()) {
             //Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
-            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getDate("orderDate"), rs.getDate("requiredDate"), rs.getDate("shippedDate"), rs.getString("customers_CustomerEmail")));
+            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), rs.getString("customers_CustomerEmail")));
         }
         return ordersList;
     }
@@ -51,22 +51,41 @@ public class OrderDB {
 
         Statement query;
         query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        query.executeQuery("SELECT * FROM order BY orderNumber ASC");
+        query.executeQuery("SELECT * FROM orders");
+
+        ResultSet rs = query.getResultSet();
+
+        rs.moveToInsertRow();
+
+        rs.updateTimestamp("orderDate", order.getOrderDate());
+        rs.updateTimestamp("requiredDate", order.getRequiredDate());
+        rs.updateTimestamp("shippedDate", order.getShippedDate());
+        rs.updateString("customers_customerEmail", order.getCustomer());
+
+        rs.insertRow();
+    }
+
+    /**
+     * Actualiza un nuevo pedido
+     *
+     * @param conn
+     * @param order
+     * @throws SQLException
+     */
+    public static void updateOrder(Connection conn, Order order) throws SQLException {
+
+        Statement query;
+        query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        query.executeQuery("SELECT * FROM orders WHERE customers_customerEmail = " + order.getCustomer());
 
         ResultSet rs = query.getResultSet();
 
         if (rs.next()) {
-            rs.last();
+            rs.updateTimestamp("orderDate", order.getOrderDate());
+            rs.updateTimestamp("requiredDate", order.getRequiredDate());
+            rs.updateTimestamp("shippedDate", order.getShippedDate());
+
+            rs.updateRow();
         }
-
-        rs.moveToInsertRow();
-
-        rs.updateDate("orderDate", order.getOrderDate());
-        rs.updateDate("requiredDate", order.getRequiredDate());
-        rs.updateDate("shippedDate", order.getShippedDate());
-        rs.updateString("customers_customerEmail", order.getCustomer());
-
-        rs.insertRow();
-        rs.getInt("orderNumber");
     }
 }

@@ -16,16 +16,14 @@ import logic.classes.AppConfig;
  */
 public class AppConfigLogic {
 
-    //Objecte connexió a la BBDD
     Connection conn;
-    //llista observable d'objectes de la classe Customer
+
     AppConfig appConfig;
 
     public AppConfigLogic() throws SQLException {
-        // inicialitzem connexió amb BD
 
         conn = ConnectionDB.getInstance().getConnection();
-        // inicialitzem col.lecció
+
         AppConfig appConfig = new AppConfig();
     }
 
@@ -36,7 +34,4 @@ public class AppConfigLogic {
     public void setData() throws SQLException {
         this.appConfig = AppConfigDB.carregarAppConfig(conn);
     }
-
-
-
 }

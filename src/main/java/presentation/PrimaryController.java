@@ -3,14 +3,9 @@ package presentation;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,9 +21,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import logic.DateConverter;
-import logic.OrderDetailsLogic;
-import logic.OrderLogic;
-import logic.classes.Order;
 import logic.AppConfigLogic;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
@@ -41,11 +33,10 @@ import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
 
+    //Logic Layer Classes
     ProductLogic productLogicLayer;
-
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
-
     AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
@@ -89,10 +80,10 @@ public class PrimaryController implements Initializable {
     private Button searchOrderBtn;
 
     @FXML
-    private ComboBox<?> clientComboBox;
+    private ComboBox<Customer> clientComboBox;
 
     @FXML
-    private ComboBox<?> productComboBox;
+    private ComboBox<Product> productComboBox;
 
     @FXML
     private TextField orderNum;
@@ -102,6 +93,15 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private TextField productQuantity;
+
+    @FXML
+    private TextField orderTabOrderDate;
+
+    @FXML
+    private TextField orderTabRequiredDate;
+
+    @FXML
+    private TextField orderTabShippingDate;
 
     @FXML
     private DatePicker requiredDate;
@@ -132,7 +132,7 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private Button cleanFieldsBtn;
-    
+
     @FXML
     private TextField productCodeField;
 
@@ -141,7 +141,7 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private TextField productDescriptionField;
-    
+
     @FXML
     private TextField quantityInStockField;
 
@@ -153,9 +153,6 @@ public class PrimaryController implements Initializable {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
 
-            //ComboBox
-            //clientComboBox.setItems();
-            //productComboBox.setItems();
             //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
@@ -168,6 +165,9 @@ public class PrimaryController implements Initializable {
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            //ComboBox
+            clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
+            productComboBox.setItems(productLogicLayer.getProductObservableList());
             //AppConfig Logic
             appConfigLogic = new AppConfigLogic();
             //Cargamos los datos del OBJETO en la base de datos
@@ -306,16 +306,18 @@ public class PrimaryController implements Initializable {
     void onActionCreateOrderBtn(ActionEvent event) {
 
         // capturem les noves dades
-        Order order = getOrderFromView();
+        Order order = getOrderFromForm();
 
         try {
-            orderLogicLayer.insertOrder();
+            orderLogicLayer.insertOrder(order);
+
+            orderLogicLayer.setData();
         } catch (NumberFormatException e) {
             showMessage(1, "Dades incorrectes: " + e);
         } catch (SQLException e) {
             showMessage(1, "Error a l'inserir les dades: " + e);
         }
-        //desactivaSeleccio();
+        disableOrderSelection();
     }
 
     @FXML
@@ -335,6 +337,33 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionModifyOrderBtn(ActionEvent event) {
+        // capturem les noves dades
+        Order order = getOrderFromForm();
+
+        try {
+            //el modifiquem a la BBDD
+            orderLogicLayer.updateOrder(order);
+
+            //si tot ha anat bé, actualitzem visualment l'objecte a la taula
+            Order asTableview = getOrderFromTable();
+
+            asTableview.setOrderDate(order.getOrderDate());
+            asTableview.setRequiredDate(order.getRequiredDate());
+            asTableview.setShippedDate(order.getShippedDate());
+
+            //quan modifiquem els atributs d'u nelement de la llista
+            //és necessàri refrescar la taula de forma manual
+            orderTableView.refresh();
+
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } catch (SQLException e) {
+            showMessage(1, "Error al modificar les dades: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
+
+        desactivaSeleccio();
 
     }
 
@@ -344,37 +373,91 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Recupera les dades del formulari
+     * Si hemos seleccionado un registro de la tabla, nos muestra los datos en
+     * el formulario.
+     *
+     * @param ev
+     */
+    @FXML
+    private void handleOrderOnMouseClicked(MouseEvent ev) {
+
+        if (orderTableView.getSelectionModel().getSelectedItem() != null) {
+
+            setOrderToView(getOrderFromTable());
+
+            modifyOrderBtn.setDisable(false);
+            deleteOrderBtn.setDisable(false);
+        } else {
+            disableOrderSelection();
+        }
+    }
+
+    /**
+     * Deshabilita botones y limpia la seleccion del usuario.
+     */
+    private void disableOrderSelection() {
+        //deshabilitem botóns i fila seleccionada
+        modifyOrderBtn.setDisable(true);
+        deleteOrderBtn.setDisable(true);
+        orderTableView.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Obtiene los datos del formulario y retorna un objeto
      *
      * @return Objecte order amb les dades
-     * @throws NumberFormatException
      */
-    private Order getOrderFromView() throws NumberFormatException {
+    private Order getOrderFromForm() {
         Order order = new Order();
 
-        order.setOrderDate(DateConverter.convertToDate(orderDate.getValue()));
-        order.setRequiredDate(DateConverter.convertToDate(requiredDate.getValue()));
-        order.setShippedDate(DateConverter.convertToDate(shippedDate.getValue()));
-        order.setCustomer(clientComboBox.getEditor().toString());
+        order.setOrderDate(DateConverter.convertToTimestamp(orderDate.getValue()));
+        order.setRequiredDate(DateConverter.convertToTimestamp(requiredDate.getValue()));
+        order.setShippedDate(DateConverter.convertToTimestamp(shippedDate.getValue()));
+        order.setCustomer(clientComboBox.getSelectionModel().getSelectedItem().toString().trim());
 
         return order;
     }
-    
+
+    /**
+     * Recupera l'objecte seleccionat a la taula
+     *
+     * @return Objecte Assignatura o null si no hi ha selecció
+     */
+    private Order getOrderFromTable() {
+        Order order = null;
+
+        order = (Order) orderTableView.getSelectionModel().getSelectedItem();
+
+        return order;
+    }
+
+    /**
+     * Rellena los campos del formulario con los datos de un objeto Order
+     *
+     * @param objecte Order
+     */
+    private void setOrderToView(Order order) {
+        if (order != null) {
+            orderTabOrderDate.setText(String.valueOf(order.getOrderDate()));
+            orderTabRequiredDate.setText(String.valueOf(order.getRequiredDate()));
+            orderTabShippingDate.setText(String.valueOf(order.getShippedDate()));
+        }
+    }
+
     /* 
     Funcions productes
-    */
-
+     */
     /**
      * Envia a la capa logica el producte a editar seleccionat des-de el
      * observableList
-     * 
+     *
      * @param event
-     * @throws SQLException 
+     * @throws SQLException
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
         productLogicLayer.editProduct(getProductFromView());
-        
+
         // Actualitzar la vista
         productLogicLayer.setData();
         productsTableView.setItems(productLogicLayer.getProductObservableList());
@@ -382,29 +465,29 @@ public class PrimaryController implements Initializable {
 
     /**
      * Envia els valors dels camps a la capa lógica
-     * 
+     *
      * @param event
-     * @throws SQLException 
+     * @throws SQLException
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
         productLogicLayer.addProduct(getProductFromView());
-        
+
         // Actualitzar la taula
         productLogicLayer.setData();
         productsTableView.setItems(productLogicLayer.getProductObservableList());
     }
-    
+
     /**
      * Envia l'entrada seleccionada que es vol eliminar de la taula a la capa
      * logica
-     * 
-     * @param event 
+     *
+     * @param event
      */
-    @FXML 
+    @FXML
     void onActionDeleteProductBtn(ActionEvent event) {
         Product product = getProductFromTable();
-        
+
         // Intenta eliminar l'entrada. Si falla, mostra un missatge amb l'error
         try {
             productLogicLayer.removeProduct(product);
@@ -412,11 +495,11 @@ public class PrimaryController implements Initializable {
             showMessage(1, "Error eliminant l'entrada: " + e);
         }
     }
-    
+
     /**
      * Desactiva botons i elimina dades als camps d'edicio
-     * 
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     void onActionCleanFieldsBtn(ActionEvent event) {
@@ -424,7 +507,7 @@ public class PrimaryController implements Initializable {
         updateProductBtn.setDisable(true);
         deleteProductBtn.setDisable(true);
         productsTableView.getSelectionModel().clearSelection();
-        
+
         // Esborrar dades als camps d'edició
         productCodeField.clear();
         productNameField.clear();
@@ -432,16 +515,16 @@ public class PrimaryController implements Initializable {
         quantityInStockField.clear();
         buyPriceField.clear();
     }
-    
+
     /**
      * Obté els valors dels camps
-     * 
+     *
      * @return
-     * @throws NumberFormatException 
+     * @throws NumberFormatException
      */
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
-        
+
         // Si estem modificant una entrada, existira un codi
         if (!productCodeField.getText().equals("")) {
             product.setProductCode(parseInt(productCodeField.getText()));
@@ -450,15 +533,15 @@ public class PrimaryController implements Initializable {
         product.setProductDescription(productDescriptionField.getText());
         product.setQuantityInStock(parseInt(quantityInStockField.getText()));
         product.setBuyPrice(Double.parseDouble(buyPriceField.getText()));
-        
+
         return product;
     }
-    
+
     /**
      * Comprova si hem seleccionat una entrada de la taula i envia els valors
      * als camps d'edició per a modificar o eliminar aquesta.
-     * 
-     * @param ev 
+     *
+     * @param ev
      */
     @FXML
     private void handleProductMouseCicked(MouseEvent ev) {
@@ -468,11 +551,11 @@ public class PrimaryController implements Initializable {
             deleteProductBtn.setDisable(false);
         }
     }
-    
+
     /**
      * Envia els valors del camp de la taula seleccionat als camps d'edició
-     * 
-     * @param product 
+     *
+     * @param product
      */
     private void setProductToView(Product product) {
         if (product != null) {
@@ -483,11 +566,11 @@ public class PrimaryController implements Initializable {
             buyPriceField.setText(String.valueOf(product.getBuyPrice()));
         }
     }
-    
+
     /**
      * Obte el producte de la taula
-     * 
-     * @return 
+     *
+     * @return
      */
     private Product getProductFromTable() {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
