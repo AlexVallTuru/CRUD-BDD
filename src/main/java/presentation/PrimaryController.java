@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -156,6 +157,10 @@ public class PrimaryController implements Initializable {
             //ComboBox
             //clientComboBox.setItems();
             //productComboBox.setItems();
+            // AppConfig Logic
+            appConfigLogic = new AppConfigLogic();
+            // Cargamos los datos del OBJETO en la base de datos
+            appConfigLogic.setData();
             //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
@@ -168,12 +173,6 @@ public class PrimaryController implements Initializable {
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
-            //AppConfig Logic
-            appConfigLogic = new AppConfigLogic();
-            //Cargamos los datos del OBJETO en la base de datos
-            appConfigLogic.setData();
-            //Bolcamos los datos de la base de datos en este objeto para poder trabajar con ellos.
-
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
