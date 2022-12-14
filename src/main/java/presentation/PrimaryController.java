@@ -1,5 +1,6 @@
 package presentation;
 
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -218,21 +219,24 @@ public class PrimaryController implements Initializable {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("ERROR");
             }
+            case 2: {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("ERROR");
+            }
             break;
             default:
                 alert = new Alert(Alert.AlertType.INFORMATION);
         }
 
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.setContentText(txt);
-        alert.showAndWait();
-    }
-
-    /**
-     * Muestra una info por pantalla
-     *
-     * @param txt
-     */
+            alert.setContentText(txt);
+            alert.showAndWait();
+        }
+        /**
+         * Muestra una info por pantalla
+         *
+         * @param txt
+         */
     private void showInfo(String txt) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info:");
@@ -354,6 +358,7 @@ public class PrimaryController implements Initializable {
 
         return order;
     }
+
     // Funcions productes
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) {
@@ -362,12 +367,12 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) {
-        
+
     }
-    
-    @FXML 
+
+    @FXML
     void onActionDeleteProductBtn(ActionEvent event) {
-        
+
     }
 
     //CUSTOMER 
@@ -384,32 +389,21 @@ public class PrimaryController implements Initializable {
     void onClick_bt_aniadir(ActionEvent event) throws SQLException {
 
         AppConfig appConfig = appConfigLogic.getAppConfig();
-        //Aqui obtenim la minima edat i si es superior o igual entra al if i escui a la base de dades
-        if (appConfig.getMinCustomerAge() > calcularEdat(getCustomerFromView())) {
-            customerLogicLayer.afegirCustomer(getCustomerFromView());
+        //Aqui obtenim la minima edat de la bdd i mira si es superior o igual
+        try {
+            if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
+                //Escrivim les dades dels texts fields a la base de dades
+                customerLogicLayer.afegirCustomer(getCustomerFromView());
 
-            //Para actualizar la pagina
-            customerLogicLayer.setData();
-            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+                //actualizar el table view
+                customerLogicLayer.setData();
+                tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            } else {
+                showMessage(0, "La minima edad es de " + appConfig.getMinCustomerAge() + " años");
+            }
+        } catch (SQLException exception) {
+            showMessage(2, "Solo se puede añadir un DNI o un correo electronico igual");
         }
-
-    }
-
-    public int calcularEdat(Customer customer) {
-        //Creamos un formato de fecha 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        //A traves del parse pasamos la fecha al formato y le pasamos la fecha de la base de datos y el formato al que la queremos pasar
-        LocalDate fechaNac = LocalDate.parse(customer.getBirthDate(), fmt);
-
-        //Creamos una variable donde le metemos la fecha de hoy
-        LocalDate ahora = LocalDate.now();
-
-        //Utilizamos el metodo period para crear un objeto que nos restara dos fechas y nos obtendra años, meses y dias.
-        Period periodo = Period.between(fechaNac, ahora);
-
-        //Esta variable obtendra la edad de la persona.
-        return periodo.getYears();
     }
 
     @FXML
