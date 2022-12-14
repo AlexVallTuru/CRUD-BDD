@@ -24,7 +24,10 @@ public class AppConfigLogic {
     Connection conn;
     //llista observable d'objectes de la classe Customer
     AppConfig appConfig;
-
+    /**
+     * 
+     * @throws SQLException 
+     */
     public AppConfigLogic() throws SQLException {
         // inicialitzem connexió amb BD
 
@@ -32,15 +35,25 @@ public class AppConfigLogic {
         // inicialitzem col.lecció
         AppConfig appConfig = new AppConfig();
     }
-
+    /**
+     * 
+     * @return 
+     */
     public AppConfig getAppConfig() {
         return appConfig;
     }
-
+    /**
+     * 
+     * @throws SQLException 
+     */
     public void setData() throws SQLException {
         this.appConfig = AppConfigDB.carregarAppConfig(conn);
     }
-    
+    /**
+     * 
+     * @param customer
+     * @return 
+     */
     public int calcularEdat(Customer customer) {
         //Creamos un formato de fecha 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
