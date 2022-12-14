@@ -8,7 +8,6 @@ import data.ConnectionDB;
 import data.CustomerDB;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.Customer;
@@ -56,7 +55,7 @@ public class CustomerLogic {
      * @throws SQLException
      */
     public void afegirCustomer(Customer customer) throws SQLException {
-        
+
         CustomerDB.insereixNouCustomer(conn, customer);
 
         llistaObservableCustomer.add(customer);
@@ -117,8 +116,6 @@ public class CustomerLogic {
     public ObservableList<Customer> getCustomerObservableList() {
         return llistaObservableCustomer;
     }
-
-
 
     public void modificarCustomer(Customer customer) throws SQLException, Exception {
         // si no valida el format del nom, genera una excepció

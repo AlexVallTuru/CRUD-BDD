@@ -1,16 +1,7 @@
 package presentation;
 
-import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,9 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import logic.DateConverter;
-import logic.OrderDetailsLogic;
-import logic.OrderLogic;
-import logic.classes.Order;
 import logic.AppConfigLogic;
 import logic.CustomerLogic;
 import logic.OrderDetailsLogic;
@@ -219,24 +207,21 @@ public class PrimaryController implements Initializable {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("ERROR");
             }
-            case 2: {
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("ERROR");
-            }
             break;
             default:
                 alert = new Alert(Alert.AlertType.INFORMATION);
         }
 
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-            alert.setContentText(txt);
-            alert.showAndWait();
-        }
-        /**
-         * Muestra una info por pantalla
-         *
-         * @param txt
-         */
+        alert.setContentText(txt);
+        alert.showAndWait();
+    }
+
+    /**
+     * Muestra una info por pantalla
+     *
+     * @param txt
+     */
     private void showInfo(String txt) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info:");
@@ -314,7 +299,7 @@ public class PrimaryController implements Initializable {
         } catch (SQLException e) {
             showMessage(1, "Error a l'inserir les dades: " + e);
         }
-        //desactivaSeleccio();
+
     }
 
     @FXML
@@ -386,7 +371,7 @@ public class PrimaryController implements Initializable {
     private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
 
     @FXML
-    void onClick_bt_aniadir(ActionEvent event) throws SQLException {
+    void onClick_bt_aniadir(ActionEvent event) {
 
         AppConfig appConfig = appConfigLogic.getAppConfig();
         //Aqui obtenim la minima edat de la bdd i mira si es superior o igual
@@ -402,8 +387,35 @@ public class PrimaryController implements Initializable {
                 showMessage(0, "La minima edad es de " + appConfig.getMinCustomerAge() + " años");
             }
         } catch (SQLException exception) {
-            showMessage(2, "Solo se puede añadir un DNI o un correo electronico igual");
+            if (primaryKeyRepetida()) {
+                showMessage(1, "Solo se puede añadir un correo electronico, revise la tabla");
+            }
+            if (dniRepetido()) {
+                showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
+            }
+
         }
+    }
+
+    //Comprueba si hay un correo repetido en el textfield y el tableview
+    private Boolean primaryKeyRepetida() {
+        //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
+        for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
+            if (getCustomerFromView().getCustomerEmail().equals(customerLogicLayer.getCustomerObservableList().get(i).getCustomerEmail())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    //Comprueba si hay un dni en el textfield y el tableview
+    private Boolean dniRepetido() {
+        //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
+        for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
+            if (getCustomerFromView().getIdCard().equals(customerLogicLayer.getCustomerObservableList().get(i).getIdCard())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @FXML
@@ -454,8 +466,6 @@ public class PrimaryController implements Initializable {
             //habilitem botó de modificar i eliminar
             bt_actualizar.setDisable(false);
             bt_eliminar.setDisable(false);
-        } else {
-            //desactivaSeleccio();
         }
     }
 
@@ -501,4 +511,5 @@ public class PrimaryController implements Initializable {
         bt_eliminar.setDisable(true);
         tv_customer.getSelectionModel().clearSelection();
     }
+
 }
