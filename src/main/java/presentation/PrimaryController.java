@@ -156,8 +156,8 @@ public class PrimaryController implements Initializable {
             appConfigLogic = new AppConfigLogic();
             //Cargamos los datos del OBJETO en la base de datos
             appConfigLogic.setData();
-            //Bolcamos los datos de la base de datos en este objeto para poder trabajar con ellos.
-
+            //Poner el DefaultCredit como valor por defecto
+             defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -407,6 +407,7 @@ public class PrimaryController implements Initializable {
         }
         return false;
     }
+
     //Comprueba si hay un dni en el textfield y el tableview
     private Boolean dniRepetido() {
         //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
@@ -479,7 +480,7 @@ public class PrimaryController implements Initializable {
 
         //seteamos todos los registros a vacio
         tf_birthDate.clear();
-        tf_creditLimit.clear();
+        defaultValorLimitCredit(appConfigLogic.getAppConfig());
         tf_customerEmail.clear();
         tf_customerName.clear();
         tf_idCard.clear();
@@ -505,11 +506,14 @@ public class PrimaryController implements Initializable {
         return customer;
     }
 
+    private void defaultValorLimitCredit(AppConfig appConfig) {
+        tf_creditLimit.setText(String.valueOf(appConfig.getDefaultCreditLimit()));
+    }
+
     private void desactivaSeleccio() {
         //deshabilitem botóns i fila seleccionada
         bt_actualizar.setDisable(true);
         bt_eliminar.setDisable(true);
         tv_customer.getSelectionModel().clearSelection();
     }
-
 }
