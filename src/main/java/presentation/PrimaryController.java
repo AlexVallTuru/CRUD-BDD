@@ -166,6 +166,7 @@ public class PrimaryController implements Initializable {
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
             // Product logic
             productLogicLayer = new ProductLogic();
             productLogicLayer.setData();
@@ -179,10 +180,6 @@ public class PrimaryController implements Initializable {
             //ComboBox
             clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
             productComboBox.setItems(productLogicLayer.getProductObservableList());
-            //AppConfig Logic
-            appConfigLogic = new AppConfigLogic();
-            //Cargamos los datos del OBJETO en la base de datos
-            appConfigLogic.setData();
             //Poner el DefaultCredit como valor por defecto
             defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
@@ -259,7 +256,9 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionAddProductBtn(ActionEvent event) {
-
+        
+        // Deixem el camp de quantitat amb el seu valor per defecte
+        productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
     }
 
     @FXML
@@ -456,7 +455,8 @@ public class PrimaryController implements Initializable {
         }
     }
 
-    // Funcions productes
+    //<editor-fold defaultstate="collapsed" desc="Botons Productes">
+    
     /**
      * Envia a la capa logica el producte a editar seleccionat des-de el
      * observableList
@@ -466,11 +466,20 @@ public class PrimaryController implements Initializable {
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
-        productLogicLayer.editProduct(getProductFromView());
+        try {
+            Product product = getProductFromView();
+            checkProductEmptyFields(product);
+            productLogicLayer.editProduct(product);
 
-        // Actualitzar la vista
-        productLogicLayer.setData();
-        productsTableView.setItems(productLogicLayer.getProductObservableList());
+            // Actualitzar la vista
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+        } catch (NumberFormatException e) {
+            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
+                    + " l'informació introduida.");
+        } catch (Exception e) {
+            showMessage(1, e.getMessage());
+        }
     }
 
     /**
@@ -483,14 +492,17 @@ public class PrimaryController implements Initializable {
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
         try {
             Product product = getProductFromView();
+            checkProductEmptyFields(product);
             productLogicLayer.addProduct(product);
-
+            
             // Actualitzar la taula
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
         } catch (NumberFormatException e) {
             showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
                     + " l'informació introduida.");
+        } catch (Exception e) {
+            showMessage(1, e.getMessage());
         }
     }
 
@@ -532,7 +544,25 @@ public class PrimaryController implements Initializable {
         quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
         buyPriceField.clear();
     }
-
+    
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
+    
+    /**
+     * Verifica que el nom i descripció del producte no siguin nuls
+     * 
+     * @param product
+     * @throws Exception 
+     */
+    private void checkProductEmptyFields(Product product) throws Exception {
+        if (product.getProductName().equals("")) {
+            throw new Exception("El nom no pot estar en blanc.");
+        } else if (product.getProductDescription().equals("")) {
+            throw new Exception("La descripcio no pot estar en blanc.");
+        }
+    }
+    
     /**
      * Obté els valors dels camps
      *
@@ -594,6 +624,8 @@ public class PrimaryController implements Initializable {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
         return product;
     }
+    
+    //</editor-fold>
 
     //CUSTOMER 
     @FXML
