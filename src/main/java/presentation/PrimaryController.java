@@ -388,11 +388,17 @@ public class PrimaryController implements Initializable {
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
-        productLogicLayer.addProduct(getProductFromView());
-        
-        // Actualitzar la taula
-        productLogicLayer.setData();
-        productsTableView.setItems(productLogicLayer.getProductObservableList());
+        try {
+            Product product = getProductFromView();
+            productLogicLayer.addProduct(product);
+
+            // Actualitzar la taula
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+        } catch (NumberFormatException e) {
+            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
+                    + " l'informació introduida.");
+        }
     }
     
     /**
@@ -423,6 +429,7 @@ public class PrimaryController implements Initializable {
         // Desactivar botons i deseleccionar entrada de la taula
         updateProductBtn.setDisable(true);
         deleteProductBtn.setDisable(true);
+        addNewProductBtn.setDisable(false);
         productsTableView.getSelectionModel().clearSelection();
         
         // Esborrar dades als camps d'edició
@@ -466,6 +473,7 @@ public class PrimaryController implements Initializable {
             setProductToView(getProductFromTable());
             updateProductBtn.setDisable(false);
             deleteProductBtn.setDisable(false);
+            addNewProductBtn.setDisable(true);
         }
     }
     
