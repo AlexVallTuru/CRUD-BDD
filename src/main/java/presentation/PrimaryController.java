@@ -369,7 +369,7 @@ public class PrimaryController implements Initializable {
             showMessage(1, "Error: " + e);
         }
 
-        desactivaSeleccio();
+        disableOrderSelection();
 
     }
 
