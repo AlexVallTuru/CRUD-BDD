@@ -21,6 +21,10 @@ public class ConnectionDB {
 
     private final Connection conn;
 
+    /**
+     *
+     * @throws SQLException
+     */
     private ConnectionDB() throws SQLException {
 
         String db = "m03uf6_22_23";
@@ -31,6 +35,10 @@ public class ConnectionDB {
                 + "useLegacyDatetimeCode=false&serverTimezone=UTC", user, password);
     }
 
+    /**
+     *
+     * @return @throws SQLException
+     */
     public static ConnectionDB getInstance() throws SQLException {
         if (connectionDB != null) {
             return connectionDB;
@@ -40,6 +48,10 @@ public class ConnectionDB {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Connection getConnection() {
         return conn;
     }
