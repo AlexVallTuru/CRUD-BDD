@@ -9,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.layout.Region;
 import logic.classes.AppConfig;
 
 /**
@@ -27,11 +30,13 @@ public class AppConfigDB {
         AppConfig appConfig = new AppConfig();
 
         Statement sentencia;
-
         sentencia = con.createStatement();
-        //Carreguem les dates del mysql
+        // Comprovem si existeixen entrades a la taula
+        checkTable(sentencia);
+        
+        // Carreguem les dates del mysql
         sentencia.executeQuery("SELECT * FROM appconfig");
-        //Guardem les dades carregades a un fitxer amb el que treballarem
+        // Guardem les dades carregades a un fitxer amb el que treballarem
         ResultSet rs = sentencia.getResultSet();
         while (rs.next()) {
             /**
@@ -49,5 +54,30 @@ public class AppConfigDB {
                     rs.getDouble("maxOrderAmount"));
         }
         return appConfig;
+    }
+    
+    /**
+     * Comprova si existeixen entrades a la taula appconfig. Si no existeixen
+     * tanca la aplicació
+     * 
+     * @param conn
+     * @throws SQLException
+     * @author Aitor
+     */
+    private static void checkTable(Statement query) throws SQLException {
+        // Crear sentencia
+        query.executeQuery("SELECT * FROM appconfig");
+        
+        // Tancar l'aplicació si no existeixen entrades
+        ResultSet rs = query.getResultSet();
+        if (rs.next() == false) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("ERROR");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.setContentText("No existeixen entrades a la taula appconfig, tancant aplicació.");
+            alert.showAndWait();
+            
+            Platform.exit();
+        }
     }
 }

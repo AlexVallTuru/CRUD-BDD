@@ -9,6 +9,7 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.DateTimeException;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -157,6 +158,10 @@ public class PrimaryController implements Initializable {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
 
+            // AppConfig Logic
+            appConfigLogic = new AppConfigLogic();
+            // Cargamos los datos del OBJETO en la base de datos
+            appConfigLogic.setData();
             //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
@@ -165,6 +170,7 @@ public class PrimaryController implements Initializable {
             productLogicLayer = new ProductLogic();
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
+            quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
             //Customer Logic
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
@@ -475,11 +481,17 @@ public class PrimaryController implements Initializable {
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
-        productLogicLayer.addProduct(getProductFromView());
+        try {
+            Product product = getProductFromView();
+            productLogicLayer.addProduct(product);
 
-        // Actualitzar la taula
-        productLogicLayer.setData();
-        productsTableView.setItems(productLogicLayer.getProductObservableList());
+            // Actualitzar la taula
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+        } catch (NumberFormatException e) {
+            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
+                    + " l'informació introduida.");
+        }
     }
 
     /**
@@ -510,13 +522,14 @@ public class PrimaryController implements Initializable {
         // Desactivar botons i deseleccionar entrada de la taula
         updateProductBtn.setDisable(true);
         deleteProductBtn.setDisable(true);
+        addNewProductBtn.setDisable(false);
         productsTableView.getSelectionModel().clearSelection();
 
         // Esborrar dades als camps d'edició
         productCodeField.clear();
         productNameField.clear();
         productDescriptionField.clear();
-        quantityInStockField.clear();
+        quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
         buyPriceField.clear();
     }
 
@@ -553,6 +566,7 @@ public class PrimaryController implements Initializable {
             setProductToView(getProductFromTable());
             updateProductBtn.setDisable(false);
             deleteProductBtn.setDisable(false);
+            addNewProductBtn.setDisable(true);
         }
     }
 

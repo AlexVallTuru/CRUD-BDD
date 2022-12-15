@@ -30,8 +30,7 @@ public class AppConfigLogic {
     public AppConfigLogic() throws SQLException {
 
         conn = ConnectionDB.getInstance().getConnection();
-
-        AppConfig appConfig = new AppConfig();
+        appConfig = new AppConfig();
     }
 
     /**

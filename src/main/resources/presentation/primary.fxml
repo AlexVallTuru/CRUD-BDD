@@ -60,14 +60,14 @@
                         <TableColumn fx:id="colBuyPrice" prefWidth="263.0" text="Precio compra" />
                      </columns>
                   </TableView>
-                  <Button fx:id="updateProductBtn" layoutX="386.0" layoutY="590.0" mnemonicParsing="false" onAction="#onActionUpdateProductBtn" text="Actualizar" />
+                  <Button fx:id="updateProductBtn" disable="true" layoutX="386.0" layoutY="590.0" mnemonicParsing="false" onAction="#onActionUpdateProductBtn" text="Actualizar" />
                   <Button fx:id="addNewProductBtn" layoutX="491.0" layoutY="590.0" mnemonicParsing="false" onAction="#onActionAddNewProductBtn" text="Añadir" />
-                  <Button fx:id="deleteProductBtn" layoutX="575.0" layoutY="590.0" mnemonicParsing="false" onAction="#onActionDeleteProductBtn" text="Eliminar" />
-                  <TextField fx:id="productCodeField" disable="true" layoutX="89.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Codigo Producto" />
-                  <TextField fx:id="productNameField" layoutX="263.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Producto" />
-                  <TextField fx:id="productDescriptionField" layoutX="441.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Descripción" />
+                  <Button fx:id="deleteProductBtn" disable="true" layoutX="575.0" layoutY="590.0" mnemonicParsing="false" onAction="#onActionDeleteProductBtn" text="Eliminar" />
+                  <TextField fx:id="productCodeField" disable="true" layoutX="89.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Codi Producte" />
+                  <TextField fx:id="productNameField" layoutX="263.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Producte" />
+                  <TextField fx:id="productDescriptionField" layoutX="441.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Descripció" />
                   <TextField fx:id="quantityInStockField" layoutX="618.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Stock" />
-                  <TextField fx:id="buyPriceField" layoutX="797.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Precio compra" />
+                  <TextField fx:id="buyPriceField" layoutX="797.0" layoutY="532.0" prefHeight="40.0" prefWidth="150.0" promptText="Preu compra" />
                   <Button fx:id="cleanFieldsBtn" layoutX="466.0" layoutY="631.0" mnemonicParsing="false" onAction="#onActionCleanFieldsBtn" text="Limpiar campos" />
                </children>
             </AnchorPane>
