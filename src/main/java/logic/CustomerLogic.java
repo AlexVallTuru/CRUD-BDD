@@ -55,11 +55,11 @@ public class CustomerLogic {
      * @throws SQLException
      */
     public void afegirCustomer(Customer customer) throws SQLException, Exception {
-        if (validaNullsCustomer(customer)) {
+        if (!validaNullsCustomer(customer)) {
             CustomerDB.insereixNouCustomer(conn, customer);
             llistaObservableCustomer.add(customer);
         } else {
-            throw new Exception("No es poden deixar camps buits");
+            throw new Exception ("No se pueden dejar campos vacios");
         }
     }
 
@@ -131,7 +131,7 @@ public class CustomerLogic {
     }
 
     public boolean validaNullsCustomer(Customer customer) {
-        if (customer.getBirthDate() == null || customer.getCustomerEmail() == null || customer.getCustomerName() == null || customer.getPhoneNumber() == null || customer.getIdCard() == null) {
+        if (customer.getBirthDate().isBlank() || customer.getCustomerEmail().isBlank() || customer.getCustomerName().isBlank() || customer.getPhoneNumber().isBlank() || customer.getIdCard().isBlank()) {
             return true;
         }
         return false;

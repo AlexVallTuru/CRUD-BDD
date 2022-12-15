@@ -1,11 +1,13 @@
 package presentation;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -518,12 +520,8 @@ public class PrimaryController implements Initializable {
             if (dniRepetido()) {
                 showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
             }
-        } catch (DateTimeException ex) {
-            showMessage(0, "No se pueden dejar campos vacios");
-        } catch (NumberFormatException ex) {
-            showMessage(0, "No se pueden dejar campos vacios");
         } catch (Exception ex) {
-            showMessage(0, "No se pueden dejar campos vacios");
+            showMessage(0, ex.getMessage());
         }
     }
 
