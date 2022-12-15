@@ -166,6 +166,7 @@ public class PrimaryController implements Initializable {
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
             // Product logic
             productLogicLayer = new ProductLogic();
             productLogicLayer.setData();
@@ -179,10 +180,6 @@ public class PrimaryController implements Initializable {
             //ComboBox
             clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
             productComboBox.setItems(productLogicLayer.getProductObservableList());
-            //AppConfig Logic
-            appConfigLogic = new AppConfigLogic();
-            //Cargamos los datos del OBJETO en la base de datos
-            appConfigLogic.setData();
             //Poner el DefaultCredit como valor por defecto
             defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
@@ -259,7 +256,9 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionAddProductBtn(ActionEvent event) {
-
+        
+        // Deixem el camp de quantitat amb el seu valor per defecte
+        productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
     }
 
     @FXML
