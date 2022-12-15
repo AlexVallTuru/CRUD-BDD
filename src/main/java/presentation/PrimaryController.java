@@ -4,7 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.DateTimeException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -122,7 +125,7 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private Button cleanFieldsBtn;
-    
+
     @FXML
     private TextField productCodeField;
 
@@ -131,7 +134,7 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private TextField productDescriptionField;
-    
+
     @FXML
     private TextField quantityInStockField;
 
@@ -350,18 +353,17 @@ public class PrimaryController implements Initializable {
     }
 
     // Funcions productes
-
     /**
      * Envia a la capa logica el producte a editar seleccionat des-de el
      * observableList
-     * 
+     *
      * @param event
-     * @throws SQLException 
+     * @throws SQLException
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
         productLogicLayer.editProduct(getProductFromView());
-        
+
         // Actualitzar la vista
         productLogicLayer.setData();
         productsTableView.setItems(productLogicLayer.getProductObservableList());
@@ -369,29 +371,29 @@ public class PrimaryController implements Initializable {
 
     /**
      * Envia els valors dels camps a la capa lógica
-     * 
+     *
      * @param event
-     * @throws SQLException 
+     * @throws SQLException
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
         productLogicLayer.addProduct(getProductFromView());
-        
+
         // Actualitzar la taula
         productLogicLayer.setData();
         productsTableView.setItems(productLogicLayer.getProductObservableList());
     }
-    
+
     /**
      * Envia l'entrada seleccionada que es vol eliminar de la taula a la capa
      * logica
-     * 
-     * @param event 
+     *
+     * @param event
      */
-    @FXML 
+    @FXML
     void onActionDeleteProductBtn(ActionEvent event) {
         Product product = getProductFromTable();
-        
+
         // Intenta eliminar l'entrada. Si falla, mostra un missatge amb l'error
         try {
             productLogicLayer.removeProduct(product);
@@ -399,11 +401,11 @@ public class PrimaryController implements Initializable {
             showMessage(1, "Error eliminant l'entrada: " + e);
         }
     }
-    
+
     /**
      * Desactiva botons i elimina dades als camps d'edicio
-     * 
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     void onActionCleanFieldsBtn(ActionEvent event) {
@@ -411,7 +413,7 @@ public class PrimaryController implements Initializable {
         updateProductBtn.setDisable(true);
         deleteProductBtn.setDisable(true);
         productsTableView.getSelectionModel().clearSelection();
-        
+
         // Esborrar dades als camps d'edició
         productCodeField.clear();
         productNameField.clear();
@@ -419,16 +421,16 @@ public class PrimaryController implements Initializable {
         quantityInStockField.clear();
         buyPriceField.clear();
     }
-    
+
     /**
      * Obté els valors dels camps
-     * 
+     *
      * @return
-     * @throws NumberFormatException 
+     * @throws NumberFormatException
      */
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
-        
+
         // Si estem modificant una entrada, existira un codi
         if (!productCodeField.getText().equals("")) {
             product.setProductCode(parseInt(productCodeField.getText()));
@@ -437,15 +439,15 @@ public class PrimaryController implements Initializable {
         product.setProductDescription(productDescriptionField.getText());
         product.setQuantityInStock(parseInt(quantityInStockField.getText()));
         product.setBuyPrice(Double.parseDouble(buyPriceField.getText()));
-        
+
         return product;
     }
-    
+
     /**
      * Comprova si hem seleccionat una entrada de la taula i envia els valors
      * als camps d'edició per a modificar o eliminar aquesta.
-     * 
-     * @param ev 
+     *
+     * @param ev
      */
     @FXML
     private void handleProductMouseCicked(MouseEvent ev) {
@@ -455,11 +457,11 @@ public class PrimaryController implements Initializable {
             deleteProductBtn.setDisable(false);
         }
     }
-    
+
     /**
      * Envia els valors del camp de la taula seleccionat als camps d'edició
-     * 
-     * @param product 
+     *
+     * @param product
      */
     private void setProductToView(Product product) {
         if (product != null) {
@@ -470,11 +472,11 @@ public class PrimaryController implements Initializable {
             buyPriceField.setText(String.valueOf(product.getBuyPrice()));
         }
     }
-    
+
     /**
      * Obte el producte de la taula
-     * 
-     * @return 
+     *
+     * @return
      */
     private Product getProductFromTable() {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
@@ -509,13 +511,19 @@ public class PrimaryController implements Initializable {
             } else {
                 showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
-        } catch (SQLException exception) {
+        } catch (SQLException ex) {
             if (primaryKeyRepetida()) {
                 showMessage(1, "Solo se puede añadir un correo electronico, revise la tabla");
             }
             if (dniRepetido()) {
                 showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
             }
+        } catch (DateTimeException ex) {
+            showMessage(0, "No se pueden dejar campos vacios");
+        } catch (NumberFormatException ex) {
+            showMessage(0, "No se pueden dejar campos vacios");
+        } catch (Exception ex) {
+            showMessage(0, "No se pueden dejar campos vacios");
         }
     }
 
@@ -712,7 +720,6 @@ public class PrimaryController implements Initializable {
     }
 
 //</editor-fold>
-    
     //<editor-fold defaultstate="collapsed" desc="Varis CUSTOMER">
     /**
      * Comprueba si hay un correo repetido en el textfield y el tableview

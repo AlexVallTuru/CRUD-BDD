@@ -54,11 +54,13 @@ public class CustomerLogic {
      *
      * @throws SQLException
      */
-    public void afegirCustomer(Customer customer) throws SQLException {
-
-        CustomerDB.insereixNouCustomer(conn, customer);
-
-        llistaObservableCustomer.add(customer);
+    public void afegirCustomer(Customer customer) throws SQLException, Exception {
+        if (validaNullsCustomer(customer)) {
+            CustomerDB.insereixNouCustomer(conn, customer);
+            llistaObservableCustomer.add(customer);
+        } else {
+            throw new Exception("No es poden deixar camps buits");
+        }
     }
 
     /**
@@ -128,10 +130,18 @@ public class CustomerLogic {
         CustomerDB.modificaCustomer(conn, customer);
     }
 
+    public boolean validaNullsCustomer(Customer customer) {
+        if (customer.getBirthDate() == null || customer.getCustomerEmail() == null || customer.getCustomerName() == null || customer.getPhoneNumber() == null || customer.getIdCard() == null) {
+            return true;
+        }
+        return false;
+    }
+
     public void calcularEdad() throws SQLException, Exception {
         AppConfig appconfig = null;
 
         appconfig.getMinCustomerAge();
 
     }
+
 }
