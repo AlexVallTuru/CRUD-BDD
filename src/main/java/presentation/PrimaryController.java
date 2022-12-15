@@ -169,6 +169,7 @@ public class PrimaryController implements Initializable {
             productLogicLayer = new ProductLogic();
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
+            quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
             //Customer Logic
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
@@ -428,7 +429,7 @@ public class PrimaryController implements Initializable {
         productCodeField.clear();
         productNameField.clear();
         productDescriptionField.clear();
-        quantityInStockField.clear();
+        quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
         buyPriceField.clear();
     }
     
