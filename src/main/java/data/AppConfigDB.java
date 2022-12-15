@@ -17,6 +17,12 @@ import logic.classes.AppConfig;
  */
 public class AppConfigDB {
 
+    /**
+     *
+     * @param con
+     * @return
+     * @throws SQLException
+     */
     public static AppConfig carregarAppConfig(Connection con) throws SQLException {
         AppConfig appConfig = new AppConfig();
 

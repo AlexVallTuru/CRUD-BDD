@@ -1,12 +1,16 @@
 package presentation;
 
+import java.lang.reflect.InvocationTargetException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.DateTimeException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -165,6 +169,7 @@ public class PrimaryController implements Initializable {
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            actualizarTvCustomer(customerLogicLayer);
             //ComboBox
             clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
             productComboBox.setItems(productLogicLayer.getProductObservableList());
@@ -172,8 +177,8 @@ public class PrimaryController implements Initializable {
             appConfigLogic = new AppConfigLogic();
             //Cargamos los datos del OBJETO en la base de datos
             appConfigLogic.setData();
-            //Bolcamos los datos de la base de datos en este objeto para poder trabajar con ellos.
-
+            //Poner el DefaultCredit como valor por defecto
+            defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -318,6 +323,7 @@ public class PrimaryController implements Initializable {
             showMessage(1, "Error a l'inserir les dades: " + e);
         }
         disableOrderSelection();
+
     }
 
     @FXML
@@ -444,9 +450,7 @@ public class PrimaryController implements Initializable {
         }
     }
 
-    /* 
-    Funcions productes
-     */
+    // Funcions productes
     /**
      * Envia a la capa logica el producte a editar seleccionat des-de el
      * observableList
@@ -587,60 +591,152 @@ public class PrimaryController implements Initializable {
     @FXML
     private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
 
+    //<editor-fold defaultstate="collapsed" desc="Botons CUSTOMER">
+    /**
+     * Boton de añadir APARTADO CLIENTE
+     *
+     * @param event
+     */
     @FXML
-    void onClick_bt_aniadir(ActionEvent event) throws SQLException {
+    void onClick_bt_aniadir(ActionEvent event) {
 
-        AppConfig appConfig = appConfigLogic.getAppConfig();
-        //Aqui obtenim la minima edat i si es superior o igual entra al if i escui a la base de dades
-        if (appConfig.getMinCustomerAge() > calcularEdat(getCustomerFromView())) {
-            customerLogicLayer.afegirCustomer(getCustomerFromView());
-
-            //Para actualizar la pagina
-            customerLogicLayer.setData();
-            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+        //Aqui obtenim la minima edat de la bdd i mira si es superior o igual
+        try {
+            if (comparadorEdades(appConfigLogic.getAppConfig())) {
+                //Escrivim les dades dels texts fields a la base de dades
+                customerLogicLayer.afegirCustomer(getCustomerFromView());
+                actualizarTvCustomer(customerLogicLayer);
+            } else {
+                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+            }
+        } catch (SQLException ex) {
+            if (primaryKeyRepetida()) {
+                showMessage(1, "Solo se puede añadir un correo electronico, revise la tabla");
+            }
+            if (dniRepetido()) {
+                showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
+            }
+        } catch (DateTimeException ex) {
+            showMessage(0, "No se pueden dejar campos vacios");
+        } catch (NumberFormatException ex) {
+            showMessage(0, "No se pueden dejar campos vacios");
+        } catch (Exception ex) {
+            showMessage(0, "No se pueden dejar campos vacios");
         }
-
     }
 
-    public int calcularEdat(Customer customer) {
-        //Creamos un formato de fecha 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        //A traves del parse pasamos la fecha al formato y le pasamos la fecha de la base de datos y el formato al que la queremos pasar
-        LocalDate fechaNac = LocalDate.parse(customer.getBirthDate(), fmt);
-
-        //Creamos una variable donde le metemos la fecha de hoy
-        LocalDate ahora = LocalDate.now();
-
-        //Utilizamos el metodo period para crear un objeto que nos restara dos fechas y nos obtendra años, meses y dias.
-        Period periodo = Period.between(fechaNac, ahora);
-
-        //Esta variable obtendra la edad de la persona.
-        return periodo.getYears();
-    }
-
+    /**
+     * Boton Actualizar datos de la tabla en los text fields Tiene un control de
+     * excepciones APARTADO CLIENTE
+     *
+     * @param event
+     * @throws Exception
+     */
     @FXML
     void onClick_bt_actualizar(ActionEvent event) throws Exception {
-        customerLogicLayer.modificarCustomer(getCustomerFromView());
-
-        //Para actualizar la pagina
-        customerLogicLayer.setData();
-        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+        try {
+            if (comparadorEdades(appConfigLogic.getAppConfig())) {
+                customerLogicLayer.modificarCustomer(getCustomerFromView());
+                //Para actualizar la pagina
+                actualizarTvCustomer(customerLogicLayer);
+            } else {
+                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+            }
+        } catch (SQLException exception) {
+            if (dniRepetido()) {
+                showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
+            }
+        }
     }
 
+    /**
+     * Boton de eliminar APARTADO CLIENTE
+     *
+     * @param event
+     */
     @FXML
     void onClick_bt_eliminar(ActionEvent event) {
         // capturem l'objecte seleccionat a la taula
         Customer customer = getCustomerFromTable();
-
         try {
             customerLogicLayer.eliminarCustomer(customer);
-
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar les dades: " + e);
         }
     }
 
+    /**
+     * Limpia los text fields y habilita el text field de email, APARTADO
+     * CLIENTE
+     *
+     * @param event
+     */
+    @FXML
+    private void onClick_bt_limpiar(ActionEvent event) {
+        desactivaSeleccioCustomer();
+        limpiarRegistroTfCustomer();
+    }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Metodes privats CUSTOMER">
+    /**
+     * Al hacer click si existe algun registro en table view, carga la
+     * informacion en los texts fields y deshabilita el text field de email ya
+     * que es la primary key para que no se pueda actualizar. APARTADO CLIENTE
+     *
+     * @param ev
+     */
+    @FXML
+    private void handleOnMouseClicked(MouseEvent ev) {
+        // si hem seleccionat un registre de la taula
+        if (tv_customer.getSelectionModel().getSelectedItem() != null) {
+            /**
+             * Desabilitem el boto del mail al ser la primarykey i el boto
+             * añadir ja que no podem afeguir si actualitzem*
+             */
+
+            // agafem les dades de l'objecte seleccionat i els traspassem
+            // als camps del formulari
+            setCustomerToView(getCustomerFromTable());
+            //Habilitem botó de modificar i eliminar
+            activarSeleccioCustomer();
+        }
+    }
+
+    /**
+     * Esta funcion rellena los texts fields con el contenido del objecto
+     * APARTADO CLIENTE
+     *
+     * @param customer
+     */
+    private void setCustomerToView(Customer customer) {
+        if (customer != null) {
+            tf_birthDate.setText(customer.getBirthDate());
+            tf_customerEmail.setText(customer.getCustomerEmail());
+            tf_creditLimit.setText(String.valueOf(customer.getCreditLimit()));
+            tf_customerName.setText(customer.getCustomerName());
+            tf_idCard.setText(customer.getIdCard());
+            tf_phoneNumber.setText(customer.getPhoneNumber());
+        }
+    }
+
+    /**
+     * Guarda informacion a un objeto del sitio donde se encuentra el objeto
+     * seleccionado APARTADO CLIENTE
+     *
+     * @return
+     */
+    private Customer getCustomerFromTable() {
+        Customer customer = null;
+        customer = (Customer) tv_customer.getSelectionModel().getSelectedItem();
+        return customer;
+    }
+
+    /**
+     * Funcion obtener CLIENTE de los text fields APARTADO CLIENTE
+     *
+     * @return @throws NumberFormatException
+     */
     private Customer getCustomerFromView() throws NumberFormatException {
         Customer customer = new Customer();
 
@@ -654,64 +750,106 @@ public class PrimaryController implements Initializable {
         return customer;
     }
 
-    @FXML
-    private void handleOnMouseClicked(MouseEvent ev) {
-        // si hem seleccionat un registre de la taula
-        if (tv_customer.getSelectionModel().getSelectedItem() != null) {
-            //Desabilitem el boto del mail al ser la primarykey i el boto añadir ja que no podem afeguir si actualitzem
-            tf_customerEmail.setDisable(true);
-            // agafem les dades de l'objecte seleccionat i els traspassem
-            // als camps del formulari
-            setCustomerToView(getCustomerFromTable());
-
-            //habilitem botó de modificar i eliminar
-            bt_actualizar.setDisable(false);
-            bt_eliminar.setDisable(false);
-        } else {
-            //desactivaSeleccio();
-        }
+    /**
+     * Habilita botones y la el text field del mail APARTADO CLIENTE
+     */
+    private void activarSeleccioCustomer() {
+        tf_customerEmail.setDisable(true);
+        bt_actualizar.setDisable(false);
+        bt_eliminar.setDisable(false);
     }
 
-    @FXML
-    private void onClick_bt_limpiar(ActionEvent event) {
-        //Habilitem el boto del mail
-        tf_customerEmail.setDisable(false);
-
-        //limpiamos registro y desactivamos el click de la pantalla
-        desactivaSeleccio();
-
-        //seteamos todos los registros a vacio
+    /**
+     * Limpia los text fields y setea el default APARTADO CLIENTE
+     */
+    private void limpiarRegistroTfCustomer() {
         tf_birthDate.clear();
-        tf_creditLimit.clear();
+        defaultValorLimitCredit(appConfigLogic.getAppConfig());
         tf_customerEmail.clear();
         tf_customerName.clear();
         tf_idCard.clear();
         tf_phoneNumber.clear();
     }
 
-    private void setCustomerToView(Customer customer) {
-        if (customer != null) {
-            tf_birthDate.setText(customer.getBirthDate());
-            tf_customerEmail.setText(customer.getCustomerEmail());
-            tf_creditLimit.setText(String.valueOf(customer.getCreditLimit()));
-            tf_customerName.setText(customer.getCustomerName());
-            tf_idCard.setText(customer.getIdCard());
-            tf_phoneNumber.setText(customer.getPhoneNumber());
-        }
-    }
-
-    private Customer getCustomerFromTable() {
-        Customer customer = null;
-
-        customer = (Customer) tv_customer.getSelectionModel().getSelectedItem();
-
-        return customer;
-    }
-
-    private void desactivaSeleccio() {
-        //deshabilitem botóns i fila seleccionada
+    /**
+     * Deshabilita botones y fila seleccionada Limpia los texts Fields APARTADO
+     * CLIENTE
+     */
+    private void desactivaSeleccioCustomer() {
+        tf_customerEmail.setDisable(false);
         bt_actualizar.setDisable(true);
         bt_eliminar.setDisable(true);
         tv_customer.getSelectionModel().clearSelection();
     }
+
+    /**
+     * Compara si la edad del cliente es mayor a la edad minima de appconfig
+     * APARTADO CLIENTE
+     *
+     * @return
+     */
+    private Boolean comparadorEdades(AppConfig appConfig) {
+        if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Añade todo el contenido de la base de datos a la ObservableList y despues
+     * añade esta lista al Table View APARTADO CLIENTE
+     *
+     * @param customerLogicLayer
+     * @throws SQLException
+     */
+    private void actualizarTvCustomer(CustomerLogic customerLogicLayer) throws SQLException {
+        customerLogicLayer.setData();
+        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+    }
+
+    /**
+     * Esta funcion setea el text field de creditLimit al valor del objeto
+     * appConfig defaultCreditLimit APARTADO CLIENTE
+     *
+     * @param appConfig
+     */
+    private void defaultValorLimitCredit(AppConfig appConfig) {
+        tf_creditLimit.setText(String.valueOf(appConfig.getDefaultCreditLimit()));
+    }
+
+//</editor-fold>
+    //<editor-fold defaultstate="collapsed" desc="Varis CUSTOMER">
+    /**
+     * Comprueba si hay un correo repetido en el textfield y el tableview
+     * APARTADO CLIENTE
+     *
+     * @return
+     */
+    private Boolean primaryKeyRepetida() {
+        //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
+        for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
+            if (getCustomerFromView().getCustomerEmail().equals(customerLogicLayer.getCustomerObservableList().get(i).getCustomerEmail())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Comprueba si hay un dni repetido en el textfield y el tableview APARTADO
+     * CLIENTE
+     *
+     * @return
+     */
+    private Boolean dniRepetido() {
+        //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
+        for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
+            if (getCustomerFromView().getIdCard().equals(customerLogicLayer.getCustomerObservableList().get(i).getIdCard())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+//</editor-fold>
 }

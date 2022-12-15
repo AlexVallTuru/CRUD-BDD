@@ -8,7 +8,6 @@ import data.ConnectionDB;
 import data.CustomerDB;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.Customer;
@@ -55,11 +54,13 @@ public class CustomerLogic {
      *
      * @throws SQLException
      */
-    public void afegirCustomer(Customer customer) throws SQLException {
-        
-        CustomerDB.insereixNouCustomer(conn, customer);
-
-        llistaObservableCustomer.add(customer);
+    public void afegirCustomer(Customer customer) throws SQLException, Exception {
+        if (validaNullsCustomer(customer)) {
+            CustomerDB.insereixNouCustomer(conn, customer);
+            llistaObservableCustomer.add(customer);
+        } else {
+            throw new Exception("No es poden deixar camps buits");
+        }
     }
 
     /**
@@ -118,8 +119,6 @@ public class CustomerLogic {
         return llistaObservableCustomer;
     }
 
-
-
     public void modificarCustomer(Customer customer) throws SQLException, Exception {
         // si no valida el format del nom, genera una excepció
         /**
@@ -131,10 +130,18 @@ public class CustomerLogic {
         CustomerDB.modificaCustomer(conn, customer);
     }
 
+    public boolean validaNullsCustomer(Customer customer) {
+        if (customer.getBirthDate() == null || customer.getCustomerEmail() == null || customer.getCustomerName() == null || customer.getPhoneNumber() == null || customer.getIdCard() == null) {
+            return true;
+        }
+        return false;
+    }
+
     public void calcularEdad() throws SQLException, Exception {
         AppConfig appconfig = null;
 
         appconfig.getMinCustomerAge();
 
     }
+
 }
