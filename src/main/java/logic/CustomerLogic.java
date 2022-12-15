@@ -100,16 +100,6 @@ public class CustomerLogic {
      * @param txt
      * @return
      */
-    private boolean validaEmail(String txt) {
-        Boolean ret = false;
-        /**
-         * Pattern regles = Pattern.compile("^([A-Z]{3}-[0-9]{3})$");
-         *
-         * if (regles.matcher(txt).find()) {ret = true;}
-         *
-         */
-        return ret;
-    }
 
     public void setData() throws SQLException {
         this.llistaObservableCustomer.setAll(CustomerDB.carregarCustomer(conn));
