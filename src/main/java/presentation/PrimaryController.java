@@ -1,5 +1,6 @@
 package presentation;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -150,14 +151,13 @@ public class PrimaryController implements Initializable {
             productsTableView.setItems(productLogicLayer.getProductObservableList());
             //Customer Logic
             customerLogicLayer = new CustomerLogic();
-            customerLogicLayer.setData();
-            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+            actualizarTvCustomer(customerLogicLayer);
             //AppConfig Logic
             appConfigLogic = new AppConfigLogic();
             //Cargamos los datos del OBJETO en la base de datos
             appConfigLogic.setData();
             //Poner el DefaultCredit como valor por defecto
-             defaultValorLimitCredit(appConfigLogic.getAppConfig());
+            defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
             showMessage(1, "Error cargando datos: " + ex.toString());
         } catch (Exception ex) {
@@ -370,21 +370,22 @@ public class PrimaryController implements Initializable {
     @FXML
     private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
 
+    /**
+     * Boton de añadir del apartado CLIENTE
+     *
+     * @param event
+     */
     @FXML
     void onClick_bt_aniadir(ActionEvent event) {
 
-        AppConfig appConfig = appConfigLogic.getAppConfig();
         //Aqui obtenim la minima edat de la bdd i mira si es superior o igual
         try {
-            if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
+            if (comparadorEdades(appConfigLogic.getAppConfig())) {
                 //Escrivim les dades dels texts fields a la base de dades
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
-
-                //actualizar el table view
-                customerLogicLayer.setData();
-                tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+                actualizarTvCustomer(customerLogicLayer);
             } else {
-                showMessage(0, "La minima edad es de " + appConfig.getMinCustomerAge() + " años");
+                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
         } catch (SQLException exception) {
             if (primaryKeyRepetida()) {
@@ -393,11 +394,14 @@ public class PrimaryController implements Initializable {
             if (dniRepetido()) {
                 showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
             }
-
         }
     }
 
-    //Comprueba si hay un correo repetido en el textfield y el tableview
+    /**
+     * Comprueba si hay un correo repetido en el textfield y el tableview
+     *
+     * @return
+     */
     private Boolean primaryKeyRepetida() {
         //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
         for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
@@ -408,7 +412,11 @@ public class PrimaryController implements Initializable {
         return false;
     }
 
-    //Comprueba si hay un dni en el textfield y el tableview
+    /**
+     * Comprueba si hay un dni en el textfield y el tableview
+     *
+     * @return
+     */
     private Boolean dniRepetido() {
         //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
         for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
@@ -419,28 +427,62 @@ public class PrimaryController implements Initializable {
         return false;
     }
 
-    @FXML
-    void onClick_bt_actualizar(ActionEvent event) throws Exception {
-        customerLogicLayer.modificarCustomer(getCustomerFromView());
-
-        //Para actualizar la pagina
-        customerLogicLayer.setData();
-        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
+    /**
+     * Compara si la edad
+     *
+     * @return
+     */
+    private Boolean comparadorEdades(AppConfig appConfig) {
+        if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * Boton Actualizar de la t
+     *
+     * @param event
+     * @throws Exception
+     */
+    @FXML
+    void onClick_bt_actualizar(ActionEvent event) throws Exception {
+        try {
+            if (comparadorEdades(appConfigLogic.getAppConfig())) {
+                customerLogicLayer.modificarCustomer(getCustomerFromView());
+                //Para actualizar la pagina
+                actualizarTvCustomer(customerLogicLayer);
+            } else {
+                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+            }
+        } catch (SQLException exception) {
+            if (dniRepetido()) {
+                showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
+            }
+        }
+    }
+
+    /**
+     * Boton de eliminar del apartado CLIENTE
+     *
+     * @param event
+     */
     @FXML
     void onClick_bt_eliminar(ActionEvent event) {
         // capturem l'objecte seleccionat a la taula
         Customer customer = getCustomerFromTable();
-
         try {
             customerLogicLayer.eliminarCustomer(customer);
-
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar les dades: " + e);
         }
     }
 
+    /**
+     * Funcion obtener CLIENTE de los text fields
+     *
+     * @return @throws NumberFormatException
+     */
     private Customer getCustomerFromView() throws NumberFormatException {
         Customer customer = new Customer();
 
@@ -454,39 +496,42 @@ public class PrimaryController implements Initializable {
         return customer;
     }
 
+    /**
+     * Funcion encargada de seleccionar los datos del tableView al realizar un
+     * click y pasarlos a los textsFields
+     *
+     * @param ev
+     */
     @FXML
     private void handleOnMouseClicked(MouseEvent ev) {
         // si hem seleccionat un registre de la taula
         if (tv_customer.getSelectionModel().getSelectedItem() != null) {
             //Desabilitem el boto del mail al ser la primarykey i el boto añadir ja que no podem afeguir si actualitzem
-            tf_customerEmail.setDisable(true);
+
             // agafem les dades de l'objecte seleccionat i els traspassem
             // als camps del formulari
             setCustomerToView(getCustomerFromTable());
-
-            //habilitem botó de modificar i eliminar
-            bt_actualizar.setDisable(false);
-            bt_eliminar.setDisable(false);
+            //Habilitem botó de modificar i eliminar
+            activarSeleccioCustomer();
         }
     }
 
+    /**
+     * Boton encargado de limpiar los textos de los texts fields
+     *
+     * @param event
+     */
     @FXML
     private void onClick_bt_limpiar(ActionEvent event) {
-        //Habilitem el boto del mail
-        tf_customerEmail.setDisable(false);
-
-        //limpiamos registro y desactivamos el click de la pantalla
-        desactivaSeleccio();
-
-        //seteamos todos los registros a vacio
-        tf_birthDate.clear();
-        defaultValorLimitCredit(appConfigLogic.getAppConfig());
-        tf_customerEmail.clear();
-        tf_customerName.clear();
-        tf_idCard.clear();
-        tf_phoneNumber.clear();
+        desactivaSeleccioCustomer();
+        limpiarRegistroTfCustomer();
     }
 
+    /**
+     * Esta funcion rellena los texts fields con el contenido del objecto
+     *
+     * @param customer
+     */
     private void setCustomerToView(Customer customer) {
         if (customer != null) {
             tf_birthDate.setText(customer.getBirthDate());
@@ -498,11 +543,13 @@ public class PrimaryController implements Initializable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     private Customer getCustomerFromTable() {
         Customer customer = null;
-
         customer = (Customer) tv_customer.getSelectionModel().getSelectedItem();
-
         return customer;
     }
 
@@ -510,10 +557,40 @@ public class PrimaryController implements Initializable {
         tf_creditLimit.setText(String.valueOf(appConfig.getDefaultCreditLimit()));
     }
 
-    private void desactivaSeleccio() {
-        //deshabilitem botóns i fila seleccionada
+    //deshabilitem botóns i fila seleccionada i netajem tf
+    private void desactivaSeleccioCustomer() {
+        tf_customerEmail.setDisable(false);
         bt_actualizar.setDisable(true);
         bt_eliminar.setDisable(true);
         tv_customer.getSelectionModel().clearSelection();
+    }
+
+    //Habilitem botóns i fila seleccionada
+    private void activarSeleccioCustomer() {
+        tf_customerEmail.setDisable(true);
+        bt_actualizar.setDisable(false);
+        bt_eliminar.setDisable(false);
+    }
+
+    //Limpia los text fields y setea el default
+    private void limpiarRegistroTfCustomer() {
+        tf_birthDate.clear();
+        defaultValorLimitCredit(appConfigLogic.getAppConfig());
+        tf_customerEmail.clear();
+        tf_customerName.clear();
+        tf_idCard.clear();
+        tf_phoneNumber.clear();
+    }
+
+    /**
+     * Añade todo el contenido de la base de datos a la ObservableList y despues
+     * añade esta lista al Table View
+     *
+     * @param customerLogicLayer
+     * @throws SQLException
+     */
+    private void actualizarTvCustomer(CustomerLogic customerLogicLayer) throws SQLException {
+        customerLogicLayer.setData();
+        tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
     }
 }
