@@ -4,6 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.time.DateTimeException;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -35,11 +38,10 @@ import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
 
+    //Logic Layer Classes
     ProductLogic productLogicLayer;
-
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
-
     AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
@@ -83,10 +85,10 @@ public class PrimaryController implements Initializable {
     private Button searchOrderBtn;
 
     @FXML
-    private ComboBox<?> clientComboBox;
+    private ComboBox<Customer> clientComboBox;
 
     @FXML
-    private ComboBox<?> productComboBox;
+    private ComboBox<Product> productComboBox;
 
     @FXML
     private TextField orderNum;
@@ -96,6 +98,15 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private TextField productQuantity;
+
+    @FXML
+    private TextField orderTabOrderDate;
+
+    @FXML
+    private TextField orderTabRequiredDate;
+
+    @FXML
+    private TextField orderTabShippingDate;
 
     @FXML
     private DatePicker requiredDate;
@@ -147,9 +158,6 @@ public class PrimaryController implements Initializable {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
 
-            //ComboBox
-            //clientComboBox.setItems();
-            //productComboBox.setItems();
             // AppConfig Logic
             appConfigLogic = new AppConfigLogic();
             // Cargamos los datos del OBJETO en la base de datos
@@ -168,6 +176,9 @@ public class PrimaryController implements Initializable {
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
             actualizarTvCustomer(customerLogicLayer);
+            //ComboBox
+            clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
+            productComboBox.setItems(productLogicLayer.getProductObservableList());
             //AppConfig Logic
             appConfigLogic = new AppConfigLogic();
             //Cargamos los datos del OBJETO en la base de datos
@@ -306,15 +317,18 @@ public class PrimaryController implements Initializable {
     void onActionCreateOrderBtn(ActionEvent event) {
 
         // capturem les noves dades
-        Order order = getOrderFromView();
+        Order order = getOrderFromForm();
 
         try {
-            orderLogicLayer.insertOrder();
+            orderLogicLayer.insertOrder(order);
+
+            orderLogicLayer.setData();
         } catch (NumberFormatException e) {
             showMessage(1, "Dades incorrectes: " + e);
         } catch (SQLException e) {
             showMessage(1, "Error a l'inserir les dades: " + e);
         }
+        disableOrderSelection();
 
     }
 
@@ -335,6 +349,33 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionModifyOrderBtn(ActionEvent event) {
+        // capturem les noves dades
+        Order order = getOrderFromForm();
+
+        try {
+            //el modifiquem a la BBDD
+            orderLogicLayer.updateOrder(order);
+
+            //si tot ha anat bé, actualitzem visualment l'objecte a la taula
+            Order asTableview = getOrderFromTable();
+
+            asTableview.setOrderDate(order.getOrderDate());
+            asTableview.setRequiredDate(order.getRequiredDate());
+            asTableview.setShippedDate(order.getShippedDate());
+
+            //quan modifiquem els atributs d'u nelement de la llista
+            //és necessàri refrescar la taula de forma manual
+            orderTableView.refresh();
+
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } catch (SQLException e) {
+            showMessage(1, "Error al modificar les dades: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
+
+        disableOrderSelection();
 
     }
 
@@ -344,20 +385,75 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Recupera les dades del formulari
+     * Si hemos seleccionado un registro de la tabla, nos muestra los datos en
+     * el formulario.
+     *
+     * @param ev
+     */
+    @FXML
+    private void handleOrderOnMouseClicked(MouseEvent ev) {
+
+        if (orderTableView.getSelectionModel().getSelectedItem() != null) {
+
+            setOrderToView(getOrderFromTable());
+
+            modifyOrderBtn.setDisable(false);
+            deleteOrderBtn.setDisable(false);
+        } else {
+            disableOrderSelection();
+        }
+    }
+
+    /**
+     * Deshabilita botones y limpia la seleccion del usuario.
+     */
+    private void disableOrderSelection() {
+        //deshabilitem botóns i fila seleccionada
+        modifyOrderBtn.setDisable(true);
+        deleteOrderBtn.setDisable(true);
+        orderTableView.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Obtiene los datos del formulario y retorna un objeto
      *
      * @return Objecte order amb les dades
-     * @throws NumberFormatException
      */
-    private Order getOrderFromView() throws NumberFormatException {
+    private Order getOrderFromForm() {
         Order order = new Order();
 
-        order.setOrderDate(DateConverter.convertToDate(orderDate.getValue()));
-        order.setRequiredDate(DateConverter.convertToDate(requiredDate.getValue()));
-        order.setShippedDate(DateConverter.convertToDate(shippedDate.getValue()));
-        order.setCustomer(clientComboBox.getEditor().toString());
+        order.setOrderDate(DateConverter.convertToTimestamp(orderDate.getValue()));
+        order.setRequiredDate(DateConverter.convertToTimestamp(requiredDate.getValue()));
+        order.setShippedDate(DateConverter.convertToTimestamp(shippedDate.getValue()));
+        order.setCustomer(clientComboBox.getSelectionModel().getSelectedItem().toString().trim());
 
         return order;
+    }
+
+    /**
+     * Recupera l'objecte seleccionat a la taula
+     *
+     * @return Objecte Assignatura o null si no hi ha selecció
+     */
+    private Order getOrderFromTable() {
+        Order order = null;
+
+        order = (Order) orderTableView.getSelectionModel().getSelectedItem();
+
+        return order;
+    }
+
+    /**
+     * Rellena los campos del formulario con los datos de un objeto Order
+     *
+     * @param objecte Order
+     */
+    private void setOrderToView(Order order) {
+        if (order != null) {
+            orderTabOrderDate.setText(String.valueOf(order.getOrderDate()));
+            orderTabRequiredDate.setText(String.valueOf(order.getRequiredDate()));
+            orderTabShippingDate.setText(String.valueOf(order.getShippedDate()));
+        }
     }
 
     // Funcions productes
