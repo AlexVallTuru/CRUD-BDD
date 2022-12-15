@@ -33,7 +33,7 @@ public class AppConfigLogic {
 
         conn = ConnectionDB.getInstance().getConnection();
         // inicialitzem col.lecció
-        AppConfig appConfig = new AppConfig();
+        appConfig = new AppConfig();
     }
     /**
      * 

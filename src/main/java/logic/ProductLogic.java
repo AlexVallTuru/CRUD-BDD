@@ -60,8 +60,6 @@ public class ProductLogic {
      */
     public void addProduct(Product product) throws SQLException {
         ProductDB.insertProduct(conn, product);
-        
-        productsOList.add(product);
     }
     
     /**
