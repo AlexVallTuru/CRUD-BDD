@@ -109,18 +109,18 @@
                   <TableView fx:id="orderDetailTableView" layoutX="35.0" layoutY="285.0" prefHeight="287.0" prefWidth="992.0">
                      <columns>
                         <TableColumn fx:id="colOrderNumDetails" prefWidth="93.0" text="Nº pedido" />
-                        <TableColumn fx:id="colOrderDetailProductName" prefWidth="108.0" text="Nº producto" />
+                        <TableColumn fx:id="colOrderLineNumber" maxWidth="250.0" prefWidth="184.0" text="Línea de pedido" />
+                        <TableColumn fx:id="colOrderDetailProductName" prefWidth="108.0" text="Producto" />
                         <TableColumn fx:id="colPriceEach" minWidth="0.0" prefWidth="153.0" text="Precio por unidad" />
                         <TableColumn fx:id="colQuantity" minWidth="0.0" prefWidth="125.0" text="Cantidad" />
-                        <TableColumn fx:id="colOrderLineNumber" maxWidth="250.0" prefWidth="184.0" text="Order Line Number" />
                         <TableColumn fx:id="colTotalPrice" minWidth="0.0" prefWidth="153.0" text="Precio total" />
                      </columns>
                   </TableView>
                   <Button fx:id="addProductBtn" layoutX="883.0" layoutY="219.0" mnemonicParsing="false" onAction="#onActionAddProductBtn" prefHeight="31.0" prefWidth="138.0" text="Añadir producto" />
                   <Button fx:id="orderDetailDeleteButton" layoutX="574.0" layoutY="597.0" mnemonicParsing="false" onAction="#onActionOrderDetailDeleteButton" prefHeight="39.0" prefWidth="95.0" text="Eliminar" />
-                  <ComboBox fx:id="clientComboBox" layoutX="37.0" layoutY="148.0" onAction="#onActionClientComboBox" prefWidth="150.0" promptText="CLIENTE" />
+                  <ComboBox fx:id="clientComboBox" layoutX="37.0" layoutY="148.0" onAction="#onActionClientComboBox" prefWidth="150.0" promptText="Cliente" />
                   <Separator layoutX="37.0" layoutY="103.0" prefHeight="42.0" prefWidth="988.0" />
-                  <ComboBox fx:id="productComboBox" layoutX="37.0" layoutY="219.0" onAction="#onActionProductComboBox" prefWidth="150.0" promptText="PRODUCTO" />
+                  <ComboBox fx:id="productComboBox" layoutX="37.0" layoutY="219.0" onAction="#onActionProductComboBox" prefWidth="150.0" promptText="Producto" />
                   <DatePicker fx:id="orderDate" layoutX="252.0" layoutY="145.0" onAction="#onActionOrderDate" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de pedido" />
                   <DatePicker fx:id="shippedDate" layoutX="470.0" layoutY="145.0" onAction="#onActionShippedDate" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de envío" />
                   <DatePicker fx:id="requiredDate" layoutX="687.0" layoutY="145.0" onAction="#onActionRequiredDate" prefHeight="31.0" prefWidth="164.0" promptText="Fecha de llegada" />

@@ -88,4 +88,21 @@ public class OrderDB {
             rs.updateRow();
         }
     }
+
+    /**
+     * Elimina el registro Order recibido como parámetro de la BBDD.
+     *
+     * @param conn
+     * @param order
+     * @throws SQLException
+     */
+    public static void deleteOrder(Connection conn, Order order) throws SQLException {
+
+        Statement query;
+        query = conn.createStatement();
+
+        String sqlStr = "DELETE FROM orders WHERE orderNumber = " + order.getOrderNumber();
+
+        query.executeUpdate(sqlStr);
+    }
 }

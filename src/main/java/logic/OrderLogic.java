@@ -75,4 +75,11 @@ public class OrderLogic {
 
         OrderDB.updateOrder(conn, order);
     }
+
+    public void deleteOrder(Order order) throws SQLException {
+
+        OrderDB.deleteOrder(conn, order);
+
+        ordersOList.remove(order);
+    }
 }

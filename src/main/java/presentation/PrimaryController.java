@@ -337,14 +337,28 @@ public class PrimaryController implements Initializable {
 
     }
 
+    // TODO Esto creo que no me hará falta.
     @FXML
     void onActionRefreshOrderBtn(ActionEvent event) {
 
     }
 
+    /**
+     * Elimina el registro seleccionado en la tabla.
+     *
+     * @param event
+     */
     @FXML
     void onActionDeleteOrderBtn(ActionEvent event) {
 
+        Order order = getOrderFromTable();
+
+        try {
+            orderLogicLayer.deleteOrder(order);
+        } catch (SQLException e) {
+            showMessage(1, "Error intentando eliminar los datos: " + e);
+        }
+        disableOrderSelection();
     }
 
     @FXML
@@ -363,7 +377,7 @@ public class PrimaryController implements Initializable {
             asTableview.setRequiredDate(order.getRequiredDate());
             asTableview.setShippedDate(order.getShippedDate());
 
-            //quan modifiquem els atributs d'u nelement de la llista
+            //quan modifiquem els atributs d'un element de la llista
             //és necessàri refrescar la taula de forma manual
             orderTableView.refresh();
 
@@ -405,13 +419,18 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Deshabilita botones y limpia la seleccion del usuario.
+     * Deshabilita botones, limpia la seleccion del usuario y los text fields
+     * los deja en blanco.
      */
     private void disableOrderSelection() {
-        //deshabilitem botóns i fila seleccionada
+
         modifyOrderBtn.setDisable(true);
         deleteOrderBtn.setDisable(true);
         orderTableView.getSelectionModel().clearSelection();
+
+        orderTabOrderDate.clear();
+        orderTabRequiredDate.clear();
+        orderTabShippingDate.clear();
     }
 
     /**
