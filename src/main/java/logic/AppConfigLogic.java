@@ -20,21 +20,19 @@ import logic.classes.Customer;
  */
 public class AppConfigLogic {
 
-    //Objecte connexió a la BBDD
     Connection conn;
-    //llista observable d'objectes de la classe Customer
+
     AppConfig appConfig;
     /**
      * 
      * @throws SQLException 
      */
     public AppConfigLogic() throws SQLException {
-        // inicialitzem connexió amb BD
 
         conn = ConnectionDB.getInstance().getConnection();
-        // inicialitzem col.lecció
         appConfig = new AppConfig();
     }
+
     /**
      * 
      * @return 
@@ -42,6 +40,7 @@ public class AppConfigLogic {
     public AppConfig getAppConfig() {
         return appConfig;
     }
+
     /**
      * 
      * @throws SQLException 
@@ -49,6 +48,7 @@ public class AppConfigLogic {
     public void setData() throws SQLException {
         this.appConfig = AppConfigDB.carregarAppConfig(conn);
     }
+
     /**
      * 
      * @param customer
@@ -71,7 +71,4 @@ public class AppConfigLogic {
         //Esta variable obtendra la edad de la persona.
         return periodo.getYears();
     }
-    
-
-
 }

@@ -47,17 +47,32 @@ public class OrderLogic {
         return ordersOList;
     }
 
-    public void insertOrder() throws SQLException {
+    /**
+     * Recibe un objeto tipo Order y lo envía a la capa de BBDD.
+     *
+     * @param order
+     * @throws SQLException
+     */
+    public void insertOrder(Order order) throws SQLException {
 
-        Order order = new Order();
-
-        // afegim una nova assignatura
         OrderDB.insertOrder(conn, order);
 
-        // Si tot ha anat bé, afegim l'objecte a la llista observable.
-        // NOTA: Quan afegim o eliminem elements de la collecció, la taula es
-        // refresca de forma automàtica, amb el mateix efecte que
-        // si fessim taulaAssignatura.refresh()
-        ordersOList.add(order);
+    }
+
+    /**
+     * Valida el format d'una assignatura i la modifica amb les dades
+     * subministrades
+     *
+     * @param order
+     * @throws SQLException
+     * @throws Exception
+     */
+    public void updateOrder(Order order) throws SQLException, Exception {
+        // si no valida el format del nom, genera una excepció
+        /*if (!this.validaNomAssignatura(order.getNom())) {
+            throw new Exception("El format del nom de l'assignatura no és correcte. Un exemple de format correcte seria ABC-123");
+        }*/
+
+        OrderDB.updateOrder(conn, order);
     }
 }

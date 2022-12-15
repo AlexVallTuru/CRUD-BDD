@@ -29,7 +29,6 @@ public class Customer {
     public Customer() {
     }
 
-
     public String getCustomerEmail() {
         return customerEmail;
     }
@@ -80,6 +79,6 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" + "customerEmail=" + customerEmail + ", idCard=" + idCard + ", customerName=" + customerName + ", phoneNumber=" + phoneNumber + ", creditLimit=" + creditLimit + ", birthDate=" + birthDate + '}';
+        return " " + customerEmail + "";
     }
 }
