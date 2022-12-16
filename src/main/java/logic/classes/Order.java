@@ -4,8 +4,7 @@
  */
 package logic.classes;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 
 /**
  *
@@ -14,12 +13,12 @@ import java.time.LocalDate;
 public class Order {
 
     private int orderNumber;
-    private Date orderDate;
-    private Date requiredDate;
-    private Date shippedDate;
+    private Timestamp orderDate;
+    private Timestamp requiredDate;
+    private Timestamp shippedDate;
     private String customer;
 
-    public Order(int orderNumber, Date orderDate, Date requiredDate, Date shippedDate, String customer) {
+    public Order(int orderNumber, Timestamp orderDate, Timestamp requiredDate, Timestamp shippedDate, String customer) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
         this.requiredDate = requiredDate;
@@ -38,27 +37,27 @@ public class Order {
         this.orderNumber = orderNumber;
     }
 
-    public Date getOrderDate() {
+    public Timestamp getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(Date orderDate) {
+    public void setOrderDate(Timestamp orderDate) {
         this.orderDate = orderDate;
     }
 
-    public Date getRequiredDate() {
+    public Timestamp getRequiredDate() {
         return requiredDate;
     }
 
-    public void setRequiredDate(Date requiredDate) {
+    public void setRequiredDate(Timestamp requiredDate) {
         this.requiredDate = requiredDate;
     }
 
-    public Date getShippedDate() {
+    public Timestamp getShippedDate() {
         return shippedDate;
     }
 
-    public void setShippedDate(Date shippedDate) {
+    public void setShippedDate(Timestamp shippedDate) {
         this.shippedDate = shippedDate;
     }
 

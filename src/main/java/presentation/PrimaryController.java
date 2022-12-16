@@ -5,9 +5,13 @@ import java.lang.reflect.InvocationTargetException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.time.DateTimeException;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeoutException;
+import javafx.application.Platform;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -36,11 +40,10 @@ import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
 
+    //Logic Layer Classes
     ProductLogic productLogicLayer;
-
     CustomerLogic customerLogicLayer;
     OrderLogic orderLogicLayer;
-
     AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
@@ -84,10 +87,10 @@ public class PrimaryController implements Initializable {
     private Button searchOrderBtn;
 
     @FXML
-    private ComboBox<?> clientComboBox;
+    private ComboBox<Customer> clientComboBox;
 
     @FXML
-    private ComboBox<?> productComboBox;
+    private ComboBox<Product> productComboBox;
 
     @FXML
     private TextField orderNum;
@@ -97,6 +100,15 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private TextField productQuantity;
+
+    @FXML
+    private TextField orderTabOrderDate;
+
+    @FXML
+    private TextField orderTabRequiredDate;
+
+    @FXML
+    private TextField orderTabShippingDate;
 
     @FXML
     private DatePicker requiredDate;
@@ -148,24 +160,28 @@ public class PrimaryController implements Initializable {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
         try {
 
-            //ComboBox
-            //clientComboBox.setItems();
-            //productComboBox.setItems();
+            // AppConfig Logic
+            appConfigLogic = new AppConfigLogic();
+            // Cargamos los datos del OBJETO en la base de datos
+            appConfigLogic.setData();
             //Order Logic
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
             // Product logic
             productLogicLayer = new ProductLogic();
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
+            quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
             //Customer Logic
             customerLogicLayer = new CustomerLogic();
+            customerLogicLayer.setData();
+            tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
             actualizarTvCustomer(customerLogicLayer);
-            //AppConfig Logic
-            appConfigLogic = new AppConfigLogic();
-            //Cargamos los datos del OBJETO en la base de datos
-            appConfigLogic.setData();
+            //ComboBox
+            clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
+            productComboBox.setItems(productLogicLayer.getProductObservableList());
             //Poner el DefaultCredit como valor por defecto
             defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
@@ -242,7 +258,9 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionAddProductBtn(ActionEvent event) {
-
+        
+        // Deixem el camp de quantitat amb el seu valor per defecte
+        productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
     }
 
     @FXML
@@ -300,15 +318,18 @@ public class PrimaryController implements Initializable {
     void onActionCreateOrderBtn(ActionEvent event) {
 
         // capturem les noves dades
-        Order order = getOrderFromView();
+        Order order = getOrderFromForm();
 
         try {
-            orderLogicLayer.insertOrder();
+            orderLogicLayer.insertOrder(order);
+
+            orderLogicLayer.setData();
         } catch (NumberFormatException e) {
             showMessage(1, "Dades incorrectes: " + e);
         } catch (SQLException e) {
             showMessage(1, "Error a l'inserir les dades: " + e);
         }
+        disableOrderSelection();
 
     }
 
@@ -329,6 +350,33 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionModifyOrderBtn(ActionEvent event) {
+        // capturem les noves dades
+        Order order = getOrderFromForm();
+
+        try {
+            //el modifiquem a la BBDD
+            orderLogicLayer.updateOrder(order);
+
+            //si tot ha anat bé, actualitzem visualment l'objecte a la taula
+            Order asTableview = getOrderFromTable();
+
+            asTableview.setOrderDate(order.getOrderDate());
+            asTableview.setRequiredDate(order.getRequiredDate());
+            asTableview.setShippedDate(order.getShippedDate());
+
+            //quan modifiquem els atributs d'u nelement de la llista
+            //és necessàri refrescar la taula de forma manual
+            orderTableView.refresh();
+
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } catch (SQLException e) {
+            showMessage(1, "Error al modificar les dades: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
+
+        disableOrderSelection();
 
     }
 
@@ -338,23 +386,79 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Recuperar les dades del formulari
+     * Si hemos seleccionado un registro de la tabla, nos muestra los datos en
+     * el formulario.
+     *
+     * @param ev
+     */
+    @FXML
+    private void handleOrderOnMouseClicked(MouseEvent ev) {
+
+        if (orderTableView.getSelectionModel().getSelectedItem() != null) {
+
+            setOrderToView(getOrderFromTable());
+
+            modifyOrderBtn.setDisable(false);
+            deleteOrderBtn.setDisable(false);
+        } else {
+            disableOrderSelection();
+        }
+    }
+
+    /**
+     * Deshabilita botones y limpia la seleccion del usuario.
+     */
+    private void disableOrderSelection() {
+        //deshabilitem botóns i fila seleccionada
+        modifyOrderBtn.setDisable(true);
+        deleteOrderBtn.setDisable(true);
+        orderTableView.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Obtiene los datos del formulario y retorna un objeto
      *
      * @return Objecte order amb les dades
-     * @throws NumberFormatException
      */
-    private Order getOrderFromView() throws NumberFormatException {
+    private Order getOrderFromForm() {
         Order order = new Order();
 
-        order.setOrderDate(DateConverter.convertToDate(orderDate.getValue()));
-        order.setRequiredDate(DateConverter.convertToDate(requiredDate.getValue()));
-        order.setShippedDate(DateConverter.convertToDate(shippedDate.getValue()));
-        order.setCustomer(clientComboBox.getEditor().toString());
+        order.setOrderDate(DateConverter.convertToTimestamp(orderDate.getValue()));
+        order.setRequiredDate(DateConverter.convertToTimestamp(requiredDate.getValue()));
+        order.setShippedDate(DateConverter.convertToTimestamp(shippedDate.getValue()));
+        order.setCustomer(clientComboBox.getSelectionModel().getSelectedItem().toString().trim());
 
         return order;
     }
 
-    // Funcions productes
+    /**
+     * Recupera l'objecte seleccionat a la taula
+     *
+     * @return Objecte Assignatura o null si no hi ha selecció
+     */
+    private Order getOrderFromTable() {
+        Order order = null;
+
+        order = (Order) orderTableView.getSelectionModel().getSelectedItem();
+
+        return order;
+    }
+
+    /**
+     * Rellena los campos del formulario con los datos de un objeto Order
+     *
+     * @param objecte Order
+     */
+    private void setOrderToView(Order order) {
+        if (order != null) {
+            orderTabOrderDate.setText(String.valueOf(order.getOrderDate()));
+            orderTabRequiredDate.setText(String.valueOf(order.getRequiredDate()));
+            orderTabShippingDate.setText(String.valueOf(order.getShippedDate()));
+        }
+    }
+
+    //<editor-fold defaultstate="collapsed" desc="Botons Productes">
+    
     /**
      * Envia a la capa logica el producte a editar seleccionat des-de el
      * observableList
@@ -364,11 +468,20 @@ public class PrimaryController implements Initializable {
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
-        productLogicLayer.editProduct(getProductFromView());
+        try {
+            Product product = getProductFromView();
+            checkProductEmptyFields(product);
+            productLogicLayer.editProduct(product);
 
-        // Actualitzar la vista
-        productLogicLayer.setData();
-        productsTableView.setItems(productLogicLayer.getProductObservableList());
+            // Actualitzar la vista
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+        } catch (NumberFormatException e) {
+            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
+                    + " l'informació introduida.");
+        } catch (Exception e) {
+            showMessage(1, e.getMessage());
+        }
     }
 
     /**
@@ -379,11 +492,20 @@ public class PrimaryController implements Initializable {
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
-        productLogicLayer.addProduct(getProductFromView());
-
-        // Actualitzar la taula
-        productLogicLayer.setData();
-        productsTableView.setItems(productLogicLayer.getProductObservableList());
+        try {
+            Product product = getProductFromView();
+            checkProductEmptyFields(product);
+            productLogicLayer.addProduct(product);
+            
+            // Actualitzar la taula
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+        } catch (NumberFormatException e) {
+            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
+                    + " l'informació introduida.");
+        } catch (Exception e) {
+            showMessage(1, e.getMessage());
+        }
     }
 
     /**
@@ -414,16 +536,35 @@ public class PrimaryController implements Initializable {
         // Desactivar botons i deseleccionar entrada de la taula
         updateProductBtn.setDisable(true);
         deleteProductBtn.setDisable(true);
+        addNewProductBtn.setDisable(false);
         productsTableView.getSelectionModel().clearSelection();
 
         // Esborrar dades als camps d'edició
         productCodeField.clear();
         productNameField.clear();
         productDescriptionField.clear();
-        quantityInStockField.clear();
+        quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
         buyPriceField.clear();
     }
-
+    
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
+    
+    /**
+     * Verifica que el nom i descripció del producte no siguin nuls
+     * 
+     * @param product
+     * @throws Exception 
+     */
+    private void checkProductEmptyFields(Product product) throws Exception {
+        if (product.getProductName().equals("")) {
+            throw new Exception("El nom no pot estar en blanc.");
+        } else if (product.getProductDescription().equals("")) {
+            throw new Exception("La descripcio no pot estar en blanc.");
+        }
+    }
+    
     /**
      * Obté els valors dels camps
      *
@@ -457,6 +598,7 @@ public class PrimaryController implements Initializable {
             setProductToView(getProductFromTable());
             updateProductBtn.setDisable(false);
             deleteProductBtn.setDisable(false);
+            addNewProductBtn.setDisable(true);
         }
     }
 
@@ -484,6 +626,8 @@ public class PrimaryController implements Initializable {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
         return product;
     }
+    
+    //</editor-fold>
 
     //CUSTOMER 
     @FXML

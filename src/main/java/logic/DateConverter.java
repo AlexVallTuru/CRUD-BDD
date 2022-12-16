@@ -4,8 +4,9 @@
  */
 package logic;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -13,8 +14,7 @@ import java.time.LocalDate;
  */
 public class DateConverter {
 
-    public static Date convertToDate(LocalDate dateToConvert) {
-        return java.sql.Date.valueOf(dateToConvert);
+    public static Timestamp convertToTimestamp(LocalDate dateToConvert) {
+        return Timestamp.valueOf(dateToConvert.atTime(LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond()));
     }
-
 }

@@ -20,9 +20,8 @@ import logic.classes.Customer;
  */
 public class AppConfigLogic {
 
-    //Objeto conección BDD
     Connection conn;
-    //Llista observable de objetos de la classe AppConfig
+
     AppConfig appConfig;
 
     /**
@@ -33,8 +32,7 @@ public class AppConfigLogic {
 
         // Inicializamos conección con la BDD
         conn = ConnectionDB.getInstance().getConnection();
-        // Inicializamos el objeto
-        AppConfig appConfig = new AppConfig();
+        appConfig = new AppConfig();
     }
 
     /**
@@ -77,5 +75,8 @@ public class AppConfigLogic {
         //Esta variable obtendra la edad de la persona.
         return periodo.getYears();
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
 }
