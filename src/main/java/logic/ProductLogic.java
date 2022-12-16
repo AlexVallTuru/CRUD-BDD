@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package logic;
 
 import data.ConnectionDB;
@@ -23,7 +18,7 @@ public class ProductLogic {
     ObservableList<Product> productsOList;
     
     /**
-     * Inicialitzar connexió i col·lecció
+     * Inicializar conexion i coleccion
      * 
      * @throws SQLException 
      */
@@ -35,7 +30,7 @@ public class ProductLogic {
     }
     
     /**
-     * Omplir la observableList amb els continguts de la taula products
+     * Pasar los contenidos de la tabla products a la observableList
      * 
      * @throws SQLException 
      */
@@ -44,7 +39,7 @@ public class ProductLogic {
     }
     
     /**
-     * Obte la observableList
+     * Obtener la observableList
      * 
      * @return 
      */
@@ -53,7 +48,7 @@ public class ProductLogic {
     }
     
     /**
-     * Envia un nou producte a la capa BBDD
+     * Envia un nuevo producto a la capa BBDD
      * 
      * @param product
      * @throws SQLException 
@@ -63,7 +58,7 @@ public class ProductLogic {
     }
     
     /**
-     * Envia a la capa BBDD la entrada a eliminar i també elimina aquesta de la
+     * Envia a la capa BBDD la entrada a eliminar i tambien elimina esta de la
      * observableList
      * 
      * @param product
@@ -75,7 +70,7 @@ public class ProductLogic {
     }
     
     /**
-     * Envia a la capa BBDD el producte modificat
+     * Envia a la capa BBDD el producto modificado
      * 
      * @param product
      * @throws SQLException 
@@ -85,7 +80,21 @@ public class ProductLogic {
     }
     
     /**
-     * Tanca la connexió a la BBDD
+     * Verifica que el nombre i la descripcion del producto no sean nulos
+     * 
+     * @param product
+     * @throws Exception 
+     */
+    public void checkProductEmptyFields(Product product) throws Exception {
+        if (product.getProductName().equals("")) {
+            throw new Exception("El nombre no puede estar en blanco.");
+        } else if (product.getProductDescription().equals("")) {
+            throw new Exception("La descripción no puede estar en blanco.");
+        }
+    }
+    
+    /**
+     * Cierra la conexion con la BBDD
      * 
      * @throws SQLException 
      */

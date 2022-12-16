@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package data;
 
 import java.sql.Connection;
@@ -19,7 +14,7 @@ import logic.classes.Product;
 public class ProductDB {
     
     /**
-     * Crea un ArrayList de tots els productes a la BBDD
+     * Crea un ArrayList con todos los productos de la BBDD
      * 
      * @param conn
      * @return 
@@ -29,14 +24,14 @@ public class ProductDB {
         
         ArrayList<Product> productsList = new ArrayList<>();
         
-        //Crear query
+        // Crear query
         Statement query;
         query = conn.createStatement();
         query.executeQuery("SELECT * FROM products");
         
         ResultSet rs = query.getResultSet();
         
-        // Passar tots els resultats al ArrayList i retornar
+        // Pasar todos los resultados al ArrayList i retornar
         while (rs.next()) {
             productsList.add(new Product(
                     rs.getInt("productCode"), rs.getString("productName"), 
@@ -47,31 +42,31 @@ public class ProductDB {
     }
     
     /**
-     * Inserta un nou producte a la BBDD
+     * Inserta un nuevo producto en la BBDD
      * 
      * @param conn
      * @param product
      * @throws SQLException 
      */
     public static void insertProduct(Connection conn, Product product) throws SQLException {
-        // Preparem una sentencia sql i carreguem les dades de la BBDD per treballar amb aquesta
+        // Preparamos el comando sql i cargamos los datos de la BBDD para trabajar con esta
         Statement query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         query.executeQuery("SELECT * FROM products");
         ResultSet rs = query.getResultSet();
-        
-        // Anem a l'ultima posició de la taula i obtenim les noves dades
+
+        // Nos movemos a la ultima posicion de la tabla e insertamos los nuevos datos
         rs.moveToInsertRow();
         rs.updateString("productName", product.getProductName());
         rs.updateString("productDescription", product.getProductDescription());
         rs.updateInt("quantityInStock", product.getQuantityInStock());
         rs.updateDouble("buyPrice", product.getBuyPrice());
         
-        // Afegim les dades a la BBDD
+        // Añadimos los datos a la tabla
         rs.insertRow();
     }
     
     /**
-     * Modifica la entrada a la BBDD seleccionada des-de la observableList
+     * Modifica la entrada de la tabla seleccionada desde la observableList
      * 
      * @param conn
      * @param product
@@ -79,14 +74,14 @@ public class ProductDB {
      */
     public static void modifyProduct(Connection conn, Product product) throws SQLException {
         /**
-         * Preparem una sentencia sql que buscara el producte amb la mateixa ID
-         * Que la proporcionada
+         * Preparamos un comando sql que buscara el producto con la misma ID que
+         * la obtenida desde la observableList
          */
         Statement query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         query.executeQuery("SELECT * FROM products WHERE productCode = " + String.valueOf(product.getProductCode()));
         ResultSet rs = query.getResultSet();
         
-        // Enviem els nous valors a la BBDD
+        // Enviamos los nuevos valores a la BBDD
         if (rs.next()) {
             rs.updateString("productName", product.getProductName());
             rs.updateString("productDescription", product.getProductDescription());
@@ -98,7 +93,7 @@ public class ProductDB {
     }
     
     /**
-     * Elimina la entrada de la taula que coincideix amb la clau proporcionada
+     * Elimina la entrada de la tabla correspondiente con la id proporcionada
      * 
      * @param conn
      * @param product
