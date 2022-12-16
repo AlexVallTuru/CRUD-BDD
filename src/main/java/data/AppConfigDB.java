@@ -58,8 +58,8 @@ public class AppConfigDB {
     }
     
     /**
-     * Comprova si existeixen entrades a la taula appconfig. Si no existeixen
-     * tanca la aplicació
+     * Comprueba si existen entradas en la tabla appconfig. Si no existen, no
+     * se abrira el programa
      * 
      * @param conn
      * @throws SQLException

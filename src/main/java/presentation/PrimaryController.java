@@ -198,7 +198,7 @@ public class PrimaryController implements Initializable {
         colShippedDate.setCellValueFactory(new PropertyValueFactory<>("shippedDate"));
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
         //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("Descripcio"));
-        // Columnes Product
+        // Columnas Product
         colProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
         colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
         colProductDescription.setCellValueFactory(new PropertyValueFactory<>("productDescription"));
@@ -457,10 +457,10 @@ public class PrimaryController implements Initializable {
         }
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Botons Productes">
+    //<editor-fold defaultstate="collapsed" desc="Botones Products">
     
     /**
-     * Envia a la capa logica el producte a editar seleccionat des-de el
+     * Envia a la capa logica el producto a editar seleccionado desde la 
      * observableList
      *
      * @param event
@@ -470,22 +470,21 @@ public class PrimaryController implements Initializable {
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
         try {
             Product product = getProductFromView();
-            checkProductEmptyFields(product);
+            productLogicLayer.checkProductEmptyFields(product);
             productLogicLayer.editProduct(product);
 
-            // Actualitzar la vista
+            // Actualizar la vista
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
         } catch (NumberFormatException e) {
-            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
-                    + " l'informació introduida.");
+            showMessage(1, "Los campos de Stock i Precio son numericos i no pueden estar en blanco.");
         } catch (Exception e) {
             showMessage(1, e.getMessage());
         }
     }
 
     /**
-     * Envia els valors dels camps a la capa lógica
+     * Envia los valores de los campos de la nueva entrada a la capa logica
      *
      * @param event
      * @throws SQLException
@@ -494,23 +493,21 @@ public class PrimaryController implements Initializable {
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
         try {
             Product product = getProductFromView();
-            checkProductEmptyFields(product);
+            productLogicLayer.checkProductEmptyFields(product);
             productLogicLayer.addProduct(product);
             
-            // Actualitzar la taula
+            // Actualizar la tabla
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
         } catch (NumberFormatException e) {
-            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
-                    + " l'informació introduida.");
+            showMessage(1, "Los campos de Stock i Precio son numericos i no pueden estar en blanco.");
         } catch (Exception e) {
             showMessage(1, e.getMessage());
         }
     }
 
     /**
-     * Envia l'entrada seleccionada que es vol eliminar de la taula a la capa
-     * logica
+     * Envia la entrada seleccionada que se quiere eliminar a la capa logica
      *
      * @param event
      */
@@ -518,28 +515,28 @@ public class PrimaryController implements Initializable {
     void onActionDeleteProductBtn(ActionEvent event) {
         Product product = getProductFromTable();
 
-        // Intenta eliminar l'entrada. Si falla, mostra un missatge amb l'error
+        // Intenta eliminar la entrada. Si falla, muestra un mensaje con el error
         try {
             productLogicLayer.removeProduct(product);
         } catch (SQLException e) {
-            showMessage(1, "Error eliminant l'entrada: " + e);
+            showMessage(1, "Error al eliminar la entrada: " + e);
         }
     }
 
     /**
-     * Desactiva botons i elimina dades als camps d'edicio
+     * Desactiva los botones i limpia los campos de edicion
      *
      * @param event
      */
     @FXML
     void onActionCleanFieldsBtn(ActionEvent event) {
-        // Desactivar botons i deseleccionar entrada de la taula
+        // Desactivar botones i seleccion de la tabla
         updateProductBtn.setDisable(true);
         deleteProductBtn.setDisable(true);
         addNewProductBtn.setDisable(false);
         productsTableView.getSelectionModel().clearSelection();
 
-        // Esborrar dades als camps d'edició
+        // Limpiar los campos de edicion
         productCodeField.clear();
         productNameField.clear();
         productDescriptionField.clear();
@@ -552,21 +549,7 @@ public class PrimaryController implements Initializable {
     //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
     
     /**
-     * Verifica que el nom i descripció del producte no siguin nuls
-     * 
-     * @param product
-     * @throws Exception 
-     */
-    private void checkProductEmptyFields(Product product) throws Exception {
-        if (product.getProductName().equals("")) {
-            throw new Exception("El nom no pot estar en blanc.");
-        } else if (product.getProductDescription().equals("")) {
-            throw new Exception("La descripcio no pot estar en blanc.");
-        }
-    }
-    
-    /**
-     * Obté els valors dels camps
+     * Obtiene los valores de los campos
      *
      * @return
      * @throws NumberFormatException
@@ -574,7 +557,7 @@ public class PrimaryController implements Initializable {
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
 
-        // Si estem modificant una entrada, existira un codi
+        // Si estamos modificando una entrada, captura el codigo del producto
         if (!productCodeField.getText().equals("")) {
             product.setProductCode(parseInt(productCodeField.getText()));
         }
@@ -587,8 +570,8 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Comprova si hem seleccionat una entrada de la taula i envia els valors
-     * als camps d'edició per a modificar o eliminar aquesta.
+     * Comprueba si hemos seleccionado una entrada de la tabla i envia los
+     * valores a los campos de edicion para modificar o eliminar esta
      *
      * @param ev
      */
@@ -603,7 +586,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Envia els valors del camp de la taula seleccionat als camps d'edició
+     * Envia los valores del producto seleccionado a los campos de edicion
      *
      * @param product
      */
@@ -618,7 +601,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Obte el producte de la taula
+     * Obtiene el producto de la tabla
      *
      * @return
      */
