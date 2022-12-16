@@ -21,6 +21,7 @@ import logic.classes.AppConfig;
 public class AppConfigDB {
 
     /**
+     * Carga los datos de la base de datos al objeto
      *
      * @param con
      * @return
@@ -39,11 +40,11 @@ public class AppConfigDB {
         // Guardem les dades carregades a un fitxer amb el que treballarem
         ResultSet rs = sentencia.getResultSet();
         while (rs.next()) {
-            /**
-             * Carreguem les dades que hi han a assignatura i les nem afeguint a
-             * una coleccio tipus array list que contindra l'objecte amb totes
-             * les dades de totes les posicions*
-             */
+            
+             //Cargamos los datos que hay en la base de datos y las asignamos a
+             //un objeto ya que solo se creara un registro de appconfig a la
+             //base de datos
+            
             appConfig = new AppConfig(rs.getDouble("defaultCreditLimit"),
                     rs.getInt("defaultQuantityInStock"),
                     rs.getInt("defaultQuantityOrdered"),

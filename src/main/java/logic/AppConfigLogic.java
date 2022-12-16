@@ -23,36 +23,41 @@ public class AppConfigLogic {
     Connection conn;
 
     AppConfig appConfig;
+
     /**
-     * 
-     * @throws SQLException 
+     *
+     * @throws SQLException
      */
     public AppConfigLogic() throws SQLException {
 
+        // Inicializamos conección con la BDD
         conn = ConnectionDB.getInstance().getConnection();
         appConfig = new AppConfig();
     }
 
     /**
+     * Retorna el objeto
      * 
-     * @return 
+     * @return
      */
     public AppConfig getAppConfig() {
         return appConfig;
     }
 
     /**
+     * Carga los datos de la base de datos
      * 
-     * @throws SQLException 
+     * @throws SQLException
      */
     public void setData() throws SQLException {
         this.appConfig = AppConfigDB.carregarAppConfig(conn);
     }
 
     /**
-     * 
+     * Calcula la edad de la persona
+     *
      * @param customer
-     * @return 
+     * @return
      */
     public int calcularEdat(Customer customer) {
         //Creamos un formato de fecha 
@@ -60,14 +65,13 @@ public class AppConfigLogic {
 
         //A traves del parse pasamos la fecha al formato y le pasamos la fecha de la base de datos y el formato al que la queremos pasar
         LocalDate fechaNac = LocalDate.parse(customer.getBirthDate(), fmt);
-        
+
         //Creamos una variable donde le metemos la fecha de hoy
         LocalDate ahora = LocalDate.now();
 
         //Utilizamos el metodo period para crear un objeto que nos restara dos fechas y nos obtendra años, meses y dias.
         Period periodo = Period.between(fechaNac, ahora);
-        
-        
+
         //Esta variable obtendra la edad de la persona.
         return periodo.getYears();
     }
