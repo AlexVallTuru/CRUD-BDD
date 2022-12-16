@@ -20,39 +20,46 @@ import logic.classes.Customer;
  */
 public class AppConfigLogic {
 
-    //Objecte connexió a la BBDD
+    //Objeto conección BDD
     Connection conn;
-    //llista observable d'objectes de la classe Customer
+    //Llista observable de objetos de la classe AppConfig
     AppConfig appConfig;
+
     /**
-     * 
-     * @throws SQLException 
+     *
+     * @throws SQLException
      */
     public AppConfigLogic() throws SQLException {
-        // inicialitzem connexió amb BD
 
+        // Inicializamos conección con la BDD
         conn = ConnectionDB.getInstance().getConnection();
-        // inicialitzem col.lecció
+        // Inicializamos el objeto
         AppConfig appConfig = new AppConfig();
     }
+
     /**
+     * Retorna el objeto
      * 
-     * @return 
+     * @return
      */
     public AppConfig getAppConfig() {
         return appConfig;
     }
+
     /**
+     * Carga los datos de la base de datos
      * 
-     * @throws SQLException 
+     * @throws SQLException
      */
     public void setData() throws SQLException {
         this.appConfig = AppConfigDB.carregarAppConfig(conn);
     }
+
     /**
-     * 
+     * Calcula la edad de la persona
+     *
      * @param customer
-     * @return 
+     * @return
      */
     public int calcularEdat(Customer customer) {
         //Creamos un formato de fecha 
@@ -60,18 +67,15 @@ public class AppConfigLogic {
 
         //A traves del parse pasamos la fecha al formato y le pasamos la fecha de la base de datos y el formato al que la queremos pasar
         LocalDate fechaNac = LocalDate.parse(customer.getBirthDate(), fmt);
-        
+
         //Creamos una variable donde le metemos la fecha de hoy
         LocalDate ahora = LocalDate.now();
 
         //Utilizamos el metodo period para crear un objeto que nos restara dos fechas y nos obtendra años, meses y dias.
         Period periodo = Period.between(fechaNac, ahora);
-        
-        
+
         //Esta variable obtendra la edad de la persona.
         return periodo.getYears();
     }
-    
-
 
 }

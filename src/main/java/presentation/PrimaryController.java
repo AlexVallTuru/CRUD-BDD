@@ -338,7 +338,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Recupera les dades del formulari
+     * Recuperar les dades del formulari
      *
      * @return Objecte order amb les dades
      * @throws NumberFormatException
@@ -497,25 +497,25 @@ public class PrimaryController implements Initializable {
 
     //<editor-fold defaultstate="collapsed" desc="Botons CUSTOMER">
     /**
-     * Boton de añadir APARTADO CLIENTE
+     * Botón de añadir APARTADO CLIENTE
      *
      * @param event
      */
     @FXML
     void onClick_bt_aniadir(ActionEvent event) {
 
-        //Aqui obtenim la minima edat de la bdd i mira si es superior o igual
+        //Aquí obtenemos la mínima edad de la bdd y mira si es superior o igual
         try {
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
-                //Escrivim les dades dels texts fields a la base de dades
+                //Escribimos los datos de los texts fields a la base de datos
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
                 actualizarTvCustomer(customerLogicLayer);
             } else {
-                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+                showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
         } catch (SQLException ex) {
             if (primaryKeyRepetida()) {
-                showMessage(1, "Solo se puede añadir un correo electronico, revise la tabla");
+                showMessage(1, "Solo se puede añadir un correo electrónico, revise la tabla");
             }
             if (dniRepetido()) {
                 showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
@@ -526,7 +526,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Boton Actualizar datos de la tabla en los text fields Tiene un control de
+     * Botón Actualizar datos de la tabla en los text fields Tiene un control de
      * excepciones APARTADO CLIENTE
      *
      * @param event
@@ -537,10 +537,10 @@ public class PrimaryController implements Initializable {
         try {
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
                 customerLogicLayer.modificarCustomer(getCustomerFromView());
-                //Para actualizar la pagina
+                //Para actualizar la página
                 actualizarTvCustomer(customerLogicLayer);
             } else {
-                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+                showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
         } catch (SQLException exception) {
             if (dniRepetido()) {
@@ -550,18 +550,18 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Boton de eliminar APARTADO CLIENTE
+     * Botón de eliminar APARTADO CLIENTE
      *
      * @param event
      */
     @FXML
     void onClick_bt_eliminar(ActionEvent event) {
-        // capturem l'objecte seleccionat a la taula
+        // Capturamos el objeto de la base de datos
         Customer customer = getCustomerFromTable();
         try {
             customerLogicLayer.eliminarCustomer(customer);
         } catch (SQLException e) {
-            showMessage(1, "Error al eliminar les dades: " + e);
+            showMessage(1, "Error al eliminar los datos: " + e);
         }
     }
 
@@ -580,31 +580,26 @@ public class PrimaryController implements Initializable {
 
     //<editor-fold defaultstate="collapsed" desc="Metodes privats CUSTOMER">
     /**
-     * Al hacer click si existe algun registro en table view, carga la
-     * informacion en los texts fields y deshabilita el text field de email ya
+     * Al hacer clic si existe algún registro en table view, carga la
+     * información en los texts fields y deshabilita el text field de email ya
      * que es la primary key para que no se pueda actualizar. APARTADO CLIENTE
      *
      * @param ev
      */
     @FXML
     private void handleOnMouseClicked(MouseEvent ev) {
-        // si hem seleccionat un registre de la taula
+        // Si hemos seleccionado algún registro de la tabla
         if (tv_customer.getSelectionModel().getSelectedItem() != null) {
-            /**
-             * Desabilitem el boto del mail al ser la primarykey i el boto
-             * añadir ja que no podem afeguir si actualitzem*
-             */
-
-            // agafem les dades de l'objecte seleccionat i els traspassem
-            // als camps del formulari
+            // Añadimos los datos del objeto seleccionado y los traspasamos
+            // a los campos del formulario
             setCustomerToView(getCustomerFromTable());
-            //Habilitem botó de modificar i eliminar
+            //Habilitamos el botón, modificar y eliminar
             activarSeleccioCustomer();
         }
     }
 
     /**
-     * Esta funcion rellena los texts fields con el contenido del objecto
+     * Esta función rellena los texts fields con el contenido del objeto
      * APARTADO CLIENTE
      *
      * @param customer
@@ -621,7 +616,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Guarda informacion a un objeto del sitio donde se encuentra el objeto
+     * Guarda información a un objeto del sitio donde se encuentra el objeto
      * seleccionado APARTADO CLIENTE
      *
      * @return
@@ -633,7 +628,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Funcion obtener CLIENTE de los text fields APARTADO CLIENTE
+     * Función obtener cliente de los text fields APARTADO CLIENTE
      *
      * @return @throws NumberFormatException
      */
@@ -672,8 +667,8 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Deshabilita botones y fila seleccionada Limpia los texts Fields APARTADO
-     * CLIENTE
+     * Deshabilita botones y fila seleccionada
+     * Limpia los texts Fields APARTADO CLIENTE
      */
     private void desactivaSeleccioCustomer() {
         tf_customerEmail.setDisable(false);
@@ -683,7 +678,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Compara si la edad del cliente es mayor a la edad minima de appconfig
+     * Compara si la edad del cliente es mayor a la edad mínima de appconfig
      * APARTADO CLIENTE
      *
      * @return
@@ -696,7 +691,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Añade todo el contenido de la base de datos a la ObservableList y despues
+     * Añade todo el contenido de la base de datos a la ObservableList y después
      * añade esta lista al Table View APARTADO CLIENTE
      *
      * @param customerLogicLayer
@@ -708,7 +703,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Esta funcion setea el text field de creditLimit al valor del objeto
+     * Esta función setea el text field de creditLimit al valor del objeto
      * appConfig defaultCreditLimit APARTADO CLIENTE
      *
      * @param appConfig
@@ -726,7 +721,7 @@ public class PrimaryController implements Initializable {
      * @return
      */
     private Boolean primaryKeyRepetida() {
-        //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
+        //En la parte izquierda del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
         for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
             if (getCustomerFromView().getCustomerEmail().equals(customerLogicLayer.getCustomerObservableList().get(i).getCustomerEmail())) {
                 return true;
@@ -736,7 +731,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Comprueba si hay un dni repetido en el textfield y el tableview APARTADO
+     * Comprueba si hay un DNI repetido en el textfield y el tableview APARTADO
      * CLIENTE
      *
      * @return

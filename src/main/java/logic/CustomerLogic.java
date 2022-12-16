@@ -19,27 +19,27 @@ import logic.classes.AppConfig;
  */
 public class CustomerLogic {
 
-    //Objecte connexió a la BBDD
+    //Objeto de conección BDD
     Connection conn;
 
-    //llista observable d'objectes de la classe Customer
+    //Llista observable de objetos de la classe Customer
     ObservableList<Customer> llistaObservableCustomer;
 
     /**
-     * Contructor capa lógica
+     * Constructor capa lógica
      *
      * @throws SQLException
      */
     public CustomerLogic() throws SQLException {
-        // inicialitzem connexió amb BD
+        // Inicializamos connexió amb BD
 
         conn = ConnectionDB.getInstance().getConnection();
-        // inicialitzem col.lecció
+        // Inicializamos colección
         llistaObservableCustomer = FXCollections.<Customer>observableArrayList();
     }
 
     /**
-     * Omple la llistaObservable amb els registres de la taula
+     * Rellena la ObservableList con los registros de la tabla
      *
      * @throws SQLException
      */
@@ -50,7 +50,7 @@ public class CustomerLogic {
     }
 
     /**
-     * Afegeix una persona
+     * Añade a una persona
      *
      * @throws SQLException
      */
@@ -64,28 +64,20 @@ public class CustomerLogic {
     }
 
     /**
-     * Elimina una assignatura
+     * Elimina un Customer
      *
      * @param as
      * @throws SQLException
      */
     public void eliminarCustomer(Customer customer) throws SQLException {
 
-        //l'eliminem de la BBDD
         CustomerDB.eliminaCustomer(conn, customer);
-        // Si tot ha anat bé, eliminem l'objecte de la llista observable.
-        // NOTA: Quan afegim o eliminem elements de la collecció, la taula es
-        // refresca de forma automàtica.
+        // Eliminamos el objeto de la ObservableList
         llistaObservableCustomer.remove(customer);
     }
 
     /**
-     * Obté la llista observable
-     *
-     * @return
-     */
-    /**
-     * Tanca la connexió amb la BBDD
+     * Cierra la conección con la BDD
      *
      * @throws SQLException
      */
@@ -94,32 +86,42 @@ public class CustomerLogic {
     }
 
     /**
-     * Valida el format en el nom d'una assignatura. Ha d'estar format per tres
-     * lletres majuscules, un guió i tres dígits
-     *
-     * @param txt
-     * @return
+     * Añade el objeto a la ObservableList
+     * 
+     * @throws SQLException 
      */
-
     public void setData() throws SQLException {
         this.llistaObservableCustomer.setAll(CustomerDB.carregarCustomer(conn));
     }
 
+    /**
+     * Retorna la ObservableList
+     * 
+     * @return 
+     */
     public ObservableList<Customer> getCustomerObservableList() {
         return llistaObservableCustomer;
     }
 
+    /**
+     * Modifica los datos del objeto seleccionado
+     * 
+     * @param customer
+     * @throws SQLException
+     * @throws Exception 
+     */
     public void modificarCustomer(Customer customer) throws SQLException, Exception {
-        // si no valida el format del nom, genera una excepció
-        /**
-         * if (!this.validaNomAssignatura(as.getNom())) { throw new
-         * Exception("El format del nom de l'assignatura no és correcte. Un
-         * exemple de format correcte seria ABC-123"); }*
-         */
 
         CustomerDB.modificaCustomer(conn, customer);
     }
-
+    
+    /**
+     * Metodo extra para que todos los usuarios tengan todos los campos rellenados
+     * Credit Limit se controla con una excepción, igual que DNI
+     * 
+     * @param customer
+     * @return 
+     */
     public boolean validaNullsCustomer(Customer customer) {
         if (customer.getBirthDate().isBlank() || customer.getCustomerEmail().isBlank() || customer.getCustomerName().isBlank() || customer.getPhoneNumber().isBlank() || customer.getIdCard().isBlank()) {
             return true;
@@ -127,6 +129,12 @@ public class CustomerLogic {
         return false;
     }
 
+    /**
+     * Calcula la edad de la persona
+     * 
+     * @throws SQLException
+     * @throws Exception 
+     */
     public void calcularEdad() throws SQLException, Exception {
         AppConfig appconfig = null;
 
