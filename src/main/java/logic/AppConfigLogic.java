@@ -75,8 +75,4 @@ public class AppConfigLogic {
         //Esta variable obtendra la edad de la persona.
         return periodo.getYears();
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
 }
