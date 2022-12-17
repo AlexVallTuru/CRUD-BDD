@@ -513,13 +513,14 @@ public class PrimaryController implements Initializable {
      */
     @FXML
     void onActionDeleteProductBtn(ActionEvent event) {
-        Product product = getProductFromTable();
-
         // Intenta eliminar la entrada. Si falla, muestra un mensaje con el error
         try {
+            Product product = getProductFromTable();
             productLogicLayer.removeProduct(product);
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar la entrada: " + e);
+        } catch (NullPointerException e) {
+            showMessage(1, "No hay ninguna entrada seleccionada.");
         }
     }
 
