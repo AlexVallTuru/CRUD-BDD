@@ -245,37 +245,7 @@ public class PrimaryController implements Initializable {
     }
 
     @FXML
-    void onActionProductComboBox(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionOrderDate(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionShippedDate(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionRequiredDate(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionOrderNum(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionProductQuantity(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionPriceEach(ActionEvent event) {
+    void onActionOrderDetailUpdateBtn(ActionEvent event) {
 
     }
 
@@ -298,17 +268,6 @@ public class PrimaryController implements Initializable {
         disableOrderSelection();
     }
 
-    @FXML
-    void onActionOrderDetailUpdateBtn(ActionEvent event) {
-
-    }
-
-    // TODO Esto creo que no me hará falta.
-    @FXML
-    void onActionRefreshOrderBtn(ActionEvent event) {
-
-    }
-
     /**
      * Elimina el registro seleccionado en la tabla.
      *
@@ -317,9 +276,8 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionDeleteOrderBtn(ActionEvent event) {
 
-        Order order = getOrderFromTable();
-
         try {
+            Order order = getOrderFromTable();
             orderLogicLayer.deleteOrder(order);
         } catch (SQLException e) {
             showMessage(1, "Error intentando eliminar los datos: " + e);
@@ -412,7 +370,7 @@ public class PrimaryController implements Initializable {
             order.setOrderDate(DateConverter.convertToTimestamp(orderDate.getValue()));
             order.setRequiredDate(DateConverter.convertToTimestamp(requiredDate.getValue()));
             order.setShippedDate(DateConverter.convertToTimestamp(shippedDate.getValue()));
-            order.setCustomer(clientComboBox.getSelectionModel().getSelectedItem().toString().trim());
+            order.setCustomer(clientComboBox.getValue());
             return order;
         }
     }
@@ -440,6 +398,7 @@ public class PrimaryController implements Initializable {
             orderDate.setValue(order.getOrderDate().toLocalDateTime().toLocalDate());
             requiredDate.setValue(order.getRequiredDate().toLocalDateTime().toLocalDate());
             shippedDate.setValue(order.getShippedDate().toLocalDateTime().toLocalDate());
+            clientComboBox.setValue(order.getCustomer());
 
         }
     }

@@ -6,16 +6,15 @@ import java.sql.Timestamp;
  *
  * @author Ztudo
  */
-
 public class Order {
 
     private int orderNumber;
     private Timestamp orderDate;
     private Timestamp requiredDate;
     private Timestamp shippedDate;
-    private String customer;
+    private Customer customer;
 
-    public Order(int orderNumber, Timestamp orderDate, Timestamp requiredDate, Timestamp shippedDate, String customer) {
+    public Order(int orderNumber, Timestamp orderDate, Timestamp requiredDate, Timestamp shippedDate, Customer customer) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
         this.requiredDate = requiredDate;
@@ -58,11 +57,11 @@ public class Order {
         this.shippedDate = shippedDate;
     }
 
-    public String getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    public void setCustomer(String customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 

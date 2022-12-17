@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import logic.classes.Customer;
 import logic.classes.Order;
 
 /**
@@ -34,8 +35,8 @@ public class OrderDB {
 
         ResultSet rs = query.getResultSet();
         while (rs.next()) {
-            //Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
-            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), rs.getString("customers_CustomerEmail")));
+            Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
+            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer));
         }
         return ordersList;
     }
@@ -60,9 +61,33 @@ public class OrderDB {
         rs.updateTimestamp("orderDate", order.getOrderDate());
         rs.updateTimestamp("requiredDate", order.getRequiredDate());
         rs.updateTimestamp("shippedDate", order.getShippedDate());
-        rs.updateString("customers_customerEmail", order.getCustomer());
+        rs.updateObject("customers_customerEmail", order.getCustomer());
 
         rs.insertRow();
+    }
+
+    /**
+     * Retorna un customer cuyo customerEmail coincida con el pasado por
+     * parámetro.
+     *
+     * @param conn
+     * @param customerEmail
+     * @return
+     * @throws SQLException
+     */
+    public static Customer getCustomer(Connection conn, String customerEmail) throws SQLException {
+        Customer customer = null;
+
+        Statement query;
+        query = conn.createStatement();
+        query.executeQuery("SELECT * FROM customers WHERE customerEmail = '" + customerEmail + "'");
+
+        ResultSet rs = query.getResultSet();
+
+        if (rs.next()) {
+            customer = new Customer(rs.getString("customerEmail"), rs.getString("idCard"), rs.getString("customerName"), rs.getString("phone"), rs.getDouble("creditLimit"), rs.getString("birthDate"));
+        }
+        return customer;
     }
 
     /**
