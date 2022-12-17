@@ -1,5 +1,6 @@
 package presentation;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.DateTimeException;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeoutException;
 import javafx.application.Platform;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -166,6 +168,7 @@ public class PrimaryController implements Initializable {
             orderLogicLayer = new OrderLogic();
             orderLogicLayer.setData();
             orderTableView.setItems(orderLogicLayer.getOrderObservableList());
+            productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
             // Product logic
             productLogicLayer = new ProductLogic();
             productLogicLayer.setData();
@@ -179,10 +182,6 @@ public class PrimaryController implements Initializable {
             //ComboBox
             clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
             productComboBox.setItems(productLogicLayer.getProductObservableList());
-            //AppConfig Logic
-            appConfigLogic = new AppConfigLogic();
-            //Cargamos los datos del OBJETO en la base de datos
-            appConfigLogic.setData();
             //Poner el DefaultCredit como valor por defecto
             defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
@@ -199,7 +198,7 @@ public class PrimaryController implements Initializable {
         colShippedDate.setCellValueFactory(new PropertyValueFactory<>("shippedDate"));
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
         //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("Descripcio"));
-        // Columnes Product
+        // Columnas Product
         colProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
         colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
         colProductDescription.setCellValueFactory(new PropertyValueFactory<>("productDescription"));
@@ -259,7 +258,9 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionAddProductBtn(ActionEvent event) {
-
+        
+        // Deixem el camp de quantitat amb el seu valor per defecte
+        productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
     }
 
     @FXML
@@ -475,9 +476,10 @@ public class PrimaryController implements Initializable {
         }
     }
 
-    // Funcions productes
+    //<editor-fold defaultstate="collapsed" desc="Botones Products">
+    
     /**
-     * Envia a la capa logica el producte a editar seleccionat des-de el
+     * Envia a la capa logica el producto a editar seleccionado desde la 
      * observableList
      *
      * @param event
@@ -485,15 +487,23 @@ public class PrimaryController implements Initializable {
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
-        productLogicLayer.editProduct(getProductFromView());
+        try {
+            Product product = getProductFromView();
+            productLogicLayer.checkProductEmptyFields(product);
+            productLogicLayer.editProduct(product);
 
-        // Actualitzar la vista
-        productLogicLayer.setData();
-        productsTableView.setItems(productLogicLayer.getProductObservableList());
+            // Actualizar la vista
+            productLogicLayer.setData();
+            productsTableView.setItems(productLogicLayer.getProductObservableList());
+        } catch (NumberFormatException e) {
+            showMessage(1, "Los campos de Stock i Precio son numericos i no pueden estar en blanco.");
+        } catch (Exception e) {
+            showMessage(1, e.getMessage());
+        }
     }
 
     /**
-     * Envia els valors dels camps a la capa lógica
+     * Envia los valores de los campos de la nueva entrada a la capa logica
      *
      * @param event
      * @throws SQLException
@@ -502,20 +512,21 @@ public class PrimaryController implements Initializable {
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
         try {
             Product product = getProductFromView();
+            productLogicLayer.checkProductEmptyFields(product);
             productLogicLayer.addProduct(product);
-
-            // Actualitzar la taula
+            
+            // Actualizar la tabla
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
         } catch (NumberFormatException e) {
-            showMessage(1, "Els camps Stock i Preu Compra son númerics, verifica"
-                    + " l'informació introduida.");
+            showMessage(1, "Los campos de Stock i Precio son numericos i no pueden estar en blanco.");
+        } catch (Exception e) {
+            showMessage(1, e.getMessage());
         }
     }
 
     /**
-     * Envia l'entrada seleccionada que es vol eliminar de la taula a la capa
-     * logica
+     * Envia la entrada seleccionada que se quiere eliminar a la capa logica
      *
      * @param event
      */
@@ -523,37 +534,41 @@ public class PrimaryController implements Initializable {
     void onActionDeleteProductBtn(ActionEvent event) {
         Product product = getProductFromTable();
 
-        // Intenta eliminar l'entrada. Si falla, mostra un missatge amb l'error
+        // Intenta eliminar la entrada. Si falla, muestra un mensaje con el error
         try {
             productLogicLayer.removeProduct(product);
         } catch (SQLException e) {
-            showMessage(1, "Error eliminant l'entrada: " + e);
+            showMessage(1, "Error al eliminar la entrada: " + e);
         }
     }
 
     /**
-     * Desactiva botons i elimina dades als camps d'edicio
+     * Desactiva los botones i limpia los campos de edicion
      *
      * @param event
      */
     @FXML
     void onActionCleanFieldsBtn(ActionEvent event) {
-        // Desactivar botons i deseleccionar entrada de la taula
+        // Desactivar botones i seleccion de la tabla
         updateProductBtn.setDisable(true);
         deleteProductBtn.setDisable(true);
         addNewProductBtn.setDisable(false);
         productsTableView.getSelectionModel().clearSelection();
 
-        // Esborrar dades als camps d'edició
+        // Limpiar los campos de edicion
         productCodeField.clear();
         productNameField.clear();
         productDescriptionField.clear();
         quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
         buyPriceField.clear();
     }
-
+    
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
+    
     /**
-     * Obté els valors dels camps
+     * Obtiene los valores de los campos
      *
      * @return
      * @throws NumberFormatException
@@ -561,7 +576,7 @@ public class PrimaryController implements Initializable {
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
 
-        // Si estem modificant una entrada, existira un codi
+        // Si estamos modificando una entrada, captura el codigo del producto
         if (!productCodeField.getText().equals("")) {
             product.setProductCode(parseInt(productCodeField.getText()));
         }
@@ -574,8 +589,8 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Comprova si hem seleccionat una entrada de la taula i envia els valors
-     * als camps d'edició per a modificar o eliminar aquesta.
+     * Comprueba si hemos seleccionado una entrada de la tabla i envia los
+     * valores a los campos de edicion para modificar o eliminar esta
      *
      * @param ev
      */
@@ -590,7 +605,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Envia els valors del camp de la taula seleccionat als camps d'edició
+     * Envia los valores del producto seleccionado a los campos de edicion
      *
      * @param product
      */
@@ -605,7 +620,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Obte el producte de la taula
+     * Obtiene el producto de la tabla
      *
      * @return
      */
@@ -613,6 +628,8 @@ public class PrimaryController implements Initializable {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
         return product;
     }
+    
+    //</editor-fold>
 
     //CUSTOMER 
     @FXML
@@ -626,40 +643,36 @@ public class PrimaryController implements Initializable {
 
     //<editor-fold defaultstate="collapsed" desc="Botons CUSTOMER">
     /**
-     * Boton de añadir APARTADO CLIENTE
+     * Botón de añadir APARTADO CLIENTE
      *
      * @param event
      */
     @FXML
     void onClick_bt_aniadir(ActionEvent event) {
 
-        //Aqui obtenim la minima edat de la bdd i mira si es superior o igual
+        //Aquí obtenemos la mínima edad de la bdd y mira si es superior o igual
         try {
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
-                //Escrivim les dades dels texts fields a la base de dades
+                //Escribimos los datos de los texts fields a la base de datos
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
                 actualizarTvCustomer(customerLogicLayer);
             } else {
-                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+                showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
         } catch (SQLException ex) {
             if (primaryKeyRepetida()) {
-                showMessage(1, "Solo se puede añadir un correo electronico, revise la tabla");
+                showMessage(1, "Solo se puede añadir un correo electrónico, revise la tabla");
             }
             if (dniRepetido()) {
                 showMessage(1, "Solo se puede añadir un DNI, revise la tabla");
             }
-        } catch (DateTimeException ex) {
-            showMessage(0, "No se pueden dejar campos vacios");
-        } catch (NumberFormatException ex) {
-            showMessage(0, "No se pueden dejar campos vacios");
         } catch (Exception ex) {
-            showMessage(0, "No se pueden dejar campos vacios");
+            showMessage(0, ex.getMessage());
         }
     }
 
     /**
-     * Boton Actualizar datos de la tabla en los text fields Tiene un control de
+     * Botón Actualizar datos de la tabla en los text fields Tiene un control de
      * excepciones APARTADO CLIENTE
      *
      * @param event
@@ -670,10 +683,10 @@ public class PrimaryController implements Initializable {
         try {
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
                 customerLogicLayer.modificarCustomer(getCustomerFromView());
-                //Para actualizar la pagina
+                //Para actualizar la página
                 actualizarTvCustomer(customerLogicLayer);
             } else {
-                showMessage(0, "La minima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+                showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
         } catch (SQLException exception) {
             if (dniRepetido()) {
@@ -683,18 +696,18 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Boton de eliminar APARTADO CLIENTE
+     * Botón de eliminar APARTADO CLIENTE
      *
      * @param event
      */
     @FXML
     void onClick_bt_eliminar(ActionEvent event) {
-        // capturem l'objecte seleccionat a la taula
+        // Capturamos el objeto de la base de datos
         Customer customer = getCustomerFromTable();
         try {
             customerLogicLayer.eliminarCustomer(customer);
         } catch (SQLException e) {
-            showMessage(1, "Error al eliminar les dades: " + e);
+            showMessage(1, "Error al eliminar los datos: " + e);
         }
     }
 
@@ -713,31 +726,26 @@ public class PrimaryController implements Initializable {
 
     //<editor-fold defaultstate="collapsed" desc="Metodes privats CUSTOMER">
     /**
-     * Al hacer click si existe algun registro en table view, carga la
-     * informacion en los texts fields y deshabilita el text field de email ya
+     * Al hacer clic si existe algún registro en table view, carga la
+     * información en los texts fields y deshabilita el text field de email ya
      * que es la primary key para que no se pueda actualizar. APARTADO CLIENTE
      *
      * @param ev
      */
     @FXML
     private void handleOnMouseClicked(MouseEvent ev) {
-        // si hem seleccionat un registre de la taula
+        // Si hemos seleccionado algún registro de la tabla
         if (tv_customer.getSelectionModel().getSelectedItem() != null) {
-            /**
-             * Desabilitem el boto del mail al ser la primarykey i el boto
-             * añadir ja que no podem afeguir si actualitzem*
-             */
-
-            // agafem les dades de l'objecte seleccionat i els traspassem
-            // als camps del formulari
+            // Añadimos los datos del objeto seleccionado y los traspasamos
+            // a los campos del formulario
             setCustomerToView(getCustomerFromTable());
-            //Habilitem botó de modificar i eliminar
+            //Habilitamos el botón, modificar y eliminar
             activarSeleccioCustomer();
         }
     }
 
     /**
-     * Esta funcion rellena los texts fields con el contenido del objecto
+     * Esta función rellena los texts fields con el contenido del objeto
      * APARTADO CLIENTE
      *
      * @param customer
@@ -754,7 +762,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Guarda informacion a un objeto del sitio donde se encuentra el objeto
+     * Guarda información a un objeto del sitio donde se encuentra el objeto
      * seleccionado APARTADO CLIENTE
      *
      * @return
@@ -766,7 +774,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Funcion obtener CLIENTE de los text fields APARTADO CLIENTE
+     * Función obtener cliente de los text fields APARTADO CLIENTE
      *
      * @return @throws NumberFormatException
      */
@@ -805,8 +813,8 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Deshabilita botones y fila seleccionada Limpia los texts Fields APARTADO
-     * CLIENTE
+     * Deshabilita botones y fila seleccionada
+     * Limpia los texts Fields APARTADO CLIENTE
      */
     private void desactivaSeleccioCustomer() {
         tf_customerEmail.setDisable(false);
@@ -816,7 +824,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Compara si la edad del cliente es mayor a la edad minima de appconfig
+     * Compara si la edad del cliente es mayor a la edad mínima de appconfig
      * APARTADO CLIENTE
      *
      * @return
@@ -829,7 +837,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Añade todo el contenido de la base de datos a la ObservableList y despues
+     * Añade todo el contenido de la base de datos a la ObservableList y después
      * añade esta lista al Table View APARTADO CLIENTE
      *
      * @param customerLogicLayer
@@ -841,7 +849,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Esta funcion setea el text field de creditLimit al valor del objeto
+     * Esta función setea el text field de creditLimit al valor del objeto
      * appConfig defaultCreditLimit APARTADO CLIENTE
      *
      * @param appConfig
@@ -859,7 +867,7 @@ public class PrimaryController implements Initializable {
      * @return
      */
     private Boolean primaryKeyRepetida() {
-        //En la parte izquiera del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
+        //En la parte izquierda del if obtenemos los datos del textflied y en la parte derecha obtenemos los datos de la observableList
         for (int i = 0; i < customerLogicLayer.getCustomerObservableList().size(); i++) {
             if (getCustomerFromView().getCustomerEmail().equals(customerLogicLayer.getCustomerObservableList().get(i).getCustomerEmail())) {
                 return true;
@@ -869,7 +877,7 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Comprueba si hay un dni repetido en el textfield y el tableview APARTADO
+     * Comprueba si hay un DNI repetido en el textfield y el tableview APARTADO
      * CLIENTE
      *
      * @return
