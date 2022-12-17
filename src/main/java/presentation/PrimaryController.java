@@ -11,6 +11,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -39,6 +42,12 @@ public class PrimaryController implements Initializable {
 
     //orderDetail TableView
     @FXML
+    private TabPane tabPane;
+
+    @FXML
+    private Tab orderDetailPane;
+
+    @FXML
     private TableView orderDetailTableView;
 
     @FXML
@@ -60,7 +69,7 @@ public class PrimaryController implements Initializable {
     private Button addProductBtn;
 
     @FXML
-    private Button orderDetailDeleteButton;
+    private Button orderDetailDeleteBtn;
 
     @FXML
     private Button orderDetailUpdateBtn;
@@ -75,7 +84,13 @@ public class PrimaryController implements Initializable {
     private Button modifyOrderBtn;
 
     @FXML
-    private Button searchOrderBtn;
+    private Label openedOrder;
+
+    @FXML
+    private Button openOrderBtn;
+
+    @FXML
+    private Button searchRangeBtn;
 
     @FXML
     private ComboBox<Customer> clientComboBox;
@@ -155,9 +170,10 @@ public class PrimaryController implements Initializable {
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
             actualizarTvCustomer(customerLogicLayer);
+            //OrderDetails Logic
+            orderDetailsLogicLayer = new OrderDetailsLogic();
             //ComboBox
             clientComboBox.setItems(customerLogicLayer.getCustomerObservableList());
-            productComboBox.setItems(productLogicLayer.getProductObservableList());
             //Poner el DefaultCredit como valor por defecto
             defaultValorLimitCredit(appConfigLogic.getAppConfig());
         } catch (SQLException ex) {
@@ -240,47 +256,22 @@ public class PrimaryController implements Initializable {
     }
 
     @FXML
-    void onActionOrderDetailDeleteButton(ActionEvent event) {
+    void onActionOrderDetailDeleteBtn(ActionEvent event) {
 
     }
 
     @FXML
-    void onActionProductComboBox(ActionEvent event) {
+    void onActionOrderDetailUpdateBtn(ActionEvent event) {
 
     }
 
+    /**
+     * Genera una order a partir del formulario y la envía a la BBDD.
+     *
+     * @param event
+     */
     @FXML
-    void onActionOrderDate(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionShippedDate(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionRequiredDate(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionOrderNum(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionProductQuantity(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionPriceEach(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionCreateOrderBtn(ActionEvent event) throws Exception {
+    void onActionCreateOrderBtn(ActionEvent event) {
 
         try {
             Order order = getOrderFromForm();
@@ -289,24 +280,27 @@ public class PrimaryController implements Initializable {
 
             orderLogicLayer.setData();
         } catch (NumberFormatException e) {
-            showMessage(1, "Dades incorrectes: " + e);
+            showMessage(1, "Datos incorrectos: " + e);
         } catch (SQLException e) {
-            showMessage(1, "Error a l'inserir les dades: " + e);
+            showMessage(1, "Error al insertar los datos: " + e);
         } catch (Exception e) {
             showMessage(1, "Error: " + e);
         }
+    }
+
+    @FXML
+    void onActionOpenOrderBtn(ActionEvent event) {
+        try {
+            Order order = getOrderFromTable();
+            int orderNumber = order.getOrderNumber();
+            openedOrder.setText("" + orderNumber);
+            productComboBox.setItems(productLogicLayer.getProductObservableList());
+            orderDetailsLogicLayer.setData(orderNumber);
+            tabPane.getSelectionModel().select(orderDetailPane);
+        } catch (SQLException e) {
+            showMessage(1, "Error : " + e);
+        }
         disableOrderSelection();
-    }
-
-    @FXML
-    void onActionOrderDetailUpdateBtn(ActionEvent event) {
-
-    }
-
-    // TODO Esto creo que no me hará falta.
-    @FXML
-    void onActionRefreshOrderBtn(ActionEvent event) {
-
     }
 
     /**
@@ -317,9 +311,8 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionDeleteOrderBtn(ActionEvent event) {
 
-        Order order = getOrderFromTable();
-
         try {
+            Order order = getOrderFromTable();
             orderLogicLayer.deleteOrder(order);
         } catch (SQLException e) {
             showMessage(1, "Error intentando eliminar los datos: " + e);
@@ -327,25 +320,19 @@ public class PrimaryController implements Initializable {
         disableOrderSelection();
     }
 
+    /**
+     * Modifica una order a partir del formulario y la envía a la BBDD.
+     *
+     * @param event
+     */
     @FXML
     void onActionModifyOrderBtn(ActionEvent event) {
-        // capturem les noves dades
 
         try {
+
             Order order = getOrderFromForm();
-            //el modifiquem a la BBDD
             orderLogicLayer.updateOrder(order);
-
-            //si tot ha anat bé, actualitzem visualment l'objecte a la taula
-            Order asTableview = getOrderFromTable();
-
-            asTableview.setOrderDate(order.getOrderDate());
-            asTableview.setRequiredDate(order.getRequiredDate());
-            asTableview.setShippedDate(order.getShippedDate());
-
-            //quan modifiquem els atributs d'un element de la llista
-            //és necessàri refrescar la taula de forma manual
-            orderTableView.refresh();
+            orderAsTableView(order);
 
         } catch (NumberFormatException e) {
             showMessage(1, "Dades incorrectes: " + e);
@@ -358,7 +345,7 @@ public class PrimaryController implements Initializable {
     }
 
     @FXML
-    void onActionSearchOrderBtn(ActionEvent event) {
+    void onActionSearchRangeBtn(ActionEvent event) {
 
     }
 
@@ -377,9 +364,28 @@ public class PrimaryController implements Initializable {
 
             modifyOrderBtn.setDisable(false);
             deleteOrderBtn.setDisable(false);
+            createOrderBtn.setDisable(false);
+            openOrderBtn.setDisable(false);
         } else {
             disableOrderSelection();
         }
+    }
+
+    /**
+     * Refresca la tabla de forma manual tras modificar los atributos del
+     * elemento Order.
+     *
+     * @param order
+     */
+    private void orderAsTableView(Order order) {
+
+        Order asTableview = getOrderFromTable();
+
+        asTableview.setOrderDate(order.getOrderDate());
+        asTableview.setRequiredDate(order.getRequiredDate());
+        asTableview.setShippedDate(order.getShippedDate());
+
+        orderTableView.refresh();
     }
 
     /**
@@ -390,11 +396,13 @@ public class PrimaryController implements Initializable {
 
         modifyOrderBtn.setDisable(true);
         deleteOrderBtn.setDisable(true);
+        createOrderBtn.setDisable(true);
+        openOrderBtn.setDisable(true);
         orderTableView.getSelectionModel().clearSelection();
 
         orderDate.getEditor().clear();
-        orderDate.getEditor().clear();
-        orderDate.getEditor().clear();
+        requiredDate.getEditor().clear();
+        shippedDate.getEditor().clear();
     }
 
     /**
@@ -412,7 +420,7 @@ public class PrimaryController implements Initializable {
             order.setOrderDate(DateConverter.convertToTimestamp(orderDate.getValue()));
             order.setRequiredDate(DateConverter.convertToTimestamp(requiredDate.getValue()));
             order.setShippedDate(DateConverter.convertToTimestamp(shippedDate.getValue()));
-            order.setCustomer(clientComboBox.getSelectionModel().getSelectedItem().toString().trim());
+            order.setCustomer(clientComboBox.getValue());
             return order;
         }
     }
@@ -440,6 +448,7 @@ public class PrimaryController implements Initializable {
             orderDate.setValue(order.getOrderDate().toLocalDateTime().toLocalDate());
             requiredDate.setValue(order.getRequiredDate().toLocalDateTime().toLocalDate());
             shippedDate.setValue(order.getShippedDate().toLocalDateTime().toLocalDate());
+            clientComboBox.setValue(order.getCustomer());
 
         }
     }
@@ -649,7 +658,7 @@ public class PrimaryController implements Initializable {
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
                 customerLogicLayer.modificarCustomer(getCustomerFromView());
                 //Para actualizar la página
-                actualizarTvCustomer(customerLogicLayer);
+                customerLogicLayer.setData();
             } else {
                 showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
