@@ -1,19 +1,9 @@
 package presentation;
 
-import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
-import java.time.DateTimeException;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeoutException;
-import javafx.application.Platform;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -47,11 +37,15 @@ public class PrimaryController implements Initializable {
     AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
+    //orderDetail TableView
     @FXML
     private TableView orderDetailTableView;
 
     @FXML
     private TableColumn colOrderNumDetails, colOrderDetailProductName, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
+
+    @FXML
+    private ComboBox<Product> productComboBox;
 
     @FXML
     private TableView orderTableView;
@@ -72,9 +66,6 @@ public class PrimaryController implements Initializable {
     private Button orderDetailUpdateBtn;
 
     @FXML
-    private Button searchOrderDetail;
-
-    @FXML
     private Button refreshOrderBtn;
 
     @FXML
@@ -90,25 +81,10 @@ public class PrimaryController implements Initializable {
     private ComboBox<Customer> clientComboBox;
 
     @FXML
-    private ComboBox<Product> productComboBox;
-
-    @FXML
-    private TextField orderNum;
-
-    @FXML
     private TextField priceEach;
 
     @FXML
     private TextField productQuantity;
-
-    @FXML
-    private TextField orderTabOrderDate;
-
-    @FXML
-    private TextField orderTabRequiredDate;
-
-    @FXML
-    private TextField orderTabShippingDate;
 
     @FXML
     private DatePicker requiredDate;
@@ -258,7 +234,7 @@ public class PrimaryController implements Initializable {
 
     @FXML
     void onActionAddProductBtn(ActionEvent event) {
-        
+
         // Deixem el camp de quantitat amb el seu valor per defecte
         productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
     }
@@ -266,12 +242,6 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionOrderDetailDeleteButton(ActionEvent event) {
 
-    }
-
-    @FXML
-    void onActionClientComboBox(ActionEvent event) {
-
-        //Cargar lista de objetos con setItems
     }
 
     @FXML
@@ -310,17 +280,11 @@ public class PrimaryController implements Initializable {
     }
 
     @FXML
-    void onActionSearchOrderDetail(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onActionCreateOrderBtn(ActionEvent event) {
-
-        // capturem les noves dades
-        Order order = getOrderFromForm();
+    void onActionCreateOrderBtn(ActionEvent event) throws Exception {
 
         try {
+            Order order = getOrderFromForm();
+
             orderLogicLayer.insertOrder(order);
 
             orderLogicLayer.setData();
@@ -328,9 +292,10 @@ public class PrimaryController implements Initializable {
             showMessage(1, "Dades incorrectes: " + e);
         } catch (SQLException e) {
             showMessage(1, "Error a l'inserir les dades: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
         }
         disableOrderSelection();
-
     }
 
     @FXML
@@ -365,9 +330,9 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionModifyOrderBtn(ActionEvent event) {
         // capturem les noves dades
-        Order order = getOrderFromForm();
 
         try {
+            Order order = getOrderFromForm();
             //el modifiquem a la BBDD
             orderLogicLayer.updateOrder(order);
 
@@ -389,9 +354,7 @@ public class PrimaryController implements Initializable {
         } catch (Exception e) {
             showMessage(1, "Error: " + e);
         }
-
         disableOrderSelection();
-
     }
 
     @FXML
@@ -429,9 +392,9 @@ public class PrimaryController implements Initializable {
         deleteOrderBtn.setDisable(true);
         orderTableView.getSelectionModel().clearSelection();
 
-        orderTabOrderDate.clear();
-        orderTabRequiredDate.clear();
-        orderTabShippingDate.clear();
+        orderDate.getEditor().clear();
+        orderDate.getEditor().clear();
+        orderDate.getEditor().clear();
     }
 
     /**
@@ -439,15 +402,19 @@ public class PrimaryController implements Initializable {
      *
      * @return Objecte order amb les dades
      */
-    private Order getOrderFromForm() {
+    private Order getOrderFromForm() throws Exception {
+
         Order order = new Order();
 
-        order.setOrderDate(DateConverter.convertToTimestamp(orderDate.getValue()));
-        order.setRequiredDate(DateConverter.convertToTimestamp(requiredDate.getValue()));
-        order.setShippedDate(DateConverter.convertToTimestamp(shippedDate.getValue()));
-        order.setCustomer(clientComboBox.getSelectionModel().getSelectedItem().toString().trim());
-
-        return order;
+        if (orderDate.getValue() == null || requiredDate.getValue() == null || shippedDate.getValue() == null || clientComboBox.getSelectionModel().getSelectedItem() == null) {
+            throw new Exception("No puedes dejar campos en blanco.");
+        } else {
+            order.setOrderDate(DateConverter.convertToTimestamp(orderDate.getValue()));
+            order.setRequiredDate(DateConverter.convertToTimestamp(requiredDate.getValue()));
+            order.setShippedDate(DateConverter.convertToTimestamp(shippedDate.getValue()));
+            order.setCustomer(clientComboBox.getSelectionModel().getSelectedItem().toString().trim());
+            return order;
+        }
     }
 
     /**
@@ -456,9 +423,8 @@ public class PrimaryController implements Initializable {
      * @return Objecte Assignatura o null si no hi ha selecció
      */
     private Order getOrderFromTable() {
-        Order order = null;
 
-        order = (Order) orderTableView.getSelectionModel().getSelectedItem();
+        Order order = (Order) orderTableView.getSelectionModel().getSelectedItem();
 
         return order;
     }
@@ -470,16 +436,17 @@ public class PrimaryController implements Initializable {
      */
     private void setOrderToView(Order order) {
         if (order != null) {
-            orderTabOrderDate.setText(String.valueOf(order.getOrderDate()));
-            orderTabRequiredDate.setText(String.valueOf(order.getRequiredDate()));
-            orderTabShippingDate.setText(String.valueOf(order.getShippedDate()));
+
+            orderDate.setValue(order.getOrderDate().toLocalDateTime().toLocalDate());
+            requiredDate.setValue(order.getRequiredDate().toLocalDateTime().toLocalDate());
+            shippedDate.setValue(order.getShippedDate().toLocalDateTime().toLocalDate());
+
         }
     }
 
     //<editor-fold defaultstate="collapsed" desc="Botones Products">
-    
     /**
-     * Envia a la capa logica el producto a editar seleccionado desde la 
+     * Envia a la capa logica el producto a editar seleccionado desde la
      * observableList
      *
      * @param event
@@ -496,7 +463,7 @@ public class PrimaryController implements Initializable {
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
         } catch (NumberFormatException e) {
-            showMessage(1, "Los campos de Stock i Precio son numericos i no pueden estar en blanco.");
+            showMessage(1, "Los campos de Stock y Precio son numericos y no pueden estar en blanco.");
         } catch (Exception e) {
             showMessage(1, e.getMessage());
         }
@@ -514,12 +481,12 @@ public class PrimaryController implements Initializable {
             Product product = getProductFromView();
             productLogicLayer.checkProductEmptyFields(product);
             productLogicLayer.addProduct(product);
-            
+
             // Actualizar la tabla
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
         } catch (NumberFormatException e) {
-            showMessage(1, "Los campos de Stock i Precio son numericos i no pueden estar en blanco.");
+            showMessage(1, "Los campos de Stock y Precio son numericos y no pueden estar en blanco.");
         } catch (Exception e) {
             showMessage(1, e.getMessage());
         }
@@ -562,11 +529,9 @@ public class PrimaryController implements Initializable {
         quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
         buyPriceField.clear();
     }
-    
+
     //</editor-fold>
-    
     //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
-    
     /**
      * Obtiene los valores de los campos
      *
@@ -628,9 +593,8 @@ public class PrimaryController implements Initializable {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
         return product;
     }
-    
-    //</editor-fold>
 
+    //</editor-fold>
     //CUSTOMER 
     @FXML
     private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
@@ -813,8 +777,8 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Deshabilita botones y fila seleccionada
-     * Limpia los texts Fields APARTADO CLIENTE
+     * Deshabilita botones y fila seleccionada Limpia los texts Fields APARTADO
+     * CLIENTE
      */
     private void desactivaSeleccioCustomer() {
         tf_customerEmail.setDisable(false);

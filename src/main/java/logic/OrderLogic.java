@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package logic;
 
 import data.ConnectionDB;
@@ -65,15 +61,11 @@ public class OrderLogic {
      *
      * @param order
      * @throws SQLException
-     * @throws Exception
      */
-    public void updateOrder(Order order) throws SQLException, Exception {
-        // si no valida el format del nom, genera una excepció
-        /*if (!this.validaNomAssignatura(order.getNom())) {
-            throw new Exception("El format del nom de l'assignatura no és correcte. Un exemple de format correcte seria ABC-123");
-        }*/
+    public void updateOrder(Order order) throws SQLException {
 
         OrderDB.updateOrder(conn, order);
+
     }
 
     public void deleteOrder(Order order) throws SQLException {
