@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package data;
 
 import java.sql.Connection;
@@ -61,7 +57,7 @@ public class OrderDB {
         rs.updateTimestamp("orderDate", order.getOrderDate());
         rs.updateTimestamp("requiredDate", order.getRequiredDate());
         rs.updateTimestamp("shippedDate", order.getShippedDate());
-        rs.updateObject("customers_customerEmail", order.getCustomer());
+        rs.updateString("customers_customerEmail", order.getCustomer().getCustomerEmail());
 
         rs.insertRow();
     }
