@@ -36,4 +36,51 @@ public class OrderDetailsLogic {
         this.orderDetailsOList.setAll(OrderDetailsDB.orderDetailsToList(conn, orderNum));
 
     }
+
+    /**
+     * Obtiene la lista observable
+     *
+     * @return
+     */
+    public ObservableList<OrderDetails> getOrderDetailsObservableList() {
+        return orderDetailsOList;
+    }
+
+    /**
+     * Añade un producto en el pedido.
+     *
+     * @param detail
+     * @throws SQLException
+     */
+    public void insertOrderDetail(OrderDetails detail) throws SQLException {
+
+        detail.setOrderLineNumber(OrderDetailsDB.insertOrderDetail(conn, detail));
+
+        orderDetailsOList.add(detail);
+    }
+
+    /**
+     * Actualiza un registro de la BBDD.
+     *
+     * @param detail
+     * @throws SQLException
+     */
+    public void updateOrderDetail(OrderDetails detail) throws SQLException {
+
+        OrderDetailsDB.updateOrderDetail(conn, detail);
+
+    }
+
+    /**
+     * Elimina un registro de la BBDD
+     *
+     * @param detail
+     * @throws SQLException
+     */
+    public void deleteOrderDetail(OrderDetails detail) throws SQLException {
+
+        OrderDetailsDB.deleteOrderDetail(conn, detail);
+
+        orderDetailsOList.remove(detail);
+    }
 }

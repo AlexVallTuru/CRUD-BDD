@@ -56,8 +56,7 @@ public class OrderLogic {
     }
 
     /**
-     * Valida el format d'una assignatura i la modifica amb les dades
-     * subministrades
+     * Actualiza un registro de la BBDD.
      *
      * @param order
      * @throws SQLException
@@ -68,6 +67,12 @@ public class OrderLogic {
 
     }
 
+    /**
+     * Elimina un registro de la BBDD
+     *
+     * @param order
+     * @throws SQLException
+     */
     public void deleteOrder(Order order) throws SQLException {
 
         OrderDB.deleteOrder(conn, order);
