@@ -8,6 +8,7 @@ import data.ConnectionDB;
 import data.CustomerDB;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -147,11 +148,10 @@ public class CustomerLogic {
      * Comprueba que el DNI sea valido segun la ley española
      * 
      * @param nif
-     * @throws SQLException
      * @throws Exception 
      * @author Aitor
      */
-    public void checkDni(String nif) throws SQLException, Exception {
+    public void checkDni(String nif) throws Exception {
         final Pattern dniP = Pattern.compile("[0-9]{8}[A-Z]");
         final String controlLletra = "TRWAGMYFPDXBNJZSQVHLCKE";
         
@@ -164,6 +164,21 @@ public class CustomerLogic {
             }
         } else {
             throw new Exception ("El DNI no es valido");
+        }
+    }
+    
+    /**
+     * Comprueba si el formato del correo es valido
+     * 
+     * @param addr
+     * @throws Exception 
+     * @author Aitor
+     */
+    public void checkEmail(String addr) throws Exception {
+        final Pattern mail = Pattern.compile(
+                "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9]+)*@[A-Za-z0-9-]+(\\.[_A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+        if (!mail.matcher(addr).matches()) {
+            throw new Exception ("El formato del correo electronico no es valido.");
         }
     }
 }

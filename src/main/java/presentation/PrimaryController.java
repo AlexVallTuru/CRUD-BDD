@@ -628,7 +628,9 @@ public class PrimaryController implements Initializable {
         //Aquí obtenemos la mínima edad de la bdd y mira si es superior o igual
         try {
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
+                // Comprobar que el DNI i el correo son validos
                 customerLogicLayer.checkDni(getCustomerFromView().getIdCard());
+                customerLogicLayer.checkEmail(getCustomerFromView().getCustomerEmail());
                 //Escribimos los datos de los texts fields a la base de datos
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
                 actualizarTvCustomer(customerLogicLayer);
@@ -658,6 +660,7 @@ public class PrimaryController implements Initializable {
     void onClick_bt_actualizar(ActionEvent event) throws Exception {
         try {
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
+                // Comprobar que el DNI es valido
                 customerLogicLayer.checkDni(getCustomerFromView().getIdCard());
                 customerLogicLayer.modificarCustomer(getCustomerFromView());
                 //Para actualizar la página
