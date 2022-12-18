@@ -120,4 +120,20 @@ public class OrderDetailsDB {
             rs.updateRow();
         }
     }
+
+    /**
+     * Elimina el registro OrderDetail recibido como parámetro de la BBDD.
+     *
+     * @param conn
+     * @param detail
+     * @throws SQLException
+     */
+    public static void deleteOrderDetail(Connection conn, OrderDetails detail) throws SQLException {
+
+        Statement query;
+        query = conn.createStatement();
+        String sqlStr = "DELETE FROM orderdetails WHERE orderNumber = " + detail.getOrderId() + " AND orderLineNumber = " + detail.getOrderLineNumber();
+
+        query.executeUpdate(sqlStr);
+    }
 }

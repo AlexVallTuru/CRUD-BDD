@@ -280,6 +280,14 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionOrderDetailDeleteBtn(ActionEvent event) {
 
+        try {
+            OrderDetails detail = getOrderDetailFromTable();
+            orderDetailsLogicLayer.deleteOrderDetail(detail);
+        } catch (SQLException e) {
+            showMessage(1, "Error intentando eliminar los datos: " + e);
+        }
+        disableOrderDetailSelection();
+
     }
 
     @FXML

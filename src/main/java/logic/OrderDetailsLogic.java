@@ -70,4 +70,17 @@ public class OrderDetailsLogic {
         OrderDetailsDB.updateOrderDetail(conn, detail);
 
     }
+
+    /**
+     * Elimina un registro de la BBDD
+     *
+     * @param detail
+     * @throws SQLException
+     */
+    public void deleteOrderDetail(OrderDetails detail) throws SQLException {
+
+        OrderDetailsDB.deleteOrderDetail(conn, detail);
+
+        orderDetailsOList.remove(detail);
+    }
 }
