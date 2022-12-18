@@ -26,13 +26,14 @@ public class OrderDetailsLogic {
     }
 
     /**
-     * Omple la llistaObservable amb els registres de la taula
+     * Rellena los registros de la tabla con los productos del nº de pedido.
      *
+     * @param orderNum
      * @throws SQLException
      */
-    public void setData() throws SQLException {
+    public void setData(int orderNum) throws SQLException {
 
-        this.orderDetailsOList.setAll(OrderDetailsDB.orderDetailsToList(conn));
+        this.orderDetailsOList.setAll(OrderDetailsDB.orderDetailsToList(conn, orderNum));
 
     }
 }

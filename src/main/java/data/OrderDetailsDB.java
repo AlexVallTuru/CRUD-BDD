@@ -18,16 +18,17 @@ public class OrderDetailsDB {
      * Retorna el contenido de la table en una colección de OrderDetails
      *
      * @param conn
+     * @param orderNum
      * @return
      * @throws java.sql.SQLException
      */
-    public static ArrayList<OrderDetails> orderDetailsToList(Connection conn) throws SQLException {
+    public static ArrayList<OrderDetails> orderDetailsToList(Connection conn, int orderNum) throws SQLException {
 
         ArrayList<OrderDetails> orderDetailsList = new ArrayList<>();
 
         Statement query;
         query = conn.createStatement();
-        query.executeQuery("SELECT * FROM orderdetails");
+        query.executeQuery("SELECT * FROM orderdetails WHERE orderNumber =" + orderNum);
 
         ResultSet rs = query.getResultSet();
 
