@@ -8,6 +8,8 @@ import data.ConnectionDB;
 import data.CustomerDB;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.Customer;
@@ -141,5 +143,42 @@ public class CustomerLogic {
         appconfig.getMinCustomerAge();
 
     }
-
+    
+    /**
+     * Comprueba que el DNI sea valido segun la ley española
+     * 
+     * @param nif
+     * @throws Exception 
+     * @author Aitor
+     */
+    public void checkDni(String nif) throws Exception {
+        final Pattern dniP = Pattern.compile("[0-9]{8}[A-Z]");
+        final String controlLletra = "TRWAGMYFPDXBNJZSQVHLCKE";
+        
+        
+        // Comprueba que el DNI tenga un patron correcto, si no envia error directamente
+        if (dniP.matcher(nif).matches()) {
+            // Comprueba que el DNI tenga un valor correcto
+            if (nif.charAt(8) != controlLletra.charAt(Integer.parseInt(nif.substring(0, 8)) % 23)) {
+                throw new Exception ("El DNI no es valido");
+            }
+        } else {
+            throw new Exception ("El DNI no es valido");
+        }
+    }
+    
+    /**
+     * Comprueba si el formato del correo es valido
+     * 
+     * @param addr
+     * @throws Exception 
+     * @author Aitor
+     */
+    public void checkEmail(String addr) throws Exception {
+        final Pattern mail = Pattern.compile(
+                "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9]+)*@[A-Za-z0-9-]+(\\.[_A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+        if (!mail.matcher(addr).matches()) {
+            throw new Exception ("El formato del correo electronico no es valido.");
+        }
+    }
 }
