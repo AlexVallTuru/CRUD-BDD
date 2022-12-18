@@ -8,6 +8,7 @@ import data.ConnectionDB;
 import data.CustomerDB;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.Customer;
@@ -141,5 +142,28 @@ public class CustomerLogic {
         appconfig.getMinCustomerAge();
 
     }
-
+    
+    /**
+     * Comprueba que el DNI sea valido segun la ley española
+     * 
+     * @param nif
+     * @throws SQLException
+     * @throws Exception 
+     * @author Aitor
+     */
+    public void checkDni(String nif) throws SQLException, Exception {
+        final Pattern dniP = Pattern.compile("[0-9]{8}[A-Z]");
+        final String controlLletra = "TRWAGMYFPDXBNJZSQVHLCKE";
+        
+        
+        // Comprueba que el DNI tenga un patron correcto, si no envia error directamente
+        if (dniP.matcher(nif).matches()) {
+            // Comprueba que el DNI tenga un valor correcto
+            if (nif.charAt(8) != controlLletra.charAt(Integer.parseInt(nif.substring(0, 8)) % 23)) {
+                throw new Exception ("El DNI no es valido");
+            }
+        } else {
+            throw new Exception ("El DNI no es valido");
+        }
+    }
 }
