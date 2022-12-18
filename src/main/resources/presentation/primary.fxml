@@ -107,7 +107,7 @@
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1039.0">
                <children>
-                  <TableView fx:id="orderDetailTableView" layoutX="35.0" layoutY="190.0" prefHeight="393.0" prefWidth="992.0">
+                  <TableView fx:id="orderDetailTableView" layoutX="35.0" layoutY="190.0" onMouseClicked="#handleOrderDetailOnMouseClicked" prefHeight="393.0" prefWidth="992.0">
                      <columns>
                         <TableColumn fx:id="colOrderLineNumber" maxWidth="250.0" prefWidth="157.0" text="Línea de pedido" />
                         <TableColumn fx:id="colOrderNumDetails" prefWidth="120.0" text="Nº Pedido" />
@@ -117,13 +117,13 @@
                         <TableColumn fx:id="colTotalPrice" minWidth="0.0" prefWidth="153.0" text="Precio total" />
                      </columns>
                   </TableView>
-                  <Button fx:id="addProductBtn" layoutX="669.0" layoutY="129.0" mnemonicParsing="false" onAction="#onActionAddProductBtn" prefHeight="31.0" prefWidth="138.0" text="Añadir producto" />
+                  <Button fx:id="addProductBtn" disable="true" layoutX="669.0" layoutY="129.0" mnemonicParsing="false" onAction="#onActionAddProductBtn" prefHeight="31.0" prefWidth="138.0" text="Añadir producto" />
                   <Button fx:id="orderDetailDeleteBtn" disable="true" layoutX="577.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailDeleteBtn" prefHeight="27.0" prefWidth="91.0" text="Eliminar" />
-                  <ComboBox fx:id="productComboBox" layoutX="37.0" layoutY="129.0" prefWidth="150.0" promptText="Producto" />
-                  <TextField fx:id="productQuantity" layoutX="244.0" layoutY="129.0" prefHeight="30.0" prefWidth="164.0" promptText="Cantidad" />
-                  <TextField fx:id="priceEach" layoutX="458.0" layoutY="129.0" prefHeight="30.0" prefWidth="164.0" promptText="PVP unitario" />
+                  <ComboBox fx:id="productComboBox" disable="true" layoutX="37.0" layoutY="129.0" prefWidth="150.0" promptText="Producto" />
+                  <TextField fx:id="productQuantity" disable="true" layoutX="244.0" layoutY="129.0" prefHeight="30.0" prefWidth="164.0" promptText="Cantidad" />
+                  <TextField fx:id="priceEach" disable="true" layoutX="458.0" layoutY="129.0" prefHeight="30.0" prefWidth="164.0" promptText="PVP unitario" />
                   <Separator layoutX="37.0" layoutY="83.0" prefHeight="24.0" prefWidth="988.0" />
-                  <Button fx:id="orderDetailUpdateBtn" disable="true" layoutX="393.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailUpdateBtn" prefHeight="31.0" prefWidth="92.0" text="Actualizar" />
+                  <Button fx:id="orderDetailUpdateBtn" disable="true" layoutX="393.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailUpdateBtn" prefHeight="31.0" prefWidth="92.0" text="Modificar" />
                   <Label fx:id="openedOrder" layoutX="519.0" layoutY="51.0" prefHeight="21.0" prefWidth="43.0" />
                   <Label layoutX="506.0" layoutY="22.0" text="Pedido:" />
                </children>

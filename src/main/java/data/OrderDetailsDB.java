@@ -90,7 +90,7 @@ public class OrderDetailsDB {
         rs.updateInt("orderNumber", detail.getOrderId());
         rs.updateInt("quantityOrdered", detail.getQuantityOrdered());
         rs.updateDouble("priceEach", detail.getPriceEach());
-        rs.updateInt("orderLineNumber", detail.getOrderLineNumber());
+        rs.updateInt("orderLineNumber", orderLine);
         rs.updateInt("productCode", detail.getProduct().getProductCode());
 
         rs.insertRow();

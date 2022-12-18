@@ -205,8 +205,8 @@ public class PrimaryController implements Initializable {
         col_birthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
         col_creditLimit.setCellValueFactory(new PropertyValueFactory<>("creditLimit"));
         //Columnas OrderDetails
-        colOrderNumDetails.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
-        colOrderDetailProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
+        colOrderNumDetails.setCellValueFactory(new PropertyValueFactory<>("orderId"));
+        colOrderDetailProductCode.setCellValueFactory(new PropertyValueFactory<>("product"));
         colPriceEach.setCellValueFactory(new PropertyValueFactory<>("priceEach"));
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantityOrdered"));
         colOrderLineNumber.setCellValueFactory(new PropertyValueFactory<>("orderLineNumber"));
@@ -320,10 +320,16 @@ public class PrimaryController implements Initializable {
         try {
             initializeOrderDetails();
 
+            productComboBox.setDisable(false);
+            productQuantity.setDisable(false);
+            priceEach.setDisable(false);
+            addProductBtn.setDisable(false);
+
         } catch (SQLException e) {
             showMessage(1, "Error : " + e);
         }
         disableOrderSelection();
+        disableOrderDetailSelection();
     }
 
     /**
@@ -373,8 +379,8 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Si hemos seleccionado un registro de la tabla, nos muestra los datos en
-     * el formulario.
+     * Si hemos seleccionado un registro de la tabla Order, nos muestra los
+     * datos en el formulario.
      *
      * @param ev
      */
@@ -394,6 +400,26 @@ public class PrimaryController implements Initializable {
         }
     }
 
+    /**
+     * Si hemos seleccionado un registro de la tabla OrderDetails, nos muestra
+     * los datos en el formulario.
+     *
+     * @param ev
+     */
+    @FXML
+    private void handleOrderDetailOnMouseClicked(MouseEvent ev) {
+
+        if (orderDetailTableView.getSelectionModel().getSelectedItem() != null) {
+
+            setOrderDetailToView(getOrderDetailFromTable());
+
+            orderDetailUpdateBtn.setDisable(false);
+            orderDetailDeleteBtn.setDisable(false);
+        } else {
+            disableOrderDetailSelection();
+        }
+    }
+
     private void initializeOrderDetails() throws SQLException {
 
         Order order = getOrderFromTable();
@@ -404,7 +430,6 @@ public class PrimaryController implements Initializable {
         orderDetailsLogicLayer.setData(orderNumber);
         orderDetailTableView.setItems(orderDetailsLogicLayer.getOrderDetailsObservableList());
         tabPane.getSelectionModel().select(orderDetailPane);
-
     }
 
     /**
@@ -425,26 +450,41 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Deshabilita botones, limpia la seleccion del usuario y los text fields
-     * los deja en blanco.
+     * Deshabilita botones, limpia la seleccion del usuario y deja los
+     * DatePickers en blanco.
      */
     private void disableOrderSelection() {
 
         updateOrderBtn.setDisable(true);
         deleteOrderBtn.setDisable(true);
-        createOrderBtn.setDisable(true);
         openOrderBtn.setDisable(true);
         orderTableView.getSelectionModel().clearSelection();
 
+        clientComboBox.valueProperty().set(null);
         orderDate.getEditor().clear();
         requiredDate.getEditor().clear();
         shippedDate.getEditor().clear();
     }
 
     /**
+     * Deshabilita botones, limpia la seleccion del usuario y los text fields
+     * los deja en blanco.
+     */
+    private void disableOrderDetailSelection() {
+
+        orderDetailUpdateBtn.setDisable(true);
+        orderDetailDeleteBtn.setDisable(true);
+        orderDetailTableView.getSelectionModel().clearSelection();
+
+        productComboBox.valueProperty().set(null);
+        productQuantity.clear();
+        priceEach.clear();
+    }
+
+    /**
      * Obtiene los datos del formulario y retorna un objeto
      *
-     * @return Objecte order amb les dades
+     * @return Objeto order con los datos
      */
     private Order getOrderFromForm() throws Exception {
 
@@ -464,7 +504,7 @@ public class PrimaryController implements Initializable {
     /**
      * Obtiene los datos del formulario y retorna un objeto
      *
-     * @return Objecte order amb les dades
+     * @return Objeto orderDetails con los datos
      */
     private OrderDetails getOrderDetailFromForm() throws Exception {
 
@@ -475,14 +515,15 @@ public class PrimaryController implements Initializable {
         } else {
             detail.setOrderId(Integer.parseInt(openedOrder.getText()));
             detail.setQuantityOrdered(Integer.parseInt(productQuantity.getText()));
-            detail.setPriceEach(Integer.parseInt(productQuantity.getText()));
+            detail.setPriceEach(Double.parseDouble(priceEach.getText()));
             detail.setProduct(productComboBox.getValue());
+
             return detail;
         }
     }
 
     /**
-     * Recupera el objeto seleccionado de la tabla
+     * Recupera el objeto seleccionado de la tabla Order
      *
      * @return Objecto Order o null si no hay selección
      */
@@ -491,6 +532,18 @@ public class PrimaryController implements Initializable {
         Order order = (Order) orderTableView.getSelectionModel().getSelectedItem();
 
         return order;
+    }
+
+    /**
+     * Recupera el objeto seleccionado de la tabla orderDetails
+     *
+     * @return Objecto Order o null si no hay selección
+     */
+    private OrderDetails getOrderDetailFromTable() {
+
+        OrderDetails detail = (OrderDetails) orderDetailTableView.getSelectionModel().getSelectedItem();
+
+        return detail;
     }
 
     /**
@@ -506,6 +559,20 @@ public class PrimaryController implements Initializable {
             shippedDate.setValue(order.getShippedDate().toLocalDateTime().toLocalDate());
             clientComboBox.setValue(order.getCustomer());
 
+        }
+    }
+
+    /**
+     * Rellena los campos del formulario con los datos de un objeto OrderDetail
+     *
+     * @param object OrderDetails
+     */
+    private void setOrderDetailToView(OrderDetails detail) {
+        if (detail != null) {
+
+            productQuantity.setText(Integer.toString(detail.getQuantityOrdered()));
+            priceEach.setText(Double.toString(detail.getPriceEach()));
+            productComboBox.setValue(detail.getProduct());
         }
     }
 
