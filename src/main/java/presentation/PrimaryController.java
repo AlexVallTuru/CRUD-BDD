@@ -29,6 +29,7 @@ import logic.classes.Order;
 import logic.ProductLogic;
 import logic.classes.AppConfig;
 import logic.classes.Customer;
+import logic.classes.OrderDetails;
 import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
@@ -51,7 +52,7 @@ public class PrimaryController implements Initializable {
     private TableView orderDetailTableView;
 
     @FXML
-    private TableColumn colOrderNumDetails, colOrderDetailProductName, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
+    private TableColumn colOrderNumDetails, colOrderDetailProductCode, colPriceEach, colQuantity, colOrderLineNumber, colTotalPrice;
 
     @FXML
     private ComboBox<Product> productComboBox;
@@ -81,7 +82,7 @@ public class PrimaryController implements Initializable {
     private Button deleteOrderBtn;
 
     @FXML
-    private Button modifyOrderBtn;
+    private Button updateOrderBtn;
 
     @FXML
     private Label openedOrder;
@@ -203,6 +204,13 @@ public class PrimaryController implements Initializable {
         col_phoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         col_birthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
         col_creditLimit.setCellValueFactory(new PropertyValueFactory<>("creditLimit"));
+        //Columnas OrderDetails
+        colOrderNumDetails.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
+        colOrderDetailProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
+        colPriceEach.setCellValueFactory(new PropertyValueFactory<>("priceEach"));
+        colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantityOrdered"));
+        colOrderLineNumber.setCellValueFactory(new PropertyValueFactory<>("orderLineNumber"));
+        //colTotalPrice.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
     }
 
     /**
@@ -251,6 +259,20 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionAddProductBtn(ActionEvent event) {
 
+        try {
+            OrderDetails detail = getOrderDetailFromForm();
+
+            orderDetailsLogicLayer.insertOrderDetail(detail);
+
+            orderLogicLayer.setData();
+        } catch (NumberFormatException e) {
+            showMessage(1, "Datos incorrectos: " + e);
+        } catch (SQLException e) {
+            showMessage(1, "Error al insertar los datos: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
+
         // Deixem el camp de quantitat amb el seu valor per defecte
         productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
     }
@@ -288,15 +310,16 @@ public class PrimaryController implements Initializable {
         }
     }
 
+    /**
+     * Abre la vista de detalle de pedido del pedido seleccionado.
+     *
+     * @param event
+     */
     @FXML
     void onActionOpenOrderBtn(ActionEvent event) {
         try {
-            Order order = getOrderFromTable();
-            int orderNumber = order.getOrderNumber();
-            openedOrder.setText("" + orderNumber);
-            productComboBox.setItems(productLogicLayer.getProductObservableList());
-            orderDetailsLogicLayer.setData(orderNumber);
-            tabPane.getSelectionModel().select(orderDetailPane);
+            initializeOrderDetails();
+
         } catch (SQLException e) {
             showMessage(1, "Error : " + e);
         }
@@ -326,7 +349,7 @@ public class PrimaryController implements Initializable {
      * @param event
      */
     @FXML
-    void onActionModifyOrderBtn(ActionEvent event) {
+    void onActionUpdateOrderBtn(ActionEvent event) {
 
         try {
 
@@ -362,13 +385,26 @@ public class PrimaryController implements Initializable {
 
             setOrderToView(getOrderFromTable());
 
-            modifyOrderBtn.setDisable(false);
+            updateOrderBtn.setDisable(false);
             deleteOrderBtn.setDisable(false);
             createOrderBtn.setDisable(false);
             openOrderBtn.setDisable(false);
         } else {
             disableOrderSelection();
         }
+    }
+
+    private void initializeOrderDetails() throws SQLException {
+
+        Order order = getOrderFromTable();
+        int orderNumber = order.getOrderNumber();
+
+        openedOrder.setText("" + orderNumber);
+        productComboBox.setItems(productLogicLayer.getProductObservableList());
+        orderDetailsLogicLayer.setData(orderNumber);
+        orderDetailTableView.setItems(orderDetailsLogicLayer.getOrderDetailsObservableList());
+        tabPane.getSelectionModel().select(orderDetailPane);
+
     }
 
     /**
@@ -394,7 +430,7 @@ public class PrimaryController implements Initializable {
      */
     private void disableOrderSelection() {
 
-        modifyOrderBtn.setDisable(true);
+        updateOrderBtn.setDisable(true);
         deleteOrderBtn.setDisable(true);
         createOrderBtn.setDisable(true);
         openOrderBtn.setDisable(true);
@@ -426,9 +462,29 @@ public class PrimaryController implements Initializable {
     }
 
     /**
-     * Recupera l'objecte seleccionat a la taula
+     * Obtiene los datos del formulario y retorna un objeto
      *
-     * @return Objecte Assignatura o null si no hi ha selecció
+     * @return Objecte order amb les dades
+     */
+    private OrderDetails getOrderDetailFromForm() throws Exception {
+
+        OrderDetails detail = new OrderDetails();
+
+        if (productQuantity.getText().isEmpty() || priceEach.getText().isEmpty() || productComboBox.getSelectionModel().getSelectedItem() == null) {
+            throw new Exception("No puedes dejar campos en blanco.");
+        } else {
+            detail.setOrderId(Integer.parseInt(openedOrder.getText()));
+            detail.setQuantityOrdered(Integer.parseInt(productQuantity.getText()));
+            detail.setPriceEach(Integer.parseInt(productQuantity.getText()));
+            detail.setProduct(productComboBox.getValue());
+            return detail;
+        }
+    }
+
+    /**
+     * Recupera el objeto seleccionado de la tabla
+     *
+     * @return Objecto Order o null si no hay selección
      */
     private Order getOrderFromTable() {
 

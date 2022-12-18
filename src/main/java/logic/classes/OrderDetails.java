@@ -7,17 +7,20 @@ package logic.classes;
 public class OrderDetails {
 
     private Product product;
-    private Order order;
+    private int orderId;
     private int quantityOrdered;
     private double priceEach;
     private int orderLineNumber;
 
-    public OrderDetails(Product product, Order order, int quantityOrdered, double priceEach, int orderLineNumber) {
+    public OrderDetails(Product product, int orderId, int quantityOrdered, double priceEach, int orderLineNumber) {
         this.product = product;
-        this.order = order;
+        this.orderId = orderId;
         this.quantityOrdered = quantityOrdered;
         this.priceEach = priceEach;
         this.orderLineNumber = orderLineNumber;
+    }
+
+    public OrderDetails() {
     }
 
     public Product getProduct() {
@@ -28,12 +31,12 @@ public class OrderDetails {
         this.product = product;
     }
 
-    public Order getOrder() {
-        return order;
+    public int getOrderId() {
+        return orderId;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
     public int getQuantityOrdered() {
@@ -62,6 +65,6 @@ public class OrderDetails {
 
     @Override
     public String toString() {
-        return "OrderDetails{" + "product=" + product + ", order=" + order + ", quantityOrdered=" + quantityOrdered + ", priceEach=" + priceEach + ", orderLineNumber=" + orderLineNumber + '}';
+        return "OrderDetails{" + "product=" + product + ", order=" + orderId + ", quantityOrdered=" + quantityOrdered + ", priceEach=" + priceEach + ", orderLineNumber=" + orderLineNumber + '}';
     }
 }
