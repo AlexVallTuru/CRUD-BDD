@@ -97,7 +97,7 @@ public class OrderDB {
 
         Statement query;
         query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        query.executeQuery("SELECT * FROM orders WHERE customers_customerEmail = " + order.getCustomer());
+        query.executeQuery("SELECT * FROM orders WHERE orderNumber = " + order.getOrderNumber());
 
         ResultSet rs = query.getResultSet();
 
