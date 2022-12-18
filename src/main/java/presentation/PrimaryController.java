@@ -285,6 +285,20 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionOrderDetailUpdateBtn(ActionEvent event) {
 
+        try {
+
+            OrderDetails detail = getOrderDetailFromForm();
+            orderDetailsLogicLayer.updateOrderDetail(detail);
+            orderDetailAsTableView(detail);
+
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } catch (SQLException e) {
+            showMessage(1, "Error al modificar les dades: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
+        disableOrderDetailSelection();
     }
 
     /**
@@ -450,6 +464,22 @@ public class PrimaryController implements Initializable {
     }
 
     /**
+     * Refresca la tabla de forma manual tras modificar los atributos del
+     * elemento Order.
+     *
+     * @param order
+     */
+    private void orderDetailAsTableView(OrderDetails detail) {
+
+        OrderDetails asTableview = getOrderDetailFromTable();
+
+        asTableview.setPriceEach(detail.getPriceEach());
+        asTableview.setQuantityOrdered(detail.getQuantityOrdered());
+
+        orderDetailTableView.refresh();
+    }
+
+    /**
      * Deshabilita botones, limpia la seleccion del usuario y deja los
      * DatePickers en blanco.
      */
@@ -508,15 +538,13 @@ public class PrimaryController implements Initializable {
      */
     private OrderDetails getOrderDetailFromForm() throws Exception {
 
-        OrderDetails detail = new OrderDetails();
+        OrderDetails detail = getOrderDetailFromTable();
 
         if (productQuantity.getText().isEmpty() || priceEach.getText().isEmpty() || productComboBox.getSelectionModel().getSelectedItem() == null) {
             throw new Exception("No puedes dejar campos en blanco.");
         } else {
-            detail.setOrderId(Integer.parseInt(openedOrder.getText()));
             detail.setQuantityOrdered(Integer.parseInt(productQuantity.getText()));
             detail.setPriceEach(Double.parseDouble(priceEach.getText()));
-            detail.setProduct(productComboBox.getValue());
 
             return detail;
         }

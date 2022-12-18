@@ -58,4 +58,16 @@ public class OrderDetailsLogic {
 
         orderDetailsOList.add(detail);
     }
+
+    /**
+     * Actualiza un registro de la BBDD.
+     *
+     * @param detail
+     * @throws SQLException
+     */
+    public void updateOrderDetail(OrderDetails detail) throws SQLException {
+
+        OrderDetailsDB.updateOrderDetail(conn, detail);
+
+    }
 }

@@ -97,4 +97,27 @@ public class OrderDetailsDB {
 
         return orderLine;
     }
+
+    /**
+     * Actualiza un nuevo pedido
+     *
+     * @param conn
+     * @param detail
+     * @throws SQLException
+     */
+    public static void updateOrderDetail(Connection conn, OrderDetails detail) throws SQLException {
+
+        Statement query;
+        query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        query.executeQuery("SELECT * FROM orderdetails WHERE orderNumber = " + detail.getOrderId() + " AND orderLineNumber = " + detail.getOrderLineNumber());
+
+        ResultSet rs = query.getResultSet();
+
+        if (rs.next()) {
+            rs.updateInt("quantityOrdered", detail.getQuantityOrdered());
+            rs.updateDouble("priceEach", detail.getPriceEach());
+
+            rs.updateRow();
+        }
+    }
 }
