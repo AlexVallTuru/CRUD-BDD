@@ -13,6 +13,7 @@ public class Order {
     private Timestamp requiredDate;
     private Timestamp shippedDate;
     private Customer customer;
+    private double totalPrice;
 
     public Order(int orderNumber, Timestamp orderDate, Timestamp requiredDate, Timestamp shippedDate, Customer customer) {
         this.orderNumber = orderNumber;
