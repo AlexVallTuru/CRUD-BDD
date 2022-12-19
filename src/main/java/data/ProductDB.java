@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.layout.Region;
 import logic.classes.Product;
 
 /**
@@ -25,8 +28,7 @@ public class ProductDB {
         ArrayList<Product> productsList = new ArrayList<>();
         
         // Crear query
-        Statement query;
-        query = conn.createStatement();
+        Statement query = conn.createStatement();
         query.executeQuery("SELECT * FROM products");
         
         ResultSet rs = query.getResultSet();
@@ -104,5 +106,22 @@ public class ProductDB {
         
         String sqlStr = "DELETE FROM products WHERE productCode = " + String.valueOf(product.getProductCode());
         query.executeUpdate(sqlStr);
+    }
+    
+    /**
+     * Comprueba si existen entradas en la tabla products
+     * 
+     * @param conn
+     * @return
+     * @throws SQLException 
+     */
+    public static boolean checkTable(Connection conn) throws SQLException {
+        // Crear sentencia
+        Statement query = conn.createStatement();
+        query.executeQuery("SELECT * FROM products");
+        
+        // Si hay productos, devuelve true. De lo contrario, false.
+        ResultSet rs = query.getResultSet();
+        return rs.next();
     }
 }

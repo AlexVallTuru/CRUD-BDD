@@ -166,6 +166,8 @@ public class PrimaryController implements Initializable {
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
             quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
+            // Si no hay productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!productLogicLayer.productExists());
             //Customer Logic
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
@@ -619,6 +621,7 @@ public class PrimaryController implements Initializable {
      *
      * @param event
      * @throws SQLException
+     * @author Aitor
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
@@ -642,6 +645,7 @@ public class PrimaryController implements Initializable {
      *
      * @param event
      * @throws SQLException
+     * @author Aitor
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
@@ -653,6 +657,8 @@ public class PrimaryController implements Initializable {
             // Actualizar la tabla
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
+            // Comprueba si hay productos para habilitar el boton de añadir pedidos
+            createOrderBtn.setDisable(!productLogicLayer.productExists());
         } catch (NumberFormatException e) {
             showMessage(1, "Los campos de Stock y Precio son numericos y no pueden estar en blanco.");
         } catch (Exception e) {
@@ -664,6 +670,7 @@ public class PrimaryController implements Initializable {
      * Envia la entrada seleccionada que se quiere eliminar a la capa logica
      *
      * @param event
+     * @author Aitor
      */
     @FXML
     void onActionDeleteProductBtn(ActionEvent event) {
@@ -671,6 +678,8 @@ public class PrimaryController implements Initializable {
         try {
             Product product = getProductFromTable();
             productLogicLayer.removeProduct(product);
+            // Comprueba si hay productos para habilitar el boton de añadir pedidos
+            createOrderBtn.setDisable(!productLogicLayer.productExists());
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar la entrada: " + e);
         } catch (NullPointerException e) {
@@ -682,6 +691,7 @@ public class PrimaryController implements Initializable {
      * Desactiva los botones i limpia los campos de edicion
      *
      * @param event
+     * @author Aitor
      */
     @FXML
     void onActionCleanFieldsBtn(ActionEvent event) {
@@ -700,12 +710,14 @@ public class PrimaryController implements Initializable {
     }
 
     //</editor-fold>
+    
     //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
     /**
      * Obtiene los valores de los campos
      *
      * @return
      * @throws NumberFormatException
+     * @author Aitor
      */
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
@@ -727,6 +739,7 @@ public class PrimaryController implements Initializable {
      * valores a los campos de edicion para modificar o eliminar esta
      *
      * @param ev
+     * @author Aitor
      */
     @FXML
     private void handleProductMouseCicked(MouseEvent ev) {
@@ -742,6 +755,7 @@ public class PrimaryController implements Initializable {
      * Envia los valores del producto seleccionado a los campos de edicion
      *
      * @param product
+     * @author Aitor
      */
     private void setProductToView(Product product) {
         if (product != null) {
@@ -757,6 +771,7 @@ public class PrimaryController implements Initializable {
      * Obtiene el producto de la tabla
      *
      * @return
+     * @author Aitor
      */
     private Product getProductFromTable() {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
