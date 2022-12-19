@@ -170,7 +170,7 @@ public class PrimaryController implements Initializable {
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
-            actualizarTvCustomer(customerLogicLayer);
+            //actualizarTvCustomer(customerLogicLayer);
             //OrderDetails Logic
             orderDetailsLogicLayer = new OrderDetailsLogic();
             //ComboBox
@@ -764,7 +764,6 @@ public class PrimaryController implements Initializable {
     }
 
     //</editor-fold>
-    
     //CUSTOMER 
     @FXML
     private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
@@ -792,7 +791,7 @@ public class PrimaryController implements Initializable {
                 customerLogicLayer.checkEmail(getCustomerFromView().getCustomerEmail());
                 //Escribimos los datos de los texts fields a la base de datos
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
-                actualizarTvCustomer(customerLogicLayer);
+                //actualizarTvCustomer(customerLogicLayer);
             } else {
                 showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
@@ -818,6 +817,7 @@ public class PrimaryController implements Initializable {
     @FXML
     void onClick_bt_actualizar(ActionEvent event) throws Exception {
         try {
+            //Compara las edades para ver si es mayor que la edad mínima
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
                 // Comprobar que el DNI es valido
                 customerLogicLayer.checkDni(getCustomerFromView().getIdCard());
@@ -825,7 +825,7 @@ public class PrimaryController implements Initializable {
                 //Para actualizar la página
                 customerLogicLayer.setData();
             } else {
-                showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+                throw new Exception("La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
         } catch (SQLException exception) {
             if (dniRepetido()) {
@@ -970,11 +970,15 @@ public class PrimaryController implements Initializable {
      *
      * @return
      */
-    private Boolean comparadorEdades(AppConfig appConfig) {
-        if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
-            return true;
+    private Boolean comparadorEdades(AppConfig appConfig) throws Exception {
+        if (getCustomerFromView().getBirthDate().isBlank()) {
+            throw new Exception("No se pueden dejar campos vacios");
+        } else {
+            if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     /**
