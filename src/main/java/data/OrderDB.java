@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import logic.classes.Customer;
 import logic.classes.Order;
@@ -35,6 +36,28 @@ public class OrderDB {
             ordersList.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer));
         }
         return ordersList;
+    }
+    
+        /**
+     * Retorna el contenido de la tabla en una colección de "Orders"
+     *
+     * @param conn
+     * @return
+     * @throws java.sql.SQLException
+     */
+    public static ArrayList<Order> ordersToListFiltered(Connection conn,Timestamp p_fecha_Desde,Timestamp p_fecha_Hasta) throws SQLException {
+
+        ArrayList<Order> ordersListFiltered = new ArrayList<>();
+
+        Statement query;
+        query = conn.createStatement();
+        query.executeQuery("SELECT * FROM orders WHERE requiredDate BETWEEN " + "'" + p_fecha_Desde + "' AND '" + p_fecha_Hasta + "'");
+        ResultSet rs = query.getResultSet();
+        while (rs.next()) {
+            Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
+            ordersListFiltered.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer));
+        }
+        return ordersListFiltered;
     }
 
     /**

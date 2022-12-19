@@ -115,6 +115,8 @@ public class PrimaryController implements Initializable {
      * Elements productes
      */
     @FXML
+    private DatePicker fromOrderData, toOrderData;
+    @FXML
     private TableView productsTableView;
 
     @FXML
@@ -146,6 +148,16 @@ public class PrimaryController implements Initializable {
 
     @FXML
     private TextField buyPriceField;
+
+    //CUSTOMER 
+    @FXML
+    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
+    @FXML
+    private TableView tv_customer;
+    @FXML
+    private TableColumn col_customerName, col_idCard, col_creditLimit, col_phoneNumber, col_customerEmail, col_birthDate;
+    @FXML
+    private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -396,8 +408,8 @@ public class PrimaryController implements Initializable {
     }
 
     @FXML
-    void onActionSearchRangeBtn(ActionEvent event) {
-
+    void onActionSearchRangeBtn(ActionEvent event) throws SQLException {
+        orderLogicLayer.filteredOrder(DateConverter.convertToTimestamp(fromOrderData.getValue()),DateConverter.convertToTimestamp(toOrderData.getValue()));
     }
 
     /**
@@ -764,16 +776,6 @@ public class PrimaryController implements Initializable {
     }
 
     //</editor-fold>
-    //CUSTOMER 
-    @FXML
-    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
-    @FXML
-    private TableView tv_customer;
-    @FXML
-    private TableColumn col_customerName, col_idCard, col_creditLimit, col_phoneNumber, col_customerEmail, col_birthDate;
-    @FXML
-    private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
-
     //<editor-fold defaultstate="collapsed" desc="Botons CUSTOMER">
     /**
      * Botón de añadir APARTADO CLIENTE
@@ -863,8 +865,8 @@ public class PrimaryController implements Initializable {
         desactivaSeleccioCustomer();
         limpiarRegistroTfCustomer();
     }
-    //</editor-fold>
 
+    //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="Metodes privats CUSTOMER">
     /**
      * Al hacer clic si existe algún registro en table view, carga la

@@ -88,8 +88,8 @@
                      </columns>
                   </TableView>
                   <Button fx:id="deleteOrderBtn" disable="true" layoutX="549.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionDeleteOrderBtn" text="Eliminar" />
-                  <DatePicker fx:id="fromOrderData" layoutX="31.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="De" />
-                  <DatePicker fx:id="toOrderData" layoutX="242.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="Hasta" />
+                  <DatePicker id="fromOrderData" fx:id="fromOrderData" layoutX="31.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="De" />
+                  <DatePicker id="toOrderData" fx:id="toOrderData" layoutX="242.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="Hasta" />
                   <Text layoutX="31.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Filtrar entre dos fechas" />
                   <Button fx:id="updateOrderBtn" disable="true" layoutX="423.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionUpdateOrderBtn" text="Modificar" />
                   <Button fx:id="searchRangeBtn" layoutX="474.0" layoutY="43.0" mnemonicParsing="false" onAction="#onActionSearchRangeBtn" text="Buscar" />

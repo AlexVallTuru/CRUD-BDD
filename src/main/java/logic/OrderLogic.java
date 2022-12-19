@@ -4,6 +4,10 @@ import data.ConnectionDB;
 import data.OrderDB;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.Order;
@@ -79,4 +83,10 @@ public class OrderLogic {
 
         ordersOList.remove(order);
     }
+
+    public void filteredOrder(Timestamp p_fecha_Desde, Timestamp p_fecha_Hasta) throws SQLException {
+
+        this.ordersOList.setAll(OrderDB.ordersToListFiltered(conn,p_fecha_Desde, p_fecha_Hasta));
+    }
+
 }
