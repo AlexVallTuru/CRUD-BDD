@@ -625,7 +625,7 @@ public class PrimaryController implements Initializable {
 
     //</editor-fold>
     // --------- //
-    //<editor-fold defaultstate="collapsed" desc="Botones Products">
+    //<editor-fold defaultstate="collapsed" desc="Product Buttons">
     /**
      * Envia a la capa logica el producto a editar seleccionado desde la
      * observableList
@@ -722,8 +722,8 @@ public class PrimaryController implements Initializable {
     }
 
     //</editor-fold>
-    
-    //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
+    // --------- //
+    //<editor-fold defaultstate="collapsed" desc="Product Private Methods">
     /**
      * Obtiene los valores de los campos
      *
