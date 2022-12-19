@@ -181,4 +181,16 @@ public class CustomerLogic {
             throw new Exception ("El formato del correo electronico no es valido.");
         }
     }
+    
+    /**
+     * Llama al metodo de la capa BD para comprobar si existen entradas en la 
+     * tabla customers i devuelve el resultado
+     * 
+     * @return
+     * @throws SQLException 
+     * @author Aitor
+     */
+    public boolean customerExists() throws SQLException {
+        return CustomerDB.checkTable(conn);
+    }
 }
