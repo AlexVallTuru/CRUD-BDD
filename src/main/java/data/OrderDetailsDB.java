@@ -22,7 +22,7 @@ public class OrderDetailsDB {
      * @return
      * @throws java.sql.SQLException
      */
-    public static ArrayList<OrderDetails> orderDetailsToList(Connection conn, int orderNum) throws SQLException {
+    public ArrayList<OrderDetails> orderDetailsToList(Connection conn, int orderNum) throws SQLException {
 
         ArrayList<OrderDetails> orderDetailsList = new ArrayList<>();
 
@@ -34,7 +34,8 @@ public class OrderDetailsDB {
 
         while (rs.next()) {
             Product product = getProduct(conn, rs.getInt("productCode"));
-            orderDetailsList.add(new OrderDetails(product, rs.getInt("orderNumber"), rs.getInt("quantityOrdered"), rs.getDouble("priceEach"), rs.getInt("orderLineNumber")));
+            Double orderLineTotal = rs.getInt("quantityOrdered") * rs.getDouble("priceEach");
+            orderDetailsList.add(new OrderDetails(product, rs.getInt("orderNumber"), rs.getInt("quantityOrdered"), rs.getDouble("priceEach"), rs.getInt("orderLineNumber"), orderLineTotal));
         }
         return orderDetailsList;
     }

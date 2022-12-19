@@ -5,14 +5,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import logic.OrderDetailsLogic;
 import logic.classes.Customer;
 import logic.classes.Order;
+import logic.classes.OrderDetails;
 
 /**
  *
  * @author Kiwi
  */
 public class OrderDB {
+
+    OrderDetailsDB orderDetailsDB = new OrderDetailsDB();
 
     /**
      * Retorna el contenido de la tabla en una colección de "Orders"
@@ -21,9 +25,10 @@ public class OrderDB {
      * @return
      * @throws java.sql.SQLException
      */
-    public static ArrayList<Order> ordersToList(Connection conn) throws SQLException {
+    public ArrayList<Order> ordersToList(Connection conn) throws SQLException {
 
         ArrayList<Order> ordersList = new ArrayList<>();
+        Customer customer;
 
         Statement query;
         query = conn.createStatement();
@@ -31,8 +36,8 @@ public class OrderDB {
 
         ResultSet rs = query.getResultSet();
         while (rs.next()) {
-            Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
-            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer));
+            customer = getCustomer(conn, rs.getString("customers_customerEmail"));
+            ordersList.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer, orderDetailsDB.orderDetailsToList(conn, rs.getInt("orderNumber"))));
         }
         return ordersList;
     }
@@ -71,7 +76,7 @@ public class OrderDB {
      * @return
      * @throws SQLException
      */
-    public static Customer getCustomer(Connection conn, String customerEmail) throws SQLException {
+    private static Customer getCustomer(Connection conn, String customerEmail) throws SQLException {
         Customer customer = null;
 
         Statement query;

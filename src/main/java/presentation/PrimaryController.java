@@ -4,6 +4,7 @@ import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -67,7 +68,7 @@ public class PrimaryController implements Initializable {
     private Button createOrderBtn, addProductBtn, deleteOrderBtn, updateOrderBtn, openOrderBtn, searchRangeBtn;
 
     @FXML
-    private Button orderDetailDeleteBtn, orderDetailUpdateBtn;
+    private Button orderDetailDeleteBtn, orderDetailUpdateBtn, orderDetailSaveBtn, cancelOrderBtn;
 
     @FXML
     private Label openedOrder;
@@ -169,7 +170,7 @@ public class PrimaryController implements Initializable {
         colRequiredDate.setCellValueFactory(new PropertyValueFactory<>("requiredDate"));
         colShippedDate.setCellValueFactory(new PropertyValueFactory<>("shippedDate"));
         colCustomerEmailOrder.setCellValueFactory(new PropertyValueFactory<>("customer"));
-        //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
+        //colTotalOrderPrice.setCellValueFactory(new PropertyValueFactory<>("orderTotalPrice"));
         // Columnas Product
         colProductCode.setCellValueFactory(new PropertyValueFactory<>("productCode"));
         colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
@@ -189,7 +190,7 @@ public class PrimaryController implements Initializable {
         colPriceEach.setCellValueFactory(new PropertyValueFactory<>("priceEach"));
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantityOrdered"));
         colOrderLineNumber.setCellValueFactory(new PropertyValueFactory<>("orderLineNumber"));
-        //colTotalPrice.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
+        colTotalPrice.setCellValueFactory(new PropertyValueFactory<>("orderLineTotal"));
     }
 
     /**
@@ -222,18 +223,6 @@ public class PrimaryController implements Initializable {
         alert.showAndWait();
     }
 
-    /**
-     * Muestra una info por pantalla
-     *
-     * @param txt
-     */
-    /*private void showInfo(String txt) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Info:");
-        alert.setContentText(txt);
-
-        alert.showAndWait();
-    }*/
     // --------- //
     //<editor-fold defaultstate="collapsed" desc="Order Buttons">
     /**
@@ -247,14 +236,15 @@ public class PrimaryController implements Initializable {
         try {
             Order order = getOrderFromForm();
 
-            orderLogicLayer.insertOrder(order);
+            orderLogicLayer.getOrderObservableList().add(order);
 
-            orderLogicLayer.setData();
+            //orderLogicLayer.insertOrder(order);
+            //orderLogicLayer.setData();
         } catch (NumberFormatException e) {
             showMessage(1, "Datos incorrectos: " + e);
-        } catch (SQLException e) {
+        } /*catch (SQLException e) {
             showMessage(1, "Error al insertar los datos: " + e);
-        } catch (Exception e) {
+        }*/ catch (Exception e) {
             showMessage(1, "Error: " + e);
         }
     }
@@ -437,19 +427,53 @@ public class PrimaryController implements Initializable {
     //</editor-fold>
     // --------- //
     //<editor-fold defaultstate="collapsed" desc="OrderDetails Buttons">
+    /**
+     * *
+     *
+     * @param event
+     */
+    @FXML
+    void onActionCancelOrderBtn(ActionEvent event) {
+
+    }
+
+    /**
+     * *
+     *
+     * @param event
+     */
+    @FXML
+    void onActionOrderDetailSaveBtn(ActionEvent event) {
+
+    }
+
+    /**
+     * *
+     *
+     * @param event
+     */
     @FXML
     void onActionAddProductBtn(ActionEvent event) {
 
         try {
             OrderDetails detail = getOrderDetailFromForm();
+            ObservableList<OrderDetails> orderDetailObservableList = orderDetailsLogicLayer.getOrderDetailsObservableList();
 
-            orderDetailsLogicLayer.insertOrderDetail(detail);
+            detail.setOrderLineNumber(orderDetailObservableList.size() + 1);
 
-            orderLogicLayer.setData();
+            for (OrderDetails d : orderDetailObservableList) {
+                if (d.getProduct().getProductCode() == detail.getProduct().getProductCode()) {
+                    throw new Exception("El producto añadido ya existe.");
+                }
+            }
+
+            if (!openedOrder.getText().equals("Nuevo pedido")) {
+                detail.setOrderId(Integer.parseInt(openedOrder.getText()));
+            }
+            orderDetailsLogicLayer.getOrderDetailsObservableList().add(detail);
+
         } catch (NumberFormatException e) {
             showMessage(1, "Datos incorrectos: " + e);
-        } catch (SQLException e) {
-            showMessage(1, "Error al insertar los datos: " + e);
         } catch (Exception e) {
             showMessage(1, "Error: " + e);
         }
@@ -477,7 +501,7 @@ public class PrimaryController implements Initializable {
         try {
 
             OrderDetails detail = getOrderDetailFromForm();
-            orderDetailsLogicLayer.updateOrderDetail(detail);
+            //orderDetailsLogicLayer.updateOrderDetail(detail);
             orderDetailAsTableView(detail);
 
         } catch (NumberFormatException e) {
@@ -525,18 +549,23 @@ public class PrimaryController implements Initializable {
         Order order = getOrderFromTable();
         int orderNumber = order.getOrderNumber();
 
-        openedOrder.setText("" + orderNumber);
+        if (orderNumber == 0) {
+            openedOrder.setText("Nuevo pedido");
+        } else {
+            openedOrder.setText("" + orderNumber);
+        }
         productComboBox.setItems(productLogicLayer.getProductObservableList());
-        orderDetailsLogicLayer.setData(orderNumber);
+        orderDetailsLogicLayer.getOrderDetailsObservableList().setAll(order.getOrderDetailsList());
         orderDetailTableView.setItems(orderDetailsLogicLayer.getOrderDetailsObservableList());
+
         tabPane.getSelectionModel().select(orderDetailPane);
     }
 
     /**
      * Refresca la tabla de forma manual tras modificar los atributos del
-     * elemento Order.
+     * elemento OrderDetails.
      *
-     * @param order
+     * @param detail
      */
     private void orderDetailAsTableView(OrderDetails detail) {
 
@@ -544,6 +573,7 @@ public class PrimaryController implements Initializable {
 
         asTableview.setPriceEach(detail.getPriceEach());
         asTableview.setQuantityOrdered(detail.getQuantityOrdered());
+        asTableview.setOrderLineTotal(detail.getPriceEach() * detail.getQuantityOrdered());
 
         orderDetailTableView.refresh();
     }
@@ -570,13 +600,15 @@ public class PrimaryController implements Initializable {
      */
     private OrderDetails getOrderDetailFromForm() throws Exception {
 
-        OrderDetails detail = getOrderDetailFromTable();
+        OrderDetails detail = new OrderDetails();
 
         if (productQuantity.getText().isEmpty() || priceEach.getText().isEmpty() || productComboBox.getSelectionModel().getSelectedItem() == null) {
             throw new Exception("No puedes dejar campos en blanco.");
         } else {
+            detail.setProduct(productComboBox.getValue());
             detail.setQuantityOrdered(Integer.parseInt(productQuantity.getText()));
             detail.setPriceEach(Double.parseDouble(priceEach.getText()));
+            detail.setOrderLineTotal(detail.getPriceEach() * detail.getQuantityOrdered());
 
             return detail;
         }

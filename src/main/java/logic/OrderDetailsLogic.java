@@ -16,6 +16,7 @@ public class OrderDetailsLogic {
 
     Connection conn;
     ObservableList<OrderDetails> orderDetailsOList;
+    OrderDetailsDB orderDetailsDB;
 
     public OrderDetailsLogic() throws SQLException {
         // inicialitzem connexió amb BD pero passant per la capa d'aplicació
@@ -23,6 +24,8 @@ public class OrderDetailsLogic {
 
         // inicialitzem col.lecció
         orderDetailsOList = FXCollections.<OrderDetails>observableArrayList();
+
+        orderDetailsDB = new OrderDetailsDB();
     }
 
     /**
@@ -33,7 +36,7 @@ public class OrderDetailsLogic {
      */
     public void setData(int orderNum) throws SQLException {
 
-        this.orderDetailsOList.setAll(OrderDetailsDB.orderDetailsToList(conn, orderNum));
+        this.orderDetailsOList.setAll(orderDetailsDB.orderDetailsToList(conn, orderNum));
 
     }
 
