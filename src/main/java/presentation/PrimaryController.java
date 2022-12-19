@@ -804,15 +804,6 @@ public class PrimaryController implements Initializable {
 
     //</editor-fold>
     // --------- //
-    //CUSTOMER 
-    @FXML
-    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
-    @FXML
-    private TableView tv_customer;
-    @FXML
-    private TableColumn col_customerName, col_idCard, col_creditLimit, col_phoneNumber, col_customerEmail, col_birthDate;
-    @FXML
-    private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
 
     //<editor-fold defaultstate="collapsed" desc="Botons CUSTOMER">
     /**
@@ -892,7 +883,7 @@ public class PrimaryController implements Initializable {
             // Si no hay clientes o productos, desactiva el boton de añadir pedidos
             createOrderBtn.setDisable(!checkProductClient());
         } catch (SQLException e) {
-            showMessage(1, "Error al eliminar los datos: " + e);
+            showMessage(1, "Se produjo un error en Mysql, al intentar eliminar datos");
         }
     }
 

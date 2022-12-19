@@ -76,6 +76,8 @@ public class CustomerLogic {
         CustomerDB.eliminaCustomer(conn, customer);
         // Eliminamos el objeto de la ObservableList
         llistaObservableCustomer.remove(customer);
+        
+        
     }
 
     /**
