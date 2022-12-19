@@ -150,6 +150,8 @@ public class PrimaryController implements Initializable {
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
             actualizarTvCustomer(customerLogicLayer);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
             //OrderDetails Logic
             orderDetailsLogicLayer = new OrderDetailsLogic();
             //ComboBox
@@ -190,6 +192,19 @@ public class PrimaryController implements Initializable {
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantityOrdered"));
         colOrderLineNumber.setCellValueFactory(new PropertyValueFactory<>("orderLineNumber"));
         //colTotalPrice.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
+    }
+    
+    /**
+     * Llama a los metodos de comprobacion de contenido en las tablas de productos
+     * y clientes. Si uno o ambos devuelven false, devolvera false; De lo contrario
+     * devolvera true
+     * 
+     * @return
+     * @throws SQLException 
+     */
+    private boolean checkProductClient() throws SQLException {
+        // Comprueba si hay productos i clientes para habilitar el boton de añadir pedidos
+        return (customerLogicLayer.customerExists() && productLogicLayer.productExists());
     }
 
     /**
@@ -617,6 +632,7 @@ public class PrimaryController implements Initializable {
      *
      * @param event
      * @throws SQLException
+     * @author Aitor
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
@@ -640,6 +656,7 @@ public class PrimaryController implements Initializable {
      *
      * @param event
      * @throws SQLException
+     * @author Aitor
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
@@ -651,6 +668,9 @@ public class PrimaryController implements Initializable {
             // Actualizar la tabla
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
+            
         } catch (NumberFormatException e) {
             showMessage(1, "Los campos de Stock y Precio son numericos y no pueden estar en blanco.");
         } catch (Exception e) {
@@ -662,6 +682,7 @@ public class PrimaryController implements Initializable {
      * Envia la entrada seleccionada que se quiere eliminar a la capa logica
      *
      * @param event
+     * @author Aitor
      */
     @FXML
     void onActionDeleteProductBtn(ActionEvent event) {
@@ -669,6 +690,8 @@ public class PrimaryController implements Initializable {
         try {
             Product product = getProductFromTable();
             productLogicLayer.removeProduct(product);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar la entrada: " + e);
         } catch (NullPointerException e) {
@@ -680,6 +703,7 @@ public class PrimaryController implements Initializable {
      * Desactiva los botones i limpia los campos de edicion
      *
      * @param event
+     * @author Aitor
      */
     @FXML
     void onActionCleanFieldsBtn(ActionEvent event) {
@@ -698,13 +722,14 @@ public class PrimaryController implements Initializable {
     }
 
     //</editor-fold>
-    // --------- //
+    
     //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
     /**
      * Obtiene los valores de los campos
      *
      * @return
      * @throws NumberFormatException
+     * @author Aitor
      */
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
@@ -726,6 +751,7 @@ public class PrimaryController implements Initializable {
      * valores a los campos de edicion para modificar o eliminar esta
      *
      * @param ev
+     * @author Aitor
      */
     @FXML
     private void handleProductMouseCicked(MouseEvent ev) {
@@ -741,6 +767,7 @@ public class PrimaryController implements Initializable {
      * Envia los valores del producto seleccionado a los campos de edicion
      *
      * @param product
+     * @author Aitor
      */
     private void setProductToView(Product product) {
         if (product != null) {
@@ -756,6 +783,7 @@ public class PrimaryController implements Initializable {
      * Obtiene el producto de la tabla
      *
      * @return
+     * @author Aitor
      */
     private Product getProductFromTable() {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
@@ -792,6 +820,8 @@ public class PrimaryController implements Initializable {
                 //Escribimos los datos de los texts fields a la base de datos
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
                 actualizarTvCustomer(customerLogicLayer);
+                // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+                createOrderBtn.setDisable(!checkProductClient());
             } else {
                 showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
@@ -846,6 +876,8 @@ public class PrimaryController implements Initializable {
         Customer customer = getCustomerFromTable();
         try {
             customerLogicLayer.eliminarCustomer(customer);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar los datos: " + e);
         }
