@@ -108,4 +108,22 @@ public class CustomerDB {
         String sqlStr = "DELETE FROM customers WHERE customerEmail = " + "'" + customer.getCustomerEmail() + "'";
         sentencia.executeUpdate(sqlStr);
     }
+    
+    /**
+     * Comprueba si existen entradas en la tabla customers
+     * 
+     * @param conn
+     * @return
+     * @throws SQLException 
+     * @author Aitor
+     */
+    public static boolean checkTable(Connection conn) throws SQLException {
+        // Crear sentencia
+        Statement query = conn.createStatement();
+        query.executeQuery("SELECT * FROM customers");
+        
+        // Si hay productos, devuelve true. De lo contrario, false.
+        ResultSet rs = query.getResultSet();
+        return rs.next();
+    }
 }

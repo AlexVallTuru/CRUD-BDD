@@ -166,13 +166,13 @@ public class PrimaryController implements Initializable {
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
             quantityInStockField.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityInStock()));
-            // Si no hay productos, desactiva el boton de añadir pedidos
-            createOrderBtn.setDisable(!productLogicLayer.productExists());
             //Customer Logic
             customerLogicLayer = new CustomerLogic();
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
             actualizarTvCustomer(customerLogicLayer);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
             //OrderDetails Logic
             orderDetailsLogicLayer = new OrderDetailsLogic();
             //ComboBox
@@ -213,6 +213,19 @@ public class PrimaryController implements Initializable {
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantityOrdered"));
         colOrderLineNumber.setCellValueFactory(new PropertyValueFactory<>("orderLineNumber"));
         //colTotalPrice.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
+    }
+    
+    /**
+     * Llama a los metodos de comprobacion de contenido en las tablas de productos
+     * y clientes. Si uno o ambos devuelven false, devolvera false; De lo contrario
+     * devolvera true
+     * 
+     * @return
+     * @throws SQLException 
+     */
+    private boolean checkProductClient() throws SQLException {
+        // Comprueba si hay productos i clientes para habilitar el boton de añadir pedidos
+        return (customerLogicLayer.customerExists() && productLogicLayer.productExists());
     }
 
     /**
@@ -657,8 +670,9 @@ public class PrimaryController implements Initializable {
             // Actualizar la tabla
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
-            // Comprueba si hay productos para habilitar el boton de añadir pedidos
-            createOrderBtn.setDisable(!productLogicLayer.productExists());
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
+            
         } catch (NumberFormatException e) {
             showMessage(1, "Los campos de Stock y Precio son numericos y no pueden estar en blanco.");
         } catch (Exception e) {
@@ -678,8 +692,8 @@ public class PrimaryController implements Initializable {
         try {
             Product product = getProductFromTable();
             productLogicLayer.removeProduct(product);
-            // Comprueba si hay productos para habilitar el boton de añadir pedidos
-            createOrderBtn.setDisable(!productLogicLayer.productExists());
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar la entrada: " + e);
         } catch (NullPointerException e) {
@@ -808,6 +822,8 @@ public class PrimaryController implements Initializable {
                 //Escribimos los datos de los texts fields a la base de datos
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
                 actualizarTvCustomer(customerLogicLayer);
+                // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+                createOrderBtn.setDisable(!checkProductClient());
             } else {
                 showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
@@ -862,6 +878,8 @@ public class PrimaryController implements Initializable {
         Customer customer = getCustomerFromTable();
         try {
             customerLogicLayer.eliminarCustomer(customer);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar los datos: " + e);
         }
