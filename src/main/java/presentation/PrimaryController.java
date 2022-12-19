@@ -856,7 +856,7 @@ public class PrimaryController implements Initializable {
         tf_creditLimit.setText(String.valueOf(appConfig.getDefaultCreditLimit()));
     }
 
-//</editor-fold>
+//</editor-fold>    
     //<editor-fold defaultstate="collapsed" desc="Varis CUSTOMER">
     /**
      * Comprueba si hay un correo repetido en el textfield y el tableview
