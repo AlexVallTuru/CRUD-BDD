@@ -35,6 +35,8 @@ import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
 
+    Order selectedOrder;
+
     //Logic Layer Classes
     ProductLogic productLogicLayer;
     CustomerLogic customerLogicLayer;
@@ -42,7 +44,6 @@ public class PrimaryController implements Initializable {
     AppConfigLogic appConfigLogic;
     OrderDetailsLogic orderDetailsLogicLayer;
 
-    //orderDetail TableView
     @FXML
     private TabPane tabPane;
 
@@ -435,6 +436,7 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionCancelOrderBtn(ActionEvent event) {
 
+        //TODO Cambiará a la pestaña de Pedidos y no efectuará ningún cambio sobre el pedido actual, además lo eliminaré de la ObservableList.
     }
 
     /**
@@ -445,6 +447,29 @@ public class PrimaryController implements Initializable {
     @FXML
     void onActionOrderDetailSaveBtn(ActionEvent event) {
 
+        try {
+
+            if (selectedOrder.getOrderNumber() == 0) {
+                if (selectedOrder.getOrderDetailsList().isEmpty()) {
+                    throw new Exception("No se puede añadir un pedido en blanco.");
+                }
+
+                //TODO Insertar Order y después los detalles. (OrderID)
+                //orderLogicLayer.insertOrder(selectedOrder);
+            } else {
+                orderDetailsLogicLayer.deleteAllOrderDetail(selectedOrder.getOrderNumber());
+                orderDetailsLogicLayer.insertAllOrderDetails(selectedOrder.getOrderDetailsList());
+            }
+
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } /*catch (SQLException e) {
+            showMessage(1, "Error al modificar les dades: " + e);
+        }*/ catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
+        showMessage(0, "Pedido guardado.");
+        disableOrderDetailSelection();
     }
 
     /**
@@ -470,6 +495,7 @@ public class PrimaryController implements Initializable {
             if (!openedOrder.getText().equals("Nuevo pedido")) {
                 detail.setOrderId(Integer.parseInt(openedOrder.getText()));
             }
+            selectedOrder.getOrderDetailsList().add(detail);
             orderDetailsLogicLayer.getOrderDetailsObservableList().add(detail);
 
         } catch (NumberFormatException e) {
@@ -480,19 +506,20 @@ public class PrimaryController implements Initializable {
 
         // Deixem el camp de quantitat amb el seu valor per defecte
         productQuantity.setText(String.valueOf(appConfigLogic.getAppConfig().getDefaultQuantityOrdered()));
+        disableOrderDetailSelection();
+        enableSaveAndCancelBtn();
     }
 
     @FXML
     void onActionOrderDetailDeleteBtn(ActionEvent event) {
 
-        try {
-            OrderDetails detail = getOrderDetailFromTable();
-            orderDetailsLogicLayer.deleteOrderDetail(detail);
-        } catch (SQLException e) {
-            showMessage(1, "Error intentando eliminar los datos: " + e);
-        }
-        disableOrderDetailSelection();
+        OrderDetails detail = getOrderDetailFromTable();
 
+        selectedOrder.getOrderDetailsList().remove(detail);
+        orderDetailsLogicLayer.getOrderDetailsObservableList().remove(detail);
+
+        enableSaveAndCancelBtn();
+        disableOrderDetailSelection();
     }
 
     @FXML
@@ -501,7 +528,6 @@ public class PrimaryController implements Initializable {
         try {
 
             OrderDetails detail = getOrderDetailFromForm();
-            //orderDetailsLogicLayer.updateOrderDetail(detail);
             orderDetailAsTableView(detail);
 
         } catch (NumberFormatException e) {
@@ -511,6 +537,7 @@ public class PrimaryController implements Initializable {
         } catch (Exception e) {
             showMessage(1, "Error: " + e);
         }
+        enableSaveAndCancelBtn();
         disableOrderDetailSelection();
     }
 
@@ -521,7 +548,8 @@ public class PrimaryController implements Initializable {
      * @param ev
      */
     @FXML
-    private void handleOrderDetailOnMouseClicked(MouseEvent ev) {
+    private void handleOrderDetailOnMouseClicked(MouseEvent ev
+    ) {
 
         if (orderDetailTableView.getSelectionModel().getSelectedItem() != null) {
 
@@ -533,10 +561,10 @@ public class PrimaryController implements Initializable {
             disableOrderDetailSelection();
         }
     }
-
     //</editor-fold>
     // --------- //
     //<editor-fold defaultstate="collapsed" desc="OrderDetails Private Methods">
+
     /**
      * Guarda el número de pedido, carga los productos en el ComboBox y muestra
      * los productos añadidos al pedido, después cambia de pestaña a Detalle de
@@ -547,6 +575,7 @@ public class PrimaryController implements Initializable {
     private void initializeOrderDetails() throws SQLException {
 
         Order order = getOrderFromTable();
+        selectedOrder = order;
         int orderNumber = order.getOrderNumber();
 
         if (orderNumber == 0) {
@@ -562,6 +591,16 @@ public class PrimaryController implements Initializable {
     }
 
     /**
+     * Habilita el botón de guardado de una Orden
+     */
+    private void enableSaveAndCancelBtn() {
+
+        orderDetailSaveBtn.setDisable(false);
+        cancelOrderBtn.setDisable(false);
+
+    }
+
+    /**
      * Refresca la tabla de forma manual tras modificar los atributos del
      * elemento OrderDetails.
      *
@@ -570,6 +609,14 @@ public class PrimaryController implements Initializable {
     private void orderDetailAsTableView(OrderDetails detail) {
 
         OrderDetails asTableview = getOrderDetailFromTable();
+
+        for (OrderDetails d : selectedOrder.getOrderDetailsList()) {
+            if (d.getProduct().getProductCode() == detail.getProduct().getProductCode()) {
+                d.setPriceEach(detail.getPriceEach());
+                d.setQuantityOrdered(detail.getQuantityOrdered());
+                d.setOrderLineTotal(detail.getPriceEach() * detail.getQuantityOrdered());
+            }
+        }
 
         asTableview.setPriceEach(detail.getPriceEach());
         asTableview.setQuantityOrdered(detail.getQuantityOrdered());

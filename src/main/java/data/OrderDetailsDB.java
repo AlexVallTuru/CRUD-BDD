@@ -100,6 +100,36 @@ public class OrderDetailsDB {
     }
 
     /**
+     * Inserta todos los detalles del pedido.
+     *
+     * @param conn
+     * @param details
+     * @throws SQLException
+     */
+    public static void insertAllOrderDetails(Connection conn, ArrayList<OrderDetails> details) throws SQLException {
+
+        Statement query;
+        query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        query.executeQuery("SELECT * FROM orderdetails WHERE orderNumber =" + details.get(0).getOrderId());
+
+        ResultSet rs = query.getResultSet();
+
+        for (OrderDetails detail : details) {
+
+            rs.moveToInsertRow();
+
+            rs.updateInt("orderNumber", detail.getOrderId());
+            rs.updateInt("quantityOrdered", detail.getQuantityOrdered());
+            rs.updateDouble("priceEach", detail.getPriceEach());
+            rs.updateInt("orderLineNumber", detail.getOrderLineNumber());
+            rs.updateInt("productCode", detail.getProduct().getProductCode());
+
+            rs.insertRow();
+        }
+
+    }
+
+    /**
      * Actualiza un nuevo pedido
      *
      * @param conn
@@ -134,6 +164,22 @@ public class OrderDetailsDB {
         Statement query;
         query = conn.createStatement();
         String sqlStr = "DELETE FROM orderdetails WHERE orderNumber = " + detail.getOrderId() + " AND orderLineNumber = " + detail.getOrderLineNumber();
+
+        query.executeUpdate(sqlStr);
+    }
+
+    /**
+     * Elimina TODOS los registros OrderDetail.
+     *
+     * @param conn
+     * @param orderId
+     * @throws SQLException
+     */
+    public static void deleteAllOrderDetail(Connection conn, int orderId) throws SQLException {
+
+        Statement query;
+        query = conn.createStatement();
+        String sqlStr = "DELETE FROM orderdetails WHERE orderNumber = " + orderId;
 
         query.executeUpdate(sqlStr);
     }

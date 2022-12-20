@@ -4,6 +4,7 @@ import data.ConnectionDB;
 import data.OrderDetailsDB;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.OrderDetails;
@@ -63,6 +64,19 @@ public class OrderDetailsLogic {
     }
 
     /**
+     * Añade todos los productos en el pedido.
+     *
+     * @param details
+     * @throws SQLException
+     */
+    public void insertAllOrderDetails(ArrayList<OrderDetails> details) throws SQLException {
+
+        OrderDetailsDB.insertAllOrderDetails(conn, details);
+
+        //orderDetailsOList.add(details);
+    }
+
+    /**
      * Actualiza un registro de la BBDD.
      *
      * @param detail
@@ -86,4 +100,17 @@ public class OrderDetailsLogic {
 
         orderDetailsOList.remove(detail);
     }
+
+    /**
+     * Elimina todos los registros de la BBDD.
+     *
+     * @param orderId
+     * @throws SQLException
+     */
+    public void deleteAllOrderDetail(int orderId) throws SQLException {
+
+        OrderDetailsDB.deleteAllOrderDetail(conn, orderId);
+
+    }
+
 }
