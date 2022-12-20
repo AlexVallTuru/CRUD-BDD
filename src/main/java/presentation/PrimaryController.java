@@ -96,6 +96,8 @@ public class PrimaryController implements Initializable {
      * Elements productes
      */
     @FXML
+    private DatePicker fromOrderData, toOrderData;
+    @FXML
     private TableView productsTableView;
 
     @FXML
@@ -128,6 +130,16 @@ public class PrimaryController implements Initializable {
     @FXML
     private TextField buyPriceField;
 
+    //CUSTOMER 
+    @FXML
+    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
+    @FXML
+    private TableView tv_customer;
+    @FXML
+    private TableColumn col_customerName, col_idCard, col_creditLimit, col_phoneNumber, col_customerEmail, col_birthDate;
+    @FXML
+    private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //Inicializa la capa lógica, que incluye la conexión con la BBDD
@@ -152,6 +164,8 @@ public class PrimaryController implements Initializable {
             customerLogicLayer.setData();
             tv_customer.setItems(customerLogicLayer.getCustomerObservableList());
             actualizarTvCustomer(customerLogicLayer);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
             //OrderDetails Logic
             orderDetailsLogicLayer = new OrderDetailsLogic();
             //ComboBox
@@ -192,6 +206,19 @@ public class PrimaryController implements Initializable {
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantityOrdered"));
         colOrderLineNumber.setCellValueFactory(new PropertyValueFactory<>("orderLineNumber"));
         colTotalPrice.setCellValueFactory(new PropertyValueFactory<>("orderLineTotal"));
+    }
+
+    /**
+     * Llama a los metodos de comprobacion de contenido en las tablas de
+     * productos y clientes. Si uno o ambos devuelven false, devolvera false; De
+     * lo contrario devolvera true
+     *
+     * @return
+     * @throws SQLException
+     */
+    private boolean checkProductClient() throws SQLException {
+        // Comprueba si hay productos i clientes para habilitar el boton de añadir pedidos
+        return (customerLogicLayer.customerExists() && productLogicLayer.productExists());
     }
 
     /**
@@ -335,9 +362,15 @@ public class PrimaryController implements Initializable {
         disableOrderSelection();
     }
 
+    /**
+     * Obtiene dos fechas de la parte visual y la envía a la parte lógica.
+     *
+     * @param event
+     * @throws SQLException
+     */
     @FXML
-    void onActionSearchRangeBtn(ActionEvent event) {
-
+    void onActionSearchRangeBtn(ActionEvent event) throws SQLException {
+        orderLogicLayer.filteredOrder(DateConverter.convertToTimestamp(fromOrderData.getValue()), DateConverter.convertToTimestamp(toOrderData.getValue()));
     }
 
     //</editor-fold>
@@ -689,13 +722,14 @@ public class PrimaryController implements Initializable {
 
     //</editor-fold>
     // --------- //
-    //<editor-fold defaultstate="collapsed" desc="Botones Products">
+    //<editor-fold defaultstate="collapsed" desc="Product Buttons">
     /**
      * Envia a la capa logica el producto a editar seleccionado desde la
      * observableList
      *
      * @param event
      * @throws SQLException
+     * @author Aitor
      */
     @FXML
     void onActionUpdateProductBtn(ActionEvent event) throws SQLException {
@@ -719,6 +753,7 @@ public class PrimaryController implements Initializable {
      *
      * @param event
      * @throws SQLException
+     * @author Aitor
      */
     @FXML
     void onActionAddNewProductBtn(ActionEvent event) throws SQLException {
@@ -730,6 +765,9 @@ public class PrimaryController implements Initializable {
             // Actualizar la tabla
             productLogicLayer.setData();
             productsTableView.setItems(productLogicLayer.getProductObservableList());
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
+
         } catch (NumberFormatException e) {
             showMessage(1, "Los campos de Stock y Precio son numericos y no pueden estar en blanco.");
         } catch (Exception e) {
@@ -741,6 +779,7 @@ public class PrimaryController implements Initializable {
      * Envia la entrada seleccionada que se quiere eliminar a la capa logica
      *
      * @param event
+     * @author Aitor
      */
     @FXML
     void onActionDeleteProductBtn(ActionEvent event) {
@@ -748,6 +787,8 @@ public class PrimaryController implements Initializable {
         try {
             Product product = getProductFromTable();
             productLogicLayer.removeProduct(product);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
         } catch (SQLException e) {
             showMessage(1, "Error al eliminar la entrada: " + e);
         } catch (NullPointerException e) {
@@ -759,6 +800,7 @@ public class PrimaryController implements Initializable {
      * Desactiva los botones i limpia los campos de edicion
      *
      * @param event
+     * @author Aitor
      */
     @FXML
     void onActionCleanFieldsBtn(ActionEvent event) {
@@ -778,12 +820,13 @@ public class PrimaryController implements Initializable {
 
     //</editor-fold>
     // --------- //
-    //<editor-fold defaultstate="collapsed" desc="Metodes Privats Productes">
+    //<editor-fold defaultstate="collapsed" desc="Product Private Methods">
     /**
      * Obtiene los valores de los campos
      *
      * @return
      * @throws NumberFormatException
+     * @author Aitor
      */
     private Product getProductFromView() throws NumberFormatException {
         Product product = new Product();
@@ -805,6 +848,7 @@ public class PrimaryController implements Initializable {
      * valores a los campos de edicion para modificar o eliminar esta
      *
      * @param ev
+     * @author Aitor
      */
     @FXML
     private void handleProductMouseCicked(MouseEvent ev) {
@@ -820,6 +864,7 @@ public class PrimaryController implements Initializable {
      * Envia los valores del producto seleccionado a los campos de edicion
      *
      * @param product
+     * @author Aitor
      */
     private void setProductToView(Product product) {
         if (product != null) {
@@ -835,6 +880,7 @@ public class PrimaryController implements Initializable {
      * Obtiene el producto de la tabla
      *
      * @return
+     * @author Aitor
      */
     private Product getProductFromTable() {
         Product product = (Product) productsTableView.getSelectionModel().getSelectedItem();
@@ -843,16 +889,6 @@ public class PrimaryController implements Initializable {
 
     //</editor-fold>
     // --------- //
-    //CUSTOMER 
-    @FXML
-    private Button bt_aniadir, bt_actualizar, bt_eliminar, bt_limpiar;
-    @FXML
-    private TableView tv_customer;
-    @FXML
-    private TableColumn col_customerName, col_idCard, col_creditLimit, col_phoneNumber, col_customerEmail, col_birthDate;
-    @FXML
-    private TextField tf_customerName, tf_idCard, tf_creditLimit, tf_phoneNumber, tf_customerEmail, tf_birthDate;
-
     //<editor-fold defaultstate="collapsed" desc="Botons CUSTOMER">
     /**
      * Botón de añadir APARTADO CLIENTE
@@ -870,7 +906,9 @@ public class PrimaryController implements Initializable {
                 customerLogicLayer.checkEmail(getCustomerFromView().getCustomerEmail());
                 //Escribimos los datos de los texts fields a la base de datos
                 customerLogicLayer.afegirCustomer(getCustomerFromView());
-                actualizarTvCustomer(customerLogicLayer);
+                //actualizarTvCustomer(customerLogicLayer);
+                // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+                createOrderBtn.setDisable(!checkProductClient());
             } else {
                 showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
@@ -896,6 +934,7 @@ public class PrimaryController implements Initializable {
     @FXML
     void onClick_bt_actualizar(ActionEvent event) throws Exception {
         try {
+            //Compara las edades para ver si es mayor que la edad mínima
             if (comparadorEdades(appConfigLogic.getAppConfig())) {
                 // Comprobar que el DNI es valido
                 customerLogicLayer.checkDni(getCustomerFromView().getIdCard());
@@ -903,7 +942,7 @@ public class PrimaryController implements Initializable {
                 //Para actualizar la página
                 customerLogicLayer.setData();
             } else {
-                showMessage(0, "La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
+                throw new Exception("La mínima edad es de " + appConfigLogic.getAppConfig().getMinCustomerAge() + " años");
             }
         } catch (SQLException exception) {
             if (dniRepetido()) {
@@ -925,8 +964,10 @@ public class PrimaryController implements Initializable {
         Customer customer = getCustomerFromTable();
         try {
             customerLogicLayer.eliminarCustomer(customer);
+            // Si no hay clientes o productos, desactiva el boton de añadir pedidos
+            createOrderBtn.setDisable(!checkProductClient());
         } catch (SQLException e) {
-            showMessage(1, "Error al eliminar los datos: " + e);
+            showMessage(1, "Se produjo un error en Mysql, al intentar eliminar datos");
         }
     }
 
@@ -941,8 +982,8 @@ public class PrimaryController implements Initializable {
         desactivaSeleccioCustomer();
         limpiarRegistroTfCustomer();
     }
-    //</editor-fold>
 
+    //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="Metodes privats CUSTOMER">
     /**
      * Al hacer clic si existe algún registro en table view, carga la
@@ -1048,11 +1089,15 @@ public class PrimaryController implements Initializable {
      *
      * @return
      */
-    private Boolean comparadorEdades(AppConfig appConfig) {
-        if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
-            return true;
+    private Boolean comparadorEdades(AppConfig appConfig) throws Exception {
+        if (getCustomerFromView().getBirthDate().isBlank()) {
+            throw new Exception("No se pueden dejar campos vacios");
+        } else {
+            if (appConfigLogic.calcularEdat(getCustomerFromView()) >= appConfig.getMinCustomerAge()) {
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     /**

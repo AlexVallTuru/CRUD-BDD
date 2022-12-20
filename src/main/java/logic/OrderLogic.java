@@ -4,6 +4,7 @@ import data.ConnectionDB;
 import data.OrderDB;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.Order;
@@ -81,4 +82,10 @@ public class OrderLogic {
 
         ordersOList.remove(order);
     }
+
+    public void filteredOrder(Timestamp fromData, Timestamp toData) throws SQLException {
+
+        this.ordersOList.setAll(orderDB.ordersToListFiltered(conn, fromData, toData));
+    }
+
 }

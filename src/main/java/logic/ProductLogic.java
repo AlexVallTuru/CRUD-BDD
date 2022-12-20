@@ -94,6 +94,17 @@ public class ProductLogic {
     }
     
     /**
+     * Llama al metodo de la capa BD para comprobar si existen entradas en la 
+     * tabla products i devuelve el resultado
+     * 
+     * @return
+     * @throws SQLException 
+     */
+    public boolean productExists() throws SQLException {
+        return ProductDB.checkTable(conn);
+    }
+    
+    /**
      * Cierra la conexion con la BBDD
      * 
      * @throws SQLException 
