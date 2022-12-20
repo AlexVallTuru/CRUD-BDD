@@ -47,15 +47,16 @@ public class OrderLogic {
     }
 
     /**
-     * Recibe un objeto tipo Order y lo envía a la capa de BBDD.
+     * Recibe un objeto tipo Order y lo envía a la capa de BBDD, retorna el
+     * orderNumber.
      *
      * @param order
+     * @return
      * @throws SQLException
      */
-    public void insertOrder(Order order) throws SQLException {
-
-        OrderDB.insertOrder(conn, order);
-
+    public int insertOrder(Order order) throws SQLException {
+        
+        return OrderDB.insertOrder(conn, order);
     }
 
     /**

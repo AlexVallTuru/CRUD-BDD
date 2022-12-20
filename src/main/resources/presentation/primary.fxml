@@ -73,7 +73,7 @@
             </AnchorPane>
          </content>
       </Tab>
-      <Tab text="Pedido">
+      <Tab fx:id="orderPane" text="Pedido">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1039.0">
                <children>
@@ -87,7 +87,7 @@
                         <TableColumn fx:id="colTotalOrderPrice" prefWidth="148.0" text="Precio pedido" />
                      </columns>
                   </TableView>
-                  <Button fx:id="deleteOrderBtn" disable="true" layoutX="547.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionDeleteOrderBtn" text="Eliminar" />
+                  <Button fx:id="deleteOrderBtn" disable="true" layoutX="540.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionDeleteOrderBtn" text="Eliminar" />
                   <DatePicker fx:id="fromOrderData" layoutX="31.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="De" />
                   <DatePicker fx:id="toOrderData" layoutX="242.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="Hasta" />
                   <Text layoutX="31.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Filtrar entre dos fechas" />
@@ -98,7 +98,7 @@
                   <DatePicker fx:id="shippedDate" layoutX="662.0" layoutY="537.0" prefHeight="24.0" prefWidth="195.0" promptText="Fecha de envío" />
                   <ComboBox fx:id="clientComboBox" layoutX="21.0" layoutY="537.0" prefWidth="150.0" promptText="Cliente" />
                   <Button fx:id="createOrderBtn" layoutX="333.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionCreateOrderBtn" text="Añadir" />
-                  <Button fx:id="openOrderBtn" disable="true" layoutX="656.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionOpenOrderBtn" text="Abrir pedido" />
+                  <Button fx:id="openOrderBtn" disable="true" layoutX="648.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionOpenOrderBtn" text="Abrir pedido" />
                   <Text layoutX="202.0" layoutY="524.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fecha de pedido:" />
                   <Text layoutX="437.0" layoutY="524.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fecha de llegada:" />
                   <Text layoutX="662.0" layoutY="524.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fecha de envío:" />
@@ -106,7 +106,7 @@
             </AnchorPane>
          </content>
       </Tab>
-      <Tab id="orderDetail" fx:id="orderDetailPane" text="Detalle de pedido">
+      <Tab id="orderDetail" fx:id="orderDetailPane" disable="true" text="Detalle de pedido">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1039.0">
                <children>
@@ -127,7 +127,7 @@
                   <TextField fx:id="priceEach" disable="true" layoutX="458.0" layoutY="129.0" prefHeight="30.0" prefWidth="164.0" promptText="PVP unitario" />
                   <Separator layoutX="37.0" layoutY="78.0" prefHeight="24.0" prefWidth="988.0" />
                   <Button fx:id="orderDetailUpdateBtn" disable="true" layoutX="429.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailUpdateBtn" prefHeight="31.0" prefWidth="92.0" text="Modificar" />
-                  <Label fx:id="openedOrder" layoutX="521.0" layoutY="25.0" prefHeight="21.0" prefWidth="105.0" text="Nuevo pedido" />
+                  <Label fx:id="openedOrder" layoutX="518.0" layoutY="27.0" prefHeight="21.0" prefWidth="105.0" text="Nuevo pedido" />
                   <Label layoutX="460.0" layoutY="29.0" text="Pedido:" />
                   <Label layoutX="244.0" layoutY="102.0" text="Cantidad:" />
                   <Label layoutX="460.0" layoutY="102.0" text="PVP:" />
