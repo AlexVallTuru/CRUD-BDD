@@ -6,10 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import logic.OrderDetailsLogic;
 import logic.classes.Customer;
 import logic.classes.Order;
-import logic.classes.OrderDetails;
 
 /**
  *
@@ -42,15 +40,18 @@ public class OrderDB {
         }
         return ordersList;
     }
-    
-        /**
-     * Retorna el contenido de la tabla en una colección de "Orders"
+
+    /**
+     * Retorna el contenido de la tabla en una colección de "Orders" filtrado
+     * por fecha.
      *
      * @param conn
+     * @param p_fecha_Desde
+     * @param p_fecha_Hasta
      * @return
      * @throws java.sql.SQLException
      */
-    public static ArrayList<Order> ordersToListFiltered(Connection conn,Timestamp p_fecha_Desde,Timestamp p_fecha_Hasta) throws SQLException {
+    public ArrayList<Order> ordersToListFiltered(Connection conn, Timestamp p_fecha_Desde, Timestamp p_fecha_Hasta) throws SQLException {
 
         ArrayList<Order> ordersListFiltered = new ArrayList<>();
 
@@ -60,7 +61,7 @@ public class OrderDB {
         ResultSet rs = query.getResultSet();
         while (rs.next()) {
             Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
-            ordersListFiltered.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer));
+            ordersListFiltered.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer, orderDetailsDB.orderDetailsToList(conn, rs.getInt("orderNumber"))));
         }
         return ordersListFiltered;
     }

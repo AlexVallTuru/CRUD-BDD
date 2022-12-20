@@ -207,14 +207,14 @@ public class PrimaryController implements Initializable {
         colOrderLineNumber.setCellValueFactory(new PropertyValueFactory<>("orderLineNumber"));
         colTotalPrice.setCellValueFactory(new PropertyValueFactory<>("orderLineTotal"));
     }
-    
+
     /**
-     * Llama a los metodos de comprobacion de contenido en las tablas de productos
-     * y clientes. Si uno o ambos devuelven false, devolvera false; De lo contrario
-     * devolvera true
-     * 
+     * Llama a los metodos de comprobacion de contenido en las tablas de
+     * productos y clientes. Si uno o ambos devuelven false, devolvera false; De
+     * lo contrario devolvera true
+     *
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
     private boolean checkProductClient() throws SQLException {
         // Comprueba si hay productos i clientes para habilitar el boton de añadir pedidos
@@ -362,9 +362,15 @@ public class PrimaryController implements Initializable {
         disableOrderSelection();
     }
 
+    /**
+     * Obtiene dos fechas de la parte visual y la envía a la parte lógica.
+     *
+     * @param event
+     * @throws SQLException
+     */
     @FXML
     void onActionSearchRangeBtn(ActionEvent event) throws SQLException {
-        orderLogicLayer.filteredOrder(DateConverter.convertToTimestamp(fromOrderData.getValue()),DateConverter.convertToTimestamp(toOrderData.getValue()));
+        orderLogicLayer.filteredOrder(DateConverter.convertToTimestamp(fromOrderData.getValue()), DateConverter.convertToTimestamp(toOrderData.getValue()));
     }
 
     //</editor-fold>
@@ -761,7 +767,7 @@ public class PrimaryController implements Initializable {
             productsTableView.setItems(productLogicLayer.getProductObservableList());
             // Si no hay clientes o productos, desactiva el boton de añadir pedidos
             createOrderBtn.setDisable(!checkProductClient());
-            
+
         } catch (NumberFormatException e) {
             showMessage(1, "Los campos de Stock y Precio son numericos y no pueden estar en blanco.");
         } catch (Exception e) {
@@ -883,7 +889,6 @@ public class PrimaryController implements Initializable {
 
     //</editor-fold>
     // --------- //
-
     //<editor-fold defaultstate="collapsed" desc="Botons CUSTOMER">
     /**
      * Botón de añadir APARTADO CLIENTE
