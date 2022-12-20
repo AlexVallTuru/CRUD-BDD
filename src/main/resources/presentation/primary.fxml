@@ -77,7 +77,7 @@
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1039.0">
                <children>
-                  <TableView fx:id="orderTableView" layoutX="26.0" layoutY="109.0" onMouseClicked="#handleOrderOnMouseClicked" prefHeight="402.0" prefWidth="985.0">
+                  <TableView fx:id="orderTableView" layoutX="26.0" layoutY="109.0" onMouseClicked="#handleOrderOnMouseClicked" prefHeight="382.0" prefWidth="985.0">
                      <columns>
                         <TableColumn fx:id="colOrderNum" prefWidth="131.0" text="Nº pedido" />
                         <TableColumn fx:id="colOrderDate" prefWidth="163.0" text="Fecha pedido" />
@@ -87,11 +87,11 @@
                         <TableColumn fx:id="colTotalOrderPrice" prefWidth="148.0" text="Precio pedido" />
                      </columns>
                   </TableView>
-                  <Button fx:id="deleteOrderBtn" disable="true" layoutX="549.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionDeleteOrderBtn" text="Eliminar" />
-                  <DatePicker id="fromOrderData" fx:id="fromOrderData" layoutX="31.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="De" />
-                  <DatePicker id="toOrderData" fx:id="toOrderData" layoutX="242.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="Hasta" />
+                  <Button fx:id="deleteOrderBtn" disable="true" layoutX="547.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionDeleteOrderBtn" text="Eliminar" />
+                  <DatePicker fx:id="fromOrderData" layoutX="31.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="De" />
+                  <DatePicker fx:id="toOrderData" layoutX="242.0" layoutY="43.0" prefHeight="24.0" prefWidth="195.0" promptText="Hasta" />
                   <Text layoutX="31.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Filtrar entre dos fechas" />
-                  <Button fx:id="updateOrderBtn" disable="true" layoutX="423.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionUpdateOrderBtn" text="Modificar" />
+                  <Button fx:id="updateOrderBtn" disable="true" layoutX="425.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionUpdateOrderBtn" text="Modificar" />
                   <Button fx:id="searchRangeBtn" layoutX="474.0" layoutY="43.0" mnemonicParsing="false" onAction="#onActionSearchRangeBtn" text="Buscar" />
                   <DatePicker fx:id="orderDate" layoutX="202.0" layoutY="537.0" prefHeight="24.0" prefWidth="195.0" promptText="Fecha de pedido" />
                   <DatePicker fx:id="requiredDate" layoutX="433.0" layoutY="537.0" prefHeight="24.0" prefWidth="195.0" promptText="Fecha de llegada" />
@@ -99,6 +99,9 @@
                   <ComboBox fx:id="clientComboBox" layoutX="21.0" layoutY="537.0" prefWidth="150.0" promptText="Cliente" />
                   <Button fx:id="createOrderBtn" layoutX="333.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionCreateOrderBtn" text="Añadir" />
                   <Button fx:id="openOrderBtn" disable="true" layoutX="656.0" layoutY="602.0" mnemonicParsing="false" onAction="#onActionOpenOrderBtn" text="Abrir pedido" />
+                  <Text layoutX="202.0" layoutY="524.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fecha de pedido:" />
+                  <Text layoutX="437.0" layoutY="524.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fecha de llegada:" />
+                  <Text layoutX="662.0" layoutY="524.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fecha de envío:" />
                </children>
             </AnchorPane>
          </content>
@@ -107,25 +110,29 @@
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1039.0">
                <children>
-                  <TableView fx:id="orderDetailTableView" layoutX="35.0" layoutY="190.0" onMouseClicked="#handleOrderDetailOnMouseClicked" prefHeight="393.0" prefWidth="992.0">
+                  <TableView fx:id="orderDetailTableView" layoutX="35.0" layoutY="190.0" onMouseClicked="#handleOrderDetailOnMouseClicked" prefHeight="386.0" prefWidth="992.0">
                      <columns>
                         <TableColumn fx:id="colOrderLineNumber" maxWidth="250.0" prefWidth="157.0" text="Línea de pedido" />
                         <TableColumn fx:id="colOrderNumDetails" prefWidth="120.0" text="Nº Pedido" />
                         <TableColumn fx:id="colOrderDetailProductCode" prefWidth="108.0" text="Nº Producto" />
-                        <TableColumn fx:id="colPriceEach" minWidth="0.0" prefWidth="153.0" text="Precio por unidad" />
                         <TableColumn fx:id="colQuantity" minWidth="0.0" prefWidth="125.0" text="Cantidad" />
+                        <TableColumn fx:id="colPriceEach" minWidth="0.0" prefWidth="153.0" text="Precio por unidad" />
                         <TableColumn fx:id="colTotalPrice" minWidth="0.0" prefWidth="153.0" text="Precio total" />
                      </columns>
                   </TableView>
                   <Button fx:id="addProductBtn" disable="true" layoutX="669.0" layoutY="129.0" mnemonicParsing="false" onAction="#onActionAddProductBtn" prefHeight="31.0" prefWidth="138.0" text="Añadir producto" />
-                  <Button fx:id="orderDetailDeleteBtn" disable="true" layoutX="577.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailDeleteBtn" prefHeight="27.0" prefWidth="91.0" text="Eliminar" />
+                  <Button fx:id="orderDetailDeleteBtn" disable="true" layoutX="547.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailDeleteBtn" prefHeight="27.0" prefWidth="91.0" text="Eliminar" />
                   <ComboBox fx:id="productComboBox" disable="true" layoutX="37.0" layoutY="129.0" prefWidth="150.0" promptText="Producto" />
                   <TextField fx:id="productQuantity" disable="true" layoutX="244.0" layoutY="129.0" prefHeight="30.0" prefWidth="164.0" promptText="Cantidad" />
                   <TextField fx:id="priceEach" disable="true" layoutX="458.0" layoutY="129.0" prefHeight="30.0" prefWidth="164.0" promptText="PVP unitario" />
-                  <Separator layoutX="37.0" layoutY="83.0" prefHeight="24.0" prefWidth="988.0" />
-                  <Button fx:id="orderDetailUpdateBtn" disable="true" layoutX="393.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailUpdateBtn" prefHeight="31.0" prefWidth="92.0" text="Modificar" />
-                  <Label fx:id="openedOrder" layoutX="519.0" layoutY="51.0" prefHeight="21.0" prefWidth="43.0" />
-                  <Label layoutX="506.0" layoutY="22.0" text="Pedido:" />
+                  <Separator layoutX="37.0" layoutY="78.0" prefHeight="24.0" prefWidth="988.0" />
+                  <Button fx:id="orderDetailUpdateBtn" disable="true" layoutX="429.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailUpdateBtn" prefHeight="31.0" prefWidth="92.0" text="Modificar" />
+                  <Label fx:id="openedOrder" layoutX="521.0" layoutY="25.0" prefHeight="21.0" prefWidth="105.0" text="Nuevo pedido" />
+                  <Label layoutX="460.0" layoutY="29.0" text="Pedido:" />
+                  <Label layoutX="244.0" layoutY="102.0" text="Cantidad:" />
+                  <Label layoutX="460.0" layoutY="102.0" text="PVP:" />
+                  <Button fx:id="orderDetailSaveBtn" disable="true" layoutX="899.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionOrderDetailSaveBtn" prefHeight="31.0" prefWidth="126.0" text="Guardar Pedido" />
+                  <Button fx:id="cancelOrderBtn" disable="true" layoutX="37.0" layoutY="601.0" mnemonicParsing="false" onAction="#onActionCancelOrderBtn" prefHeight="31.0" prefWidth="129.0" text="Cancelar Pedido" />
                </children>
             </AnchorPane>
          </content>

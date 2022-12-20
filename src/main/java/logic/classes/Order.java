@@ -1,6 +1,7 @@
 package logic.classes;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 /**
  *
@@ -13,17 +14,19 @@ public class Order {
     private Timestamp requiredDate;
     private Timestamp shippedDate;
     private Customer customer;
-    private double totalPrice;
+    private ArrayList<OrderDetails> orderDetailsList;
 
-    public Order(int orderNumber, Timestamp orderDate, Timestamp requiredDate, Timestamp shippedDate, Customer customer) {
+    public Order(int orderNumber, Timestamp orderDate, Timestamp requiredDate, Timestamp shippedDate, Customer customer, ArrayList<OrderDetails> orderDetailsList) {
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
         this.requiredDate = requiredDate;
         this.shippedDate = shippedDate;
         this.customer = customer;
+        this.orderDetailsList = orderDetailsList;
     }
 
     public Order() {
+        orderDetailsList = new ArrayList<>();
     }
 
     public int getOrderNumber() {
@@ -64,6 +67,14 @@ public class Order {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public ArrayList<OrderDetails> getOrderDetailsList() {
+        return orderDetailsList;
+    }
+
+    public void setOrderDetailsList(ArrayList<OrderDetails> orderDetailsList) {
+        this.orderDetailsList = orderDetailsList;
     }
 
     @Override

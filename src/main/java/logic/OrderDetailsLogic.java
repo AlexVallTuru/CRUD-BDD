@@ -4,6 +4,7 @@ import data.ConnectionDB;
 import data.OrderDetailsDB;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import logic.classes.OrderDetails;
@@ -16,6 +17,7 @@ public class OrderDetailsLogic {
 
     Connection conn;
     ObservableList<OrderDetails> orderDetailsOList;
+    OrderDetailsDB orderDetailsDB;
 
     public OrderDetailsLogic() throws SQLException {
         // inicialitzem connexió amb BD pero passant per la capa d'aplicació
@@ -23,6 +25,8 @@ public class OrderDetailsLogic {
 
         // inicialitzem col.lecció
         orderDetailsOList = FXCollections.<OrderDetails>observableArrayList();
+
+        orderDetailsDB = new OrderDetailsDB();
     }
 
     /**
@@ -33,7 +37,7 @@ public class OrderDetailsLogic {
      */
     public void setData(int orderNum) throws SQLException {
 
-        this.orderDetailsOList.setAll(OrderDetailsDB.orderDetailsToList(conn, orderNum));
+        this.orderDetailsOList.setAll(orderDetailsDB.orderDetailsToList(conn, orderNum));
 
     }
 
@@ -60,6 +64,19 @@ public class OrderDetailsLogic {
     }
 
     /**
+     * Añade todos los productos en el pedido.
+     *
+     * @param details
+     * @throws SQLException
+     */
+    public void insertAllOrderDetails(ArrayList<OrderDetails> details) throws SQLException {
+
+        OrderDetailsDB.insertAllOrderDetails(conn, details);
+
+        //orderDetailsOList.add(details);
+    }
+
+    /**
      * Actualiza un registro de la BBDD.
      *
      * @param detail
@@ -83,4 +100,17 @@ public class OrderDetailsLogic {
 
         orderDetailsOList.remove(detail);
     }
+
+    /**
+     * Elimina todos los registros de la BBDD.
+     *
+     * @param orderId
+     * @throws SQLException
+     */
+    public void deleteAllOrderDetail(int orderId) throws SQLException {
+
+        OrderDetailsDB.deleteAllOrderDetail(conn, orderId);
+
+    }
+
 }

@@ -8,7 +8,6 @@ import data.ConnectionDB;
 import data.CustomerDB;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

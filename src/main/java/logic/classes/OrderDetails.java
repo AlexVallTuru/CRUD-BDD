@@ -11,13 +11,15 @@ public class OrderDetails {
     private int quantityOrdered;
     private double priceEach;
     private int orderLineNumber;
+    private double orderLineTotal;
 
-    public OrderDetails(Product product, int orderId, int quantityOrdered, double priceEach, int orderLineNumber) {
+    public OrderDetails(Product product, int orderId, int quantityOrdered, double priceEach, int orderLineNumber, double orderLineTotal) {
         this.product = product;
         this.orderId = orderId;
         this.quantityOrdered = quantityOrdered;
         this.priceEach = priceEach;
         this.orderLineNumber = orderLineNumber;
+        this.orderLineTotal = orderLineTotal;
     }
 
     public OrderDetails() {
@@ -61,6 +63,14 @@ public class OrderDetails {
 
     public void setOrderLineNumber(int orderLineNumber) {
         this.orderLineNumber = orderLineNumber;
+    }
+
+    public double getOrderLineTotal() {
+        return orderLineTotal;
+    }
+
+    public void setOrderLineTotal(double orderLineTotal) {
+        this.orderLineTotal = orderLineTotal;
     }
 
     @Override
