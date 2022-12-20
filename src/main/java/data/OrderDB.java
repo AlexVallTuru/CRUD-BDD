@@ -54,29 +54,32 @@ public class OrderDB {
     public ArrayList<Order> ordersToListFiltered(Connection conn, Timestamp p_fecha_Desde, Timestamp p_fecha_Hasta) throws SQLException {
 
         ArrayList<Order> ordersListFiltered = new ArrayList<>();
+        Customer customer;
 
         Statement query;
         query = conn.createStatement();
         query.executeQuery("SELECT * FROM orders WHERE requiredDate BETWEEN " + "'" + p_fecha_Desde + "' AND '" + p_fecha_Hasta + "'");
+
         ResultSet rs = query.getResultSet();
         while (rs.next()) {
-            Customer customer = getCustomer(conn, rs.getString("customers_customerEmail"));
+            customer = getCustomer(conn, rs.getString("customers_customerEmail"));
             ordersListFiltered.add(new Order(rs.getInt("orderNumber"), rs.getTimestamp("orderDate"), rs.getTimestamp("requiredDate"), rs.getTimestamp("shippedDate"), customer, orderDetailsDB.orderDetailsToList(conn, rs.getInt("orderNumber"))));
         }
         return ordersListFiltered;
     }
 
     /**
-     * Inserta un nuevo pedido
+     * Inserta un nuevo pedido y retorna su orderNumber
      *
      * @param conn
      * @param order
+     * @return
      * @throws SQLException
      */
-    public static void insertOrder(Connection conn, Order order) throws SQLException {
+    public static int insertOrder(Connection conn, Order order) throws SQLException {
 
         Statement query;
-        query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        query = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE, Statement.RETURN_GENERATED_KEYS);
         query.executeQuery("SELECT * FROM orders");
 
         ResultSet rs = query.getResultSet();
@@ -89,6 +92,14 @@ public class OrderDB {
         rs.updateString("customers_customerEmail", order.getCustomer().getCustomerEmail());
 
         rs.insertRow();
+
+        ResultSet generatedKeys = query.getGeneratedKeys();
+        int orderNumber = 0;
+
+        if (generatedKeys.next()) {
+            orderNumber = generatedKeys.getInt("orderNumber");
+        }
+        return orderNumber;
     }
 
     /**

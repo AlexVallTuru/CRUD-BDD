@@ -35,7 +35,8 @@ import logic.classes.Product;
 
 public class PrimaryController implements Initializable {
 
-    Order selectedOrder;
+    Order newSelectedOrder;
+    Order oldSelectedOrder;
 
     //Logic Layer Classes
     ProductLogic productLogicLayer;
@@ -48,7 +49,7 @@ public class PrimaryController implements Initializable {
     private TabPane tabPane;
 
     @FXML
-    private Tab orderDetailPane;
+    private Tab orderDetailPane, orderPane;
 
     @FXML
     private TableView orderDetailTableView;
@@ -254,30 +255,6 @@ public class PrimaryController implements Initializable {
     // --------- //
     //<editor-fold defaultstate="collapsed" desc="Order Buttons">
     /**
-     * Genera una order a partir del formulario y la envía a la BBDD.
-     *
-     * @param event
-     */
-    @FXML
-    void onActionCreateOrderBtn(ActionEvent event) {
-
-        try {
-            Order order = getOrderFromForm();
-
-            orderLogicLayer.getOrderObservableList().add(order);
-
-            //orderLogicLayer.insertOrder(order);
-            //orderLogicLayer.setData();
-        } catch (NumberFormatException e) {
-            showMessage(1, "Datos incorrectos: " + e);
-        } /*catch (SQLException e) {
-            showMessage(1, "Error al insertar los datos: " + e);
-        }*/ catch (Exception e) {
-            showMessage(1, "Error: " + e);
-        }
-    }
-
-    /**
      * Si hemos seleccionado un registro de la tabla Order, nos muestra los
      * datos en el formulario.
      *
@@ -300,25 +277,53 @@ public class PrimaryController implements Initializable {
     }
 
     /**
+     * Genera una order a partir del formulario y la envía a la ObservableList.
      * Abre la vista de detalle de pedido del pedido seleccionado.
+     *
+     *
+     * @param event
+     */
+    @FXML
+    void onActionCreateOrderBtn(ActionEvent event) {
+
+        try {
+            Order order = getOrderFromForm();
+
+            orderLogicLayer.getOrderObservableList().add(order);
+
+            initializeOrderDetails(order);
+
+        } catch (NumberFormatException e) {
+            showMessage(1, "Datos incorrectos: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
+
+        disableOrderSelection();
+        enableAddProductDetailSection();
+    }
+
+    /**
+     * Abre la vista de detalle de pedido del pedido seleccionado.
+     *
      *
      * @param event
      */
     @FXML
     void onActionOpenOrderBtn(ActionEvent event) {
+
         try {
-            initializeOrderDetails();
+            Order order = getOrderFromTable();
 
-            productComboBox.setDisable(false);
-            productQuantity.setDisable(false);
-            priceEach.setDisable(false);
-            addProductBtn.setDisable(false);
+            initializeOrderDetails(order);
 
+        } catch (NumberFormatException e) {
+            showMessage(1, "Datos incorrectos: " + e);
         } catch (SQLException e) {
-            showMessage(1, "Error : " + e);
+            showMessage(1, "Error: " + e);
         }
-        disableOrderSelection();
-        disableOrderDetailSelection();
+
+        enableAddProductDetailSection();
     }
 
     /**
@@ -462,18 +467,40 @@ public class PrimaryController implements Initializable {
     // --------- //
     //<editor-fold defaultstate="collapsed" desc="OrderDetails Buttons">
     /**
-     * *
+     * Cambiará a la pestaña de Pedidos y no efectuará ningún cambio sobre el
+     * pedido actual, además lo elimina de la ObservableList en caso de tener
+     * orderNum 0.
      *
      * @param event
      */
     @FXML
     void onActionCancelOrderBtn(ActionEvent event) {
 
-        //TODO Cambiará a la pestaña de Pedidos y no efectuará ningún cambio sobre el pedido actual, además lo eliminaré de la ObservableList.
+        try {
+
+            if (newSelectedOrder.getOrderNumber() == 0) {
+
+                orderLogicLayer.getOrderObservableList().remove(oldSelectedOrder);
+                tabPane.getSelectionModel().select(orderPane);
+                orderPane.setDisable(false);
+                orderDetailPane.setDisable(true);
+                showMessage(0, "Pedido cancelado.");
+
+            } else {
+                tabPane.getSelectionModel().select(orderPane);
+                orderPane.setDisable(false);
+                orderDetailPane.setDisable(true);
+                showMessage(0, "Pedido cancelado.");
+            }
+        } catch (NumberFormatException e) {
+            showMessage(1, "Dades incorrectes: " + e);
+        } catch (Exception e) {
+            showMessage(1, "Error: " + e);
+        }
     }
 
     /**
-     * *
+     * Guarda el pedido y lo envía a la base de datos.
      *
      * @param event
      */
@@ -481,32 +508,57 @@ public class PrimaryController implements Initializable {
     void onActionOrderDetailSaveBtn(ActionEvent event) {
 
         try {
-
-            if (selectedOrder.getOrderNumber() == 0) {
-                if (selectedOrder.getOrderDetailsList().isEmpty()) {
+            // Si la orderNum es 0
+            if (newSelectedOrder.getOrderNumber() == 0) {
+                // Y además está vacía
+                if (newSelectedOrder.getOrderDetailsList().isEmpty()) {
                     throw new Exception("No se puede añadir un pedido en blanco.");
                 }
+                // Obtenemos el primaryKey del order, que será la foreign Key de los detalles
+                int orderNum = orderLogicLayer.insertOrder(newSelectedOrder);
 
-                //TODO Insertar Order y después los detalles. (OrderID)
-                //orderLogicLayer.insertOrder(selectedOrder);
+                //Seteamos el nuevo orderNum que nos ha retornado la BBDD
+                newSelectedOrder.setOrderNumber(orderNum);
+
+                //Recorremos el orderDetailList actualizando la foreign key antes de enviarlos.
+                newSelectedOrder.getOrderDetailsList().forEach((t) -> {
+                    t.setOrderId(orderNum);
+                });
+
+                //Los enviamos a la BBDD.
+                orderDetailsLogicLayer.insertAllOrderDetails(newSelectedOrder.getOrderDetailsList());
+
+                // Habilitamos/Deshabilitamos aspectos visuales.
+                tabPane.getSelectionModel().select(orderPane);
+                orderPane.setDisable(false);
+                orderDetailPane.setDisable(true);
+                showMessage(0, "Pedido guardado.");
+
             } else {
-                orderDetailsLogicLayer.deleteAllOrderDetail(selectedOrder.getOrderNumber());
-                orderDetailsLogicLayer.insertAllOrderDetails(selectedOrder.getOrderDetailsList());
+
+                orderDetailsLogicLayer.deleteAllOrderDetail(newSelectedOrder.getOrderNumber());
+
+                orderDetailsLogicLayer.insertAllOrderDetails(newSelectedOrder.getOrderDetailsList());
+
+                oldSelectedOrder.setOrderDetailsList(newSelectedOrder.getOrderDetailsList());
+
+                tabPane.getSelectionModel().select(orderPane);
+                orderPane.setDisable(false);
+                orderDetailPane.setDisable(true);
+
+                showMessage(0, "Pedido guardado.");
+
             }
 
         } catch (NumberFormatException e) {
             showMessage(1, "Dades incorrectes: " + e);
-        } /*catch (SQLException e) {
-            showMessage(1, "Error al modificar les dades: " + e);
-        }*/ catch (Exception e) {
+        } catch (Exception e) {
             showMessage(1, "Error: " + e);
         }
-        showMessage(0, "Pedido guardado.");
-        disableOrderDetailSelection();
     }
 
     /**
-     * *
+     * Añadimos un producto en la observableList
      *
      * @param event
      */
@@ -528,7 +580,7 @@ public class PrimaryController implements Initializable {
             if (!openedOrder.getText().equals("Nuevo pedido")) {
                 detail.setOrderId(Integer.parseInt(openedOrder.getText()));
             }
-            selectedOrder.getOrderDetailsList().add(detail);
+            newSelectedOrder.getOrderDetailsList().add(detail);
             orderDetailsLogicLayer.getOrderDetailsObservableList().add(detail);
 
         } catch (NumberFormatException e) {
@@ -548,7 +600,7 @@ public class PrimaryController implements Initializable {
 
         OrderDetails detail = getOrderDetailFromTable();
 
-        selectedOrder.getOrderDetailsList().remove(detail);
+        newSelectedOrder.getOrderDetailsList().remove(detail);
         orderDetailsLogicLayer.getOrderDetailsObservableList().remove(detail);
 
         enableSaveAndCancelBtn();
@@ -605,11 +657,20 @@ public class PrimaryController implements Initializable {
      *
      * @throws SQLException
      */
-    private void initializeOrderDetails() throws SQLException {
+    private void initializeOrderDetails(Order order) throws SQLException {
 
-        Order order = getOrderFromTable();
-        selectedOrder = order;
-        int orderNumber = order.getOrderNumber();
+        newSelectedOrder = new Order();
+        oldSelectedOrder = order;
+
+        //Rellenamos el objeto NUEVO para no referenciar al que nos llega al método
+        newSelectedOrder.setCustomer(order.getCustomer());
+        newSelectedOrder.setOrderNumber(order.getOrderNumber());
+        newSelectedOrder.setOrderDate(order.getOrderDate());
+        newSelectedOrder.setShippedDate(order.getShippedDate());
+        newSelectedOrder.setRequiredDate(order.getRequiredDate());
+        newSelectedOrder.setOrderDetailsList(order.getOrderDetailsList());
+
+        int orderNumber = newSelectedOrder.getOrderNumber();
 
         if (orderNumber == 0) {
             openedOrder.setText("Nuevo pedido");
@@ -619,7 +680,8 @@ public class PrimaryController implements Initializable {
         productComboBox.setItems(productLogicLayer.getProductObservableList());
         orderDetailsLogicLayer.getOrderDetailsObservableList().setAll(order.getOrderDetailsList());
         orderDetailTableView.setItems(orderDetailsLogicLayer.getOrderDetailsObservableList());
-
+        orderPane.setDisable(true);
+        orderDetailPane.setDisable(false);
         tabPane.getSelectionModel().select(orderDetailPane);
     }
 
@@ -643,7 +705,7 @@ public class PrimaryController implements Initializable {
 
         OrderDetails asTableview = getOrderDetailFromTable();
 
-        for (OrderDetails d : selectedOrder.getOrderDetailsList()) {
+        for (OrderDetails d : newSelectedOrder.getOrderDetailsList()) {
             if (d.getProduct().getProductCode() == detail.getProduct().getProductCode()) {
                 d.setPriceEach(detail.getPriceEach());
                 d.setQuantityOrdered(detail.getQuantityOrdered());
@@ -658,6 +720,15 @@ public class PrimaryController implements Initializable {
         orderDetailTableView.refresh();
     }
 
+    private void enableAddProductDetailSection() {
+
+        productComboBox.setDisable(false);
+        productQuantity.setDisable(false);
+        priceEach.setDisable(false);
+        addProductBtn.setDisable(false);
+
+    }
+
     /**
      * Deshabilita botones, limpia la seleccion del usuario y los text fields
      * los deja en blanco.
@@ -668,7 +739,7 @@ public class PrimaryController implements Initializable {
         orderDetailDeleteBtn.setDisable(true);
         orderDetailTableView.getSelectionModel().clearSelection();
 
-        productComboBox.valueProperty().set(null);
+        //productComboBox.valueProperty().set(null);
         productQuantity.clear();
         priceEach.clear();
     }
